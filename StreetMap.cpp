@@ -1,22 +1,20 @@
 #include "StreetMap.h"
 
-StreetMap::StreetMap(int maxX1, int maxY1)
+StreetMap::StreetMap()
 {
-//    maxX = maxX1;
-//    maxY = maxY1;
-
-    for (int x = 0; x < maxX1; x++) {
-        for (int y = 0; y < maxY1; y++) {
-            Map[x] = new Coordinates(x, y);
+    for (int x = 0; x < X; x++) {
+        for (int y = 0; y < Y; y++) {
+            Map[x][y] = new Coordinates(x, y);
         }
     }
 }
 
+
 StreetMap::~StreetMap()
 {
-//    for (int x = 0; x < maxX; x++) {
-//        for (int y = 0; y < maxY; y++) {
-//           // delete Map.back();
-//        }
-//    }
+    for (auto &x : Map) {
+        for (auto &y : x) {
+           delete y;
+        }
+    }
 }

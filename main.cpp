@@ -2,7 +2,7 @@
 #include "StreetMap.h"
 
 int main() {
-    auto *map = new StreetMap(10,10);
+    auto *map = new StreetMap();
 
     return 0;
 }

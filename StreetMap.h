@@ -5,17 +5,16 @@
 #include <iostream>
 #include <vector>
 
+#define X    100
+#define Y    100
+
 class StreetMap {
 public:
-    static int maxX, maxY;
-    Coordinates **Map{};
+    Coordinates *Map[X][Y]{};
 
-    StreetMap(int maxX1, int maxY1);
+    StreetMap();
 
     ~StreetMap();
-
-private:
-
 };
 
 #endif
