@@ -7,15 +7,3 @@ Coordinates::Coordinates(int x1, int y1)
 }
 
 Coordinates::~Coordinates()= default;
-
-int
-Coordinates::GetX()
-{
-    return x;
-}
-
-int
-Coordinates::GetY()
-{
-    return y;
-}
