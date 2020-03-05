@@ -42,7 +42,7 @@ Kamenova-68/49 68 49
 Kamenova-Psotova 68 68 
 Kamenova-Krajní 68 78 
 Bystrcova-Vnitrní 97 0 
-Bystrcova-97/10	97 10 
+Bystrcova-97/10 97 10 
 Bystrcova-Tererova 97 29 
 Bystrcova-Tyršova 97 39 
 Bystrcova-97/49 97 49 
