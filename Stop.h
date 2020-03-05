@@ -1,4 +1,8 @@
-c
+/**
+ * @file Stop.h
+ * @brief stop header file
+ * @author Martin Vadura, Alexandra Slezakova
+ */
 #ifndef ICP_PROJECT_STOP_H
 #define ICP_PROJECT_STOP_H
 
