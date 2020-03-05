@@ -1,7 +1,0 @@
-Mojžíšova-0/0 0 0
-Mojžíšova-Tábor 0 10
-Mojžíšova-0/29 0 29
-Mojžíšova-Tyršova 0 39
-Mojžíšova-Škálova 0 49
-Mojžíšova-0/68 0 68
-Mojžíšova-Krajní 0 78
