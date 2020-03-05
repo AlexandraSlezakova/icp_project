@@ -1,3 +1,4 @@
+c
 #ifndef ICP_PROJECT_STOP_H
 #define ICP_PROJECT_STOP_H
 
@@ -6,11 +7,15 @@
 class Stop
 {
 public:
+    /**
+     * @brief initial setup of bus stop
+     * @param coordinates coordinates of bus stop
+     */
     Stop(Coordinates *coordinates);
 
     ~Stop();
 
-    Coordinates *coordinates;
+    Coordinates *coordinates;   //!< coordinates of bus stop
 };
 
 
