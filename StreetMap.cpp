@@ -24,21 +24,28 @@ bool
 StreetMap::AddStreet(Street *s)
 {
     int counter = 0;
+    static std::string crossedStreet;
 
     for (int x = s->start->x; x <= s->end->x; x++) {
         for (int y = s->start->y; y <= s->end->y; y++) {
             /* only two streets can cross at a point */
             std::vector<Street *> &positionOnMap = Map[x][y];
             IF(positionOnMap.front() != nullptr && counter >= 0, counter++)
+            IF(counter == 1 && crossedStreet.empty(), crossedStreet = positionOnMap.front()->name)
 
             /* restart for loop */
             if (counter > 1) {
-                x = s->start->y == s->end->y ? s->start->x - 1 : s->start->x;
-                y = s->start->x == s->end->x ? s->start->y - 1 : s->start->y;
-                counter = -1;
+                if (crossedStreet == positionOnMap.front()->name) {
+                    x = s->start->y == s->end->y ? s->start->x - 1 : s->start->x;
+                    y = s->start->x == s->end->x ? s->start->y - 1 : s->start->y;
+                    counter = -1;
+                } else {
+                    counter = 0;
+                    crossedStreet = positionOnMap.front()->name;
+                }
             } /* erase street from map */
             else if (counter == -1) {
-                IF(positionOnMap.back()->name == s->name, positionOnMap.pop_back())
+                IF(positionOnMap.back() && positionOnMap.back()->name == s->name, positionOnMap.pop_back())
                 IF(positionOnMap.empty(), positionOnMap.push_back(nullptr))
             } /* add street on map */
             else {
@@ -49,6 +56,7 @@ StreetMap::AddStreet(Street *s)
         }
     }
 
+    crossedStreet.clear();
     return counter != -1;
 }
 
@@ -68,4 +76,25 @@ StreetMap::GetStreet(const std::string& name)
     }
 
     return nullptr;
+}
+
+void
+StreetMap::AddStreets(const std::string& pathToFile)
+{
+    std::ifstream file;
+    std::string line;
+    std::vector<std::string> strings;
+    bool insert;
+
+    file.open(pathToFile);
+    while (std::getline(file, line)) {
+        strings = Functions::Split(line);
+        IF(strings.empty(), break)
+        insert = AddStreet(new Street(strings[0],
+                new Coordinates(std::stoi(strings[1]), std::stoi(strings[2])),
+                new Coordinates(std::stoi(strings[3]), std::stoi(strings[4]))));
+        if (!insert) std::cerr << "Street " << strings[0] <<  " cannot be added to map" << std::endl;
+    }
+
+    file.close();
 }

@@ -7,12 +7,9 @@
 #define ICP_PROJECT_STREETMAP_H
 
 #include "Street.h"
-#include <iostream>
-#include <vector>
-#include <map>
 
-#define X    100
-#define Y    100
+#define X    138
+#define Y    79
 
 class StreetMap {
 public:
@@ -29,6 +26,12 @@ public:
      * @return true if street on coordinates does not exists, otherwise false
      */
     bool AddStreet(Street *s);
+
+    /**
+     * @brief add streets on map from file
+     * @param pathToFile
+     */
+     void AddStreets(const std::string& pathToFile);
 
     /**
      * @brief searches the map with name of street

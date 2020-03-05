@@ -6,10 +6,7 @@
 #ifndef ICP_PROJECT_COORDINATES_H
 #define ICP_PROJECT_COORDINATES_H
 
-#include <string>
-
-#define IF(CONDITION, IF_BLOCK) if (CONDITION) {IF_BLOCK;}
-#define IF_RETURN(CONDITION, VALUE) if (CONDITION) return VALUE;
+#include "Functions.h"
 
 class Coordinates
 {
