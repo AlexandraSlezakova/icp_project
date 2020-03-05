@@ -13,13 +13,15 @@ class Stop
 public:
     /**
      * @brief initial setup of bus stop
+     * @param stopName bus stop name
      * @param coordinates coordinates of bus stop
      */
-    Stop(Coordinates *coordinates);
+    explicit Stop(std::string stopName, Coordinates *coordinates);
 
     ~Stop();
 
     Coordinates *coordinates;   //!< coordinates of bus stop
+    std::string stopName;       //!< bus stop name
 };
 
 

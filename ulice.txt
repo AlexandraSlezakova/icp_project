@@ -8,7 +8,7 @@ Karlova 19 68 58 68
 Psotova 78 68 107 68 
 Krajní 0 78 137 78 
 Mojžíšova 0 0 0 78 
-Ramešova 19 39 19 78 
+Remešova 19 39 19 78
 Pešinova 29 0 29 78 
 Matulkova 39 0 39 78 
 Hutařova 58 0 58 78 

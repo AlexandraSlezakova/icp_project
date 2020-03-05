@@ -34,6 +34,12 @@ public:
      void AddStreets(const std::string& pathToFile);
 
     /**
+    * @brief adds bus stops on street
+    * @param pathToFile
+    */
+    void AddStops(const std::string& pathToFile);
+
+    /**
      * @brief searches the map with name of street
      * @param name name of street
      * @return street if found, otherwise nullptr

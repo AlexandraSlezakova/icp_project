@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <utility>
 
 #define IF(CONDITION, IF_BLOCK) if (CONDITION) {IF_BLOCK;}
 #define IF_RETURN(CONDITION, VALUE) if (CONDITION) return VALUE;
@@ -23,7 +24,7 @@ public:
      * @param str string to split
      * @return vector of strings
      */
-    static std::vector<std::string> Split(const std::string& str);
+    static std::vector<std::string> Split(const std::string& str, const std::string& delimiter);
 
 };
 

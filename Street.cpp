@@ -32,6 +32,3 @@ Street::GetCoordinatesList()
 {
     return coordinatesList;
 }
-
-
-

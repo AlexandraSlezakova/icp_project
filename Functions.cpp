@@ -1,17 +1,13 @@
-//
-// Created by alexandra on 5. 3. 2020.
-//
-
 #include "Functions.h"
 
 Functions::Functions() =default;
 
 std::vector<std::string>
-Functions::Split(const std::string& str)
+Functions::Split(const std::string& str, const std::string& delimiter)
 {
     std::vector<std::string> tokens;
     size_t prev = 0, pos = 0;
-    std::string token, delimiter = " ";
+    std::string token;
 
     do
     {

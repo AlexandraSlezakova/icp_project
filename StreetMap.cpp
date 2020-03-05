@@ -31,6 +31,7 @@ StreetMap::AddStreet(Street *s)
             /* only two streets can cross at a point */
             std::vector<Street *> &positionOnMap = Map[x][y];
             IF(positionOnMap.front() != nullptr && counter >= 0, counter++)
+
             IF(counter == 1 && crossedStreet.empty(), crossedStreet = positionOnMap.front()->name)
 
             /* restart for loop */
@@ -87,13 +88,46 @@ StreetMap::AddStreets(const std::string& pathToFile)
     bool insert;
 
     file.open(pathToFile);
+    IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
+
     while (std::getline(file, line)) {
-        strings = Functions::Split(line);
+        strings = Functions::Split(line, " ");
         IF(strings.empty(), break)
-        insert = AddStreet(new Street(strings[0],
+        insert = StreetMap::AddStreet(new Street(strings[0],
                 new Coordinates(std::stoi(strings[1]), std::stoi(strings[2])),
                 new Coordinates(std::stoi(strings[3]), std::stoi(strings[4]))));
-        if (!insert) std::cerr << "Street " << strings[0] <<  " cannot be added to map" << std::endl;
+        if (!insert) std::cerr << "Warning: Street " << strings[0] <<  " cannot be added to map" << std::endl;
+    }
+
+    file.close();
+}
+
+void
+StreetMap::AddStops(const std::string& pathToFile)
+{
+    std::ifstream file;
+    std::string line, streetName;
+    std::vector<std::string> coordinates;
+    Street *street = nullptr;
+    bool insert;
+
+    file.open(pathToFile);
+    IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
+
+    while (std::getline(file, line)) {
+        /* get content from file */
+        streetName = Functions::Split(line, "-")[0];
+        coordinates = Functions::Split(line, " ");
+        /* find street */
+        IF(!street || (street && street->name != streetName), street = StreetMap::GetStreet(streetName))
+        /* check if street was found and add stop to street */
+        if (street) {
+            street->SetStop(new Stop(coordinates[0],
+                    new Coordinates(std::stoi(coordinates[1]), std::stoi(coordinates[2]))));
+        } else {
+            std::cerr << "Error: Couldn't find street " << streetName << std::endl;
+        }
+
     }
 
     file.close();
