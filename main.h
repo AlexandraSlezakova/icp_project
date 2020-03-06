@@ -7,6 +7,6 @@
 #define ICP_PROJECT_MAIN_H
 
 #include <iostream>
-#include "StreetMap.h"
+#include "src/StreetMap.h"
 
 #endif
