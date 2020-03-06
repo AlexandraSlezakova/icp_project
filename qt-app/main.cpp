@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     std::string streetName;
 
     auto map = new StreetMap();
-    map->AddStreets("/home/alexandra/Projects/icp-project/ulice.txt");
-    map->AddStops("/home/alexandra/Projects/icp-project/zastavky.txt");
+    map->AddStreets("/home/alexandra/Projects/icp_project/files/ulice.txt");
+    map->AddStops("/home/alexandra/Projects/icp_project/files/zastavky.txt");
 
     QApplication a(argc, argv);
 
