@@ -9,8 +9,4 @@
 #include <iostream>
 #include "StreetMap.h"
 
-
-std::vector<std::string> split(const std::string& str);
-
-
 #endif
