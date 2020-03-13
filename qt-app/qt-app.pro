@@ -16,8 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Qt/MainWindow.cpp \
+    Qt/Square.cpp \
+    Qt/Scene.cpp \
     main.cpp \
-    Qt/mainwindow.cpp \
     Coordinates.cpp \
     Functions.cpp \
     Stop.cpp \
@@ -25,7 +27,9 @@ SOURCES += \
     StreetMap.cpp \
 
 HEADERS += \
-    Qt/mainwindow.h \
+    Qt/MainWindow.h \
+    Qt/Square.h \
+    Qt/Scene.h \
     main.h \
     Coordinates.h \
     Functions.h \
