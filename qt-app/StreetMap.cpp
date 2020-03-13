@@ -2,9 +2,23 @@
 
 StreetMap::StreetMap()
 {
-    for (auto & x : Map) {
-        for (auto & y : x) {
-            y.push_back(nullptr);
+    /* size of board */
+    setRect(0,0,8000,8000);
+
+    for (int x = 0; x < X; x++) {
+        for (int y = 0; y < Y; y++) {
+            Map[x][y].push_back(nullptr);
+            /* creating square */
+            auto *square = new Square(this);
+            /* save its row and col */
+            square->row = x;
+            square->col = y;
+            /* add position on screen */
+            square->setPos(x, y);
+            /* set color */
+            square->setColor(Qt::green);
+            /* save square into layout */
+            layout[x][y] = square;
         }
     }
 }
@@ -53,6 +67,8 @@ StreetMap::AddStreet(Street *s)
                 /* erase nullptr */
                 IF(positionOnMap.front() == nullptr, positionOnMap.erase(positionOnMap.begin()))
                 positionOnMap.push_back(s);
+                /* change background of street */
+                layout[x][y]->setColor(Qt::red);
             }
         }
     }

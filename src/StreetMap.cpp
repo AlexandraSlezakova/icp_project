@@ -1,5 +1,7 @@
 #include "StreetMap.h"
 
+#include <QApplication>
+
 StreetMap::StreetMap()
 {
     for (auto & x : Map) {

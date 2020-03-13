@@ -7,11 +7,12 @@
 #define STREETMAP_H
 
 #include "Street.h"
+#include "Qt/Square.h"
 
 #define X    138
 #define Y    79
 
-class StreetMap
+class StreetMap : public QGraphicsRectItem
 {
 public:
     /**
@@ -47,7 +48,9 @@ public:
      */
     Street *GetStreet(const std::string& name);
 
+
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
+    Square *layout[X][Y];
 };
 
 #endif // STREETMAP_H
