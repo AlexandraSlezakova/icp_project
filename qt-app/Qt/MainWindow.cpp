@@ -4,8 +4,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //ui->setupUi(this);
-    //this->setStyleSheet("background-color: pink;");
+    ui->setupUi(this);
+    this->setStyleSheet("background-color: pink;");
     auto *scene = new Scene();
     scene->CreateMap();
 }
