@@ -147,10 +147,8 @@ StreetMap::AddStops(const std::string& pathToFile)
             square = layout[x][y];
             square->SetColor("#FFFFFF");
             square->hasStop = true;
-            Stop *stop = new Stop(tokens[0], new Coordinates(x, y));
-
             /* add stop to list for each street */
-            street->SetStop(stop);
+            street->SetStop(new Stop(tokens[0], new Coordinates(x, y)));
         } else {
             std::cerr << "Error: Couldn't find street " << streetName << std::endl;
         }
