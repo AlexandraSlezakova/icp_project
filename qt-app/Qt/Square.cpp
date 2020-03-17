@@ -4,13 +4,16 @@
 
 Square::Square(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
 {
+    /* set square size */
     setRect(0, 0, SQUARE_SIZE, SQUARE_SIZE);
-    brush().setStyle(Qt::SolidPattern);
-    //setZValue(-1);
+    brush.setStyle(Qt::SolidPattern);
+    setZValue(-2);
 }
 
 void
-Square::setColor(QColor color)
+Square::SetColor(const QString &name)
 {
-    this->color = std::move(color);
+    color_.setNamedColor(name);
+    brush.setColor(color_);
+    setBrush(brush);
 }

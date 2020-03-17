@@ -38,8 +38,8 @@ Krajní-68/78 68 78
 Vnitřní-78/0 78 0
 Tererova-78/29 78 29 
 Kamanova-Tyršova 78 39
-Kamanova-68/49 68 49
-Kamanova-Psotova 68 68
+Kamanova-68/49 78 49
+Kamanova-Psotova 78 68
 Kamanova-Krajní 68 78
 Bystřinova-Vnitřní 97 0
 Bystřinova-97/10 97 10
@@ -51,7 +51,7 @@ Bystřinova-Krajní 97 78
 Vnitřní-107/0 107 0
 Edisonova-Tyršova 107 39 
 Edisonova-Rybníček 107 49 
-Edisonova-Psotova 107 69 
+Edisonova-Psotova 107 68
 Krajní-107/78 107 78 
 Firkušného-Vnitřní 117 0
 Firkušného-117/10 117 10 

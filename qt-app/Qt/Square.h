@@ -3,18 +3,22 @@
 
 #include <QGraphicsRectItem>
 #include <QBrush>
-#define SQUARE_SIZE     12
+#include "../Stop.h"
+#define SQUARE_SIZE     20
 class Square : public QGraphicsRectItem
 {
 public:
-    Square(QGraphicsRectItem *parent = nullptr);
+    explicit Square(QGraphicsRectItem *parent = nullptr);
 
-    void setColor(QColor color);
+    void SetColor(const QString &name);
 
-    int row, col;   //!< row and column
+    int row = 0;                //!< row
+    int col = 0;                //!< column
+    bool hasStop = false;       //!< information about bus stop on square
 
 private:
-    QColor color;
+    QColor color_;
+    QBrush brush;
 };
 
 #endif // SQUARE_H

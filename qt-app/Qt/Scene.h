@@ -12,6 +12,10 @@ public:
 
     void CreateMap();
 
+    void AddMap(StreetMap *map);
+
+    void AddBusStops(StreetMap *map);
+
     QGraphicsScene *scene;
     QGraphicsView *view;
 };

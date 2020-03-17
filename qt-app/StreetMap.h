@@ -27,7 +27,7 @@ public:
      * @param s street
      * @return true if street on coordinates does not exists, otherwise false
      */
-    bool AddStreet(Street *s);
+    bool AddStreet(Street *s, const QString &name);
 
     /**
      * @brief add streets on map from file

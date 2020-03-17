@@ -10,6 +10,7 @@
 #include <list>
 #include "Stop.h"
 
+#define SQUARE_SIZE     20
 class Street
 {
 public:
@@ -34,7 +35,7 @@ public:
      * @brief get list of bus stops on street
      * @return list of bus stops
      */
-    std::list<Stop*> GetBusStopsList();
+    std::vector<Stop*> GetBusStopsList();
 
     /**
      * @brief get list of coordinates of street
@@ -42,13 +43,15 @@ public:
      */
     std::list<Coordinates*> GetCoordinatesList();
 
-    std::string name;   //!< name of street
-    Coordinates *start; //!< start of street
-    Coordinates *end;   //!< end of street
+    void AddStopsToScene(QGraphicsScene *scene);
+
+    std::string name;                       //!< name of street
+    Coordinates *start;                     //!< start of street
+    Coordinates *end;                       //!< end of street
 
 protected:
-    std::list<Stop*> busStopsList;              //!< bus stops list
     std::list<Coordinates*> coordinatesList;    //!< list of coordinates of street
+    std::vector<Stop*> busStopsList;        //!< bus stops list
 };
 
 #endif // STREET_H

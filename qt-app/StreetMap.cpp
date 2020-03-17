@@ -12,9 +12,9 @@ StreetMap::StreetMap()
             square->row = x;
             square->col = y;
             /* add position on screen */
-            square->setPos(x*SQUARE_SIZE, y*SQUARE_SIZE);
+            square->setPos(x * SQUARE_SIZE, y * SQUARE_SIZE);
             /* set color */
-            square->setColor(Qt::green);
+            square->SetColor("#CCFFCC");
             /* save square into layout */
             layout[x][y] = square;
         }
@@ -33,7 +33,7 @@ StreetMap::~StreetMap()
 }
 
 bool
-StreetMap::AddStreet(Street *s)
+StreetMap::AddStreet(Street *s, const QString &name)
 {
     int counter = 0;
     static std::string crossedStreet;
@@ -66,7 +66,7 @@ StreetMap::AddStreet(Street *s)
                 IF(positionOnMap.front() == nullptr, positionOnMap.erase(positionOnMap.begin()))
                 positionOnMap.push_back(s);
                 /* change background of street */
-                layout[x][y]->setColor(Qt::red);
+                layout[x][y]->SetColor(name);
             }
         }
     }
@@ -107,9 +107,12 @@ StreetMap::AddStreets(const std::string& pathToFile)
     while (std::getline(file, line)) {
         strings = Functions::Split(line, " ");
         IF(strings.empty(), break)
+        /* color of street */
+        QString color = QString::fromStdString(strings[5]);
+        /* add street to map */
         insert = StreetMap::AddStreet(new Street(strings[0],
                 new Coordinates(std::stoi(strings[1]), std::stoi(strings[2])),
-                new Coordinates(std::stoi(strings[3]), std::stoi(strings[4]))));
+                new Coordinates(std::stoi(strings[3]), std::stoi(strings[4]))), color);
         if (!insert) std::cerr << "Warning: Street " << strings[0] <<  " cannot be added to map" << std::endl;
     }
 
@@ -121,8 +124,10 @@ StreetMap::AddStops(const std::string& pathToFile)
 {
     std::ifstream file;
     std::string line, streetName;
-    std::vector<std::string> coordinates;
+    std::vector<std::string> tokens;
+    Square *square;
     Street *street = nullptr;
+    int x, y;
 
     file.open(pathToFile);
     IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
@@ -130,13 +135,22 @@ StreetMap::AddStops(const std::string& pathToFile)
     while (std::getline(file, line)) {
         /* get content from file */
         streetName = Functions::Split(line, "-")[0];
-        coordinates = Functions::Split(line, " ");
+        tokens = Functions::Split(line, " ");
         /* find street */
         IF(!street || (street && street->name != streetName), street = StreetMap::GetStreet(streetName))
         /* check if street was found and add stop to street */
         if (street) {
-            street->SetStop(new Stop(coordinates[0],
-                    new Coordinates(std::stoi(coordinates[1]), std::stoi(coordinates[2]))));
+            x = std::stoi(tokens[1]);
+            y = std::stoi(tokens[2]);
+
+            /* add stop on square */
+            square = layout[x][y];
+            square->SetColor("#FFFFFF");
+            square->hasStop = true;
+            Stop *stop = new Stop(tokens[0], new Coordinates(x, y));
+
+            /* add stop to list for each street */
+            street->SetStop(stop);
         } else {
             std::cerr << "Error: Couldn't find street " << streetName << std::endl;
         }
