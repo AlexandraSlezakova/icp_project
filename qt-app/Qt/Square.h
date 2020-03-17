@@ -3,7 +3,7 @@
 
 #include <QGraphicsRectItem>
 #include <QBrush>
-
+#define SQUARE_SIZE     12
 class Square : public QGraphicsRectItem
 {
 public:

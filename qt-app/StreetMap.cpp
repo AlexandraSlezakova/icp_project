@@ -2,8 +2,6 @@
 
 StreetMap::StreetMap()
 {
-    /* size of board */
-    setRect(0,0,8000,8000);
 
     for (int x = 0; x < X; x++) {
         for (int y = 0; y < Y; y++) {
@@ -14,7 +12,7 @@ StreetMap::StreetMap()
             square->row = x;
             square->col = y;
             /* add position on screen */
-            square->setPos(x, y);
+            square->setPos(x*SQUARE_SIZE, y*SQUARE_SIZE);
             /* set color */
             square->setColor(Qt::green);
             /* save square into layout */

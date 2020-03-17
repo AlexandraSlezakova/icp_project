@@ -3,7 +3,8 @@
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
     scene = new QGraphicsScene;
-    scene->setSceneRect(0,0,8000,8000);
+    /* size of board */
+    scene->setSceneRect(0,0,2000,1000);
 }
 
 void
@@ -21,6 +22,10 @@ Scene::CreateMap()
             scene->addItem(y);
         }
     }
+
+    /* create view and add scene */
+    view = new QGraphicsView();
+    view->setScene(scene);
 
     /* add buses and bus stops */
     // TODO
