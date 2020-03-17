@@ -38,6 +38,7 @@ Street::AddStopsToScene(QGraphicsScene *scene)
 {
     for (const auto& i : busStopsList) {
         auto *item = new QGraphicsPixmapItem(QPixmap("/home/alexandra/Projects/icp_project/images/bus_stop.jpeg"));
+        item->setToolTip(QString::fromStdString(i->stopName));
         scene->addItem(item);
         item->setScale(0.05);
         /* put image in the center of square */
