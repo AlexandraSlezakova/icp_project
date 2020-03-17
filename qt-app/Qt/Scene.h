@@ -13,6 +13,7 @@ public:
     void CreateMap();
 
     QGraphicsScene *scene;
+    QGraphicsView *view;
 };
 
 #endif // SCENE_H

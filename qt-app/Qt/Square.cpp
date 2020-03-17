@@ -1,14 +1,16 @@
 #include "Square.h"
 
+#include <utility>
+
 Square::Square(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
 {
-    /* square size 75 */
-    setRect(0, 0, 75, 75);
+    setRect(0, 0, SQUARE_SIZE, SQUARE_SIZE);
     brush().setStyle(Qt::SolidPattern);
+    //setZValue(-1);
 }
 
 void
 Square::setColor(QColor color)
 {
-    this->color = color;
+    this->color = std::move(color);
 }
