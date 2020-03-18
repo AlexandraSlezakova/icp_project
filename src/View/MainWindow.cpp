@@ -4,6 +4,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    timerId = startTimer(1000);
     ResizeWindow();
     CreateScene();
 }
@@ -47,15 +48,90 @@ MainWindow::CreateScene()
 
     /* text area for bus timetable */
     scene->text = new QPlainTextEdit(widget);
-    scene->text->setMinimumSize(width * 0.3, height * 0.8);
-    scene->text->move(0, 30);
+    scene->text->setMinimumSize(width * 0.3, height * 0.6);
+    scene->text->move(0, TIME_AREA_HEIGHT * 2);
 
-    QWidget *buttons = new QWidget(widget);
+    /* text area with time */
+    InitTimeArea(widget);
 
+    /* buttons */
+    InitButtons(widget, scene);
+}
+
+void
+MainWindow::timerEvent(QTimerEvent *event)
+{
+    timeArea->clear();
+    timeArea->appendPlainText(Timer::GetTime());
+}
+
+void
+MainWindow::InitTimeArea(QWidget *parent)
+{
+    QFont font;
+    font.setPointSize(16);
+    /* text area with time */
+    timeArea = new QPlainTextEdit(parent);
+    timeArea->setFixedSize(TIME_AREA_WIDTH, TIME_AREA_HEIGHT);
+    timeArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    timeArea->setFont(font);
+    /* button for stopping and starting time */
+    timerButton = new QPushButton(parent);
+    timerButton->move(TIME_AREA_WIDTH + 5, 0);
+    timerButton->setFixedSize(90, 30);
+    timerButton->setText("Change time");
+    connect(timerButton, SIGNAL (released()), this , SLOT(StopTimer()));
+    /* reset button */
+    QPushButton *resetButton = new QPushButton(parent);
+    resetButton->move(TIME_AREA_WIDTH + 95, 0);
+    resetButton->setFixedSize(90, 30);
+    resetButton->setText("Reset timer");
+    connect(resetButton, SIGNAL (released()), this , SLOT(ResetTimer()));
+}
+
+void
+MainWindow::InitButtons(QWidget *parent, Scene *scene)
+{
+    QWidget *buttons = new QWidget(parent);
+    buttons->move(0, TIME_AREA_HEIGHT);
     /* button for bus 1 */
     QPushButton *bus1 = new QPushButton(buttons);
-    bus1->setFixedHeight(30);
-    bus1->setFixedWidth(140);
+    bus1->setFixedSize(140, 30);
     bus1->setText("Timetable of bus #1");
     connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
 }
+
+void
+MainWindow::StopTimer()
+{
+    if (!stopFlag) {
+        killTimer(timerId);
+        timerButton->setText("Start timer");
+        stopFlag = 1;
+        previousTime = timeArea->toPlainText();
+        connect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
+    } else {
+        timerButton->setText("Change time");
+        stopFlag = 0;
+        timerId = startTimer(1000);
+        disconnect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
+    }
+}
+
+void
+MainWindow::ReadInput()
+{
+    QString data = timeArea->toPlainText();
+    std::vector<std::string> time = Functions::Split(data.toStdString(), ":");
+    if (time.size() == 3) {
+        Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]),
+                previousTime);
+    }
+}
+
+void
+MainWindow::ResetTimer()
+{
+    Timer::ResetTime();
+}
+

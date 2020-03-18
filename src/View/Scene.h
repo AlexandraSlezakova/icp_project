@@ -46,6 +46,9 @@ public:
     QPlainTextEdit *text;
 
 public slots:
+    /**
+     * @brief show timetable of bus number 1
+     */
     void GetBus1Timetable();
 };
 

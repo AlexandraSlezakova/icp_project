@@ -19,8 +19,8 @@ BusRouteMap::paintEvent(QPaintEvent *event)
 void
 BusRouteMap::DrawLine(Square *layout[X][Y])
 {
-    auto *bus = new Bus(1);
-    bus->CreateTimetable();
+    //auto *bus = new Bus(1);
+    //bus->CreateTimetable();
 
 }
 

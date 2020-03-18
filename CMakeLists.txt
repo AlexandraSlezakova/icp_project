@@ -19,5 +19,5 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Quick REQUIRED)
 
 #add_executable(icp_project main.cpp src/StreetMap.cpp src/StreetMap.h src/Coordinates.cpp src/Coordinates.h src/Street.cpp src/Street.h src/Stop.cpp src/Stop.h main.h src/Functions.cpp src/Functions.h)
-add_executable(icp_project ${qt_app})
+add_executable(icp_project ${qt_app} src/View/Timer.cpp src/View/Timer.h)
 target_link_libraries(icp_project Qt5::Core Qt5::Widgets Qt5::Quick)
