@@ -3,19 +3,21 @@
  * @brief Functions header file
  * @author Martin Vadura, Alexandra Slezakova
  */
-#ifndef ICP_PROJECT_FUNCTIONS_H
-#define ICP_PROJECT_FUNCTIONS_H
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <utility>
+#include <QDir>
 
 #define IF(CONDITION, IF_BLOCK) if (CONDITION) {IF_BLOCK;}
 #define IF_RETURN(CONDITION, VALUE) if (CONDITION) return VALUE;
 
-class Functions {
+class Functions
+{
 public:
     Functions();
 
@@ -26,7 +28,12 @@ public:
      */
     static std::vector<std::string> Split(const std::string& str, const std::string& delimiter);
 
+    /**
+     * @brief absolute path to file
+     * @param fileName name of file
+     * @return absolute path as string
+     */
+    static std::string GetAbsolutePath(const char* fileName);
 };
 
-
-#endif
+#endif // FUNCTIONS_H

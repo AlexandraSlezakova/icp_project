@@ -16,30 +16,33 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Qt/MainWindow.cpp \
-    Qt/Square.cpp \
-    Qt/Scene.cpp \
+    View/MainWindow.cpp \
+    View/Square.cpp \
+    View/Scene.cpp \
     main.cpp \
-    Coordinates.cpp \
+    View/Coordinates.cpp \
     Functions.cpp \
-    Stop.cpp \
-    Street.cpp \
-    StreetMap.cpp \
+    Bus/Stop.cpp \
+    View/Street.cpp \
+    View/StreetMap.cpp \
+    Bus/Bus.cpp \
+    Bus/BusRouteMap.cpp \
 
 HEADERS += \
-    Qt/MainWindow.h \
-    Qt/Square.h \
-    Qt/Scene.h \
+    View/MainWindow.h \
+    View/Square.h \
+    View/Scene.h \
     main.h \
-    Coordinates.h \
+    View/Coordinates.h \
     Functions.h \
-    Stop.h \
-    Street.h \
-    StreetMap.h \
+    Bus/Stop.h \
+    View/Street.h \
+    View/StreetMap.h \
+    Bus/Bus.h \
+    Bus/BusRouteMap.h \
 
 FORMS += \
     mainwindow.ui
-
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -6,11 +6,7 @@
 #ifndef STREETMAP_H
 #define STREETMAP_H
 
-#include "Street.h"
-#include "Qt/Square.h"
-
-#define X    138
-#define Y    79
+#include "../Bus/BusRouteMap.h"
 
 class StreetMap : public QGraphicsRectItem
 {

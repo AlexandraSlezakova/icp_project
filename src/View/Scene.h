@@ -8,7 +8,7 @@
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
-#include "../StreetMap.h"
+#include "StreetMap.h"
 
 class Scene : public QGraphicsView
 {
@@ -17,7 +17,7 @@ public:
      * @brief scene constructor
      * @param parent parent widget
      */
-    Scene(QGraphicsView *parent = nullptr);
+    Scene(QWidget *parent = nullptr);
 
     /**
      * @brief create map with streets, bus stops and buses
@@ -35,6 +35,11 @@ public:
      * @param map map of streets
      */
     void AddBusStops(StreetMap *map);
+
+    /**
+     * @brief set up view and add scene
+     */
+    void SetUpView();
 
     QGraphicsScene *scene;
     QGraphicsView *view;

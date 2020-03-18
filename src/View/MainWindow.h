@@ -7,6 +7,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QApplication>
 #include "Scene.h"
 
 QT_BEGIN_NAMESPACE
@@ -31,7 +32,11 @@ public:
      */
     void ResizeWindow();
 
+    void CreateScene();
+
 private:
     Ui::MainWindow *ui;
+    int width = 0;          //!< width of screen
+    int height = 0;         //!< height of screen
 };
 #endif // MAINWINDOW_H

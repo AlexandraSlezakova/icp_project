@@ -8,9 +8,11 @@
 
 #include <QGraphicsRectItem>
 #include <QBrush>
-#include "../Stop.h"
+#include "../Bus/Stop.h"
 
 #define SQUARE_SIZE     20
+#define X    138
+#define Y    79
 
 class Square : public QGraphicsRectItem
 {

@@ -96,24 +96,28 @@ StreetMap::GetStreet(const std::string& name)
 void
 StreetMap::AddStreets(const std::string& pathToFile)
 {
+    QString color;
+    Coordinates *start;
+    Coordinates *end;
     std::ifstream file;
     std::string line;
-    std::vector<std::string> strings;
+    std::vector<std::string> tokens;
     bool insert;
 
     file.open(pathToFile);
     IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
 
     while (std::getline(file, line)) {
-        strings = Functions::Split(line, " ");
-        IF(strings.empty(), break)
+        tokens = Functions::Split(line, " ");
+        IF(tokens.empty(), break)
         /* color of street */
-        QString color = QString::fromStdString(strings[5]);
+        color = QString::fromStdString(tokens[5]);
+        /* coordinates of street */
+        start = new Coordinates(std::stoi(tokens[1]), std::stoi(tokens[2]));
+        end = new Coordinates(std::stoi(tokens[3]), std::stoi(tokens[4]));
         /* add street to map */
-        insert = StreetMap::AddStreet(new Street(strings[0],
-                new Coordinates(std::stoi(strings[1]), std::stoi(strings[2])),
-                new Coordinates(std::stoi(strings[3]), std::stoi(strings[4]))), color);
-        if (!insert) std::cerr << "Warning: Street " << strings[0] <<  " cannot be added to map" << std::endl;
+        insert = StreetMap::AddStreet(new Street(tokens[0], start, end), color);
+        if (!insert) std::cerr << "Warning: Street " << tokens[0] <<  " cannot be added to map" << std::endl;
     }
 
     file.close();
@@ -148,7 +152,7 @@ StreetMap::AddStops(const std::string& pathToFile)
             square->SetColor("#FFFFFF");
             square->hasStop = true;
             /* add stop to list for each street */
-            street->SetStop(new Stop(tokens[0], new Coordinates(x, y)));
+            street->SetStop(new Stop(tokens[0],new Coordinates(x, y)));
         } else {
             std::cerr << "Error: Couldn't find street " << streetName << std::endl;
         }

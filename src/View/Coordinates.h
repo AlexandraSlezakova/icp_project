@@ -3,10 +3,10 @@
  * @brief Coordinates header file
  * @author Martin Vadura, Alexandra Slezakova
  */
-#ifndef ICP_PROJECT_COORDINATES_H
-#define ICP_PROJECT_COORDINATES_H
+#ifndef COORDINATES_H
+#define COORDINATES_H
 
-#include "Functions.h"
+#include "../Functions.h"
 
 class Coordinates
 {
@@ -22,4 +22,5 @@ public:
 
     ~Coordinates();
 };
-#endif
+
+#endif // COORDINATES_H

@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <list>
-#include "Stop.h"
+#include "../Bus/Bus.h"
 
 #define SQUARE_SIZE     20
 class Street
@@ -29,7 +29,7 @@ public:
      * @brief set stop on street
      * @param stop
      */
-    void SetStop(Stop *stop);
+    void SetStop(Stop* stop);
 
     /**
      * @brief get list of bus stops on street
@@ -48,11 +48,11 @@ public:
      * where bus stops of each street are
      * @param scene scene where to put image
      */
-    void AddStopsToScene(QGraphicsScene *scene);
+    void AddStopsToScene(QGraphicsScene* scene);
 
     std::string name;                       //!< name of street
-    Coordinates *start;                     //!< start of street
-    Coordinates *end;                       //!< end of street
+    Coordinates* start;                     //!< start of street
+    Coordinates* end;                       //!< end of street
 
 protected:
     std::list<Coordinates*> coordinatesList;    //!< list of coordinates of street

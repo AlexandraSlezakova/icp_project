@@ -7,5 +7,6 @@
 #define MAIN_H
 
 #include <iostream>
+#include "View/MainWindow.h"
 
 #endif // MAIN_H

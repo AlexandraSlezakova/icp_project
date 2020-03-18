@@ -21,3 +21,12 @@ Functions::Split(const std::string& str, const std::string& delimiter)
 
     return tokens;
 }
+
+std::string
+Functions::GetAbsolutePath(const char *fileName)
+{
+    std::string path  = realpath(fileName, nullptr);
+    IF (path.empty(), std::cerr << "Error: Couldn't open file " << fileName; exit(1))
+
+    return path;
+}

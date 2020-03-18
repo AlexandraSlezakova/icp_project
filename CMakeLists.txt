@@ -6,10 +6,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_PREFIX_PATH "/home/alexandra/Qt/5.14.1/gcc_64/lib/cmake")
 
 file (GLOB qt_app
-        "qt-app/Qt/*.cpp"
-        "qt-app/Qt/*.h"
-        "qt-app/*.cpp"
-        "qt-app/*.h"
+        "src/View/*.cpp"
+        "src/View/*.h"
+        "src/Bus/*h"
+        "src/Bus/*cpp"
+        "src/*.cpp"
+        "src/*.h"
 )
 
 find_package(Qt5Core REQUIRED)

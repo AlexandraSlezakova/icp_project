@@ -1,8 +1,10 @@
 #include "Scene.h"
 
-Scene::Scene(QGraphicsView *parent) : QGraphicsView(parent)
+Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
-    scene = new QGraphicsScene;
+    scene = new QGraphicsScene();
+    SetUpView();
+    CreateMap();
 }
 
 void
@@ -10,23 +12,16 @@ Scene::CreateMap()
 {
     /* initialize map */
     auto *map = new StreetMap();
-
     /* initialize streets and bus stops */
-    map->AddStreets("/home/alexandra/Projects/icp_project/files/ulice.txt");
-    map->AddStops("/home/alexandra/Projects/icp_project/files/zastavky.txt");
+    map->AddStreets(Functions::GetAbsolutePath("../files/ulice.txt"));
+    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"));
 
     AddMap(map);
     AddBusStops(map);
 
     /* add buses */
     // TODO
-
-    /* create view and add scene */
-    view = new QGraphicsView();
-    view->setScene(scene);
-    scene->setSceneRect(0, 0, X * SQUARE_SIZE, Y * SQUARE_SIZE);
-    view->setFixedSize((int)(view->scene()->width() / 2), (int)(view->scene()->height() - 600));
-
+    auto *busRouteMap = new BusRouteMap();
 }
 
 void
@@ -49,4 +44,13 @@ Scene::AddBusStops(StreetMap *map)
             }
         }
     }
+}
+
+void
+Scene::SetUpView()
+{
+    setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setScene(scene);
 }
