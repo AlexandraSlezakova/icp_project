@@ -19,7 +19,7 @@ public:
 
     void SetCurrentSquare(Square *square);
 
-    void CreateTimetable();
+    void CreateTimetable(QPlainTextEdit *text);
 
     Square *currentSquare;                          //!< square where bus is
     std::vector<Coordinates*> stopCoordinates;       //!< coordinates of all stops of bus

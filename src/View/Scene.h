@@ -12,6 +12,7 @@
 
 class Scene : public QGraphicsView
 {
+    Q_OBJECT
 public:
     /**
      * @brief scene constructor
@@ -42,7 +43,10 @@ public:
     void SetUpView();
 
     QGraphicsScene *scene;
-    QGraphicsView *view;
+    QPlainTextEdit *text;
+
+public slots:
+    void GetBus1Timetable();
 };
 
 #endif // SCENE_H

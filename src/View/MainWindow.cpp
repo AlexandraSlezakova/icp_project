@@ -4,13 +4,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    /* resize main window */
     ResizeWindow();
-
     CreateScene();
-    
-    /* view is set to main window */
-    //this->setCentralWidget(scene->view);
 }
 
 MainWindow::~MainWindow()
@@ -40,21 +35,27 @@ void
 MainWindow::CreateScene()
 {
     QScrollArea *scrollArea = new QScrollArea(this);
-    scrollArea->setMinimumSize(width * 0.7, 900);
+    scrollArea->setMinimumSize(width * 0.7, height * 0.9);
     /* create scene */
     auto *scene = new Scene(scrollArea);
     scrollArea->setWidget(scene);
 
+    QWidget *widget = new QWidget(this);
+    /* move widget */
+    widget->move(width * 0.7, 0);
+    widget->setMinimumSize(width * 0.3, height * 0.9);
 
+    /* text area for bus timetable */
+    scene->text = new QPlainTextEdit(widget);
+    scene->text->setMinimumSize(width * 0.3, height * 0.8);
+    scene->text->move(0, 30);
 
+    QWidget *buttons = new QWidget(widget);
 
-//    QPushButton *push_Play = new QPushButton(widget);
-//    push_Play->setFixedHeight(20);
-//    push_Play->setText("Play");
-//    connect(push_Play, SIGNAL (released()), scene , SLOT (play()));
-//
-//    QVBoxLayout *buttonsLayout = new QVBoxLayout();
-//    buttonsLayout->addWidget(push_Play);
-//    buttonsLayout->setSpacing(10); //space between buttons
-//    buttonsLayout->addStretch(100);
+    /* button for bus 1 */
+    QPushButton *bus1 = new QPushButton(buttons);
+    bus1->setFixedHeight(30);
+    bus1->setFixedWidth(140);
+    bus1->setText("Timetable of bus #1");
+    connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
 }

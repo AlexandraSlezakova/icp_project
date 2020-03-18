@@ -12,7 +12,7 @@ Bus::SetCurrentSquare(Square *square)
 }
 
 void
-Bus::CreateTimetable()
+Bus::CreateTimetable(QPlainTextEdit *text)
 {
     Coordinates *coordinates;
     std::ifstream file;
@@ -29,14 +29,14 @@ Bus::CreateTimetable()
 
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
-        // TODO vypis cestovneho poriadku
-        coordinates = Stop::GetStop(tokens[0]);
+        coordinates = Stop::GetStop(tokens[1]);
         if (!coordinates) {
-            std::cerr << "Error: bus stop -- " << tokens[0] << " -- wasn't found" << std::endl;
+            std::cerr << "Error: bus stop -- " << tokens[1] << " -- wasn't found" << std::endl;
         } else {
             stopCoordinates.push_back(coordinates);
         }
-
+        text->appendPlainText(QString::fromStdString(line));
+        text->moveCursor (QTextCursor::End);
     }
 
     file.close();

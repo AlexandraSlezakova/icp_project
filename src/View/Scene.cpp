@@ -54,3 +54,10 @@ Scene::SetUpView()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
 }
+
+void
+Scene::GetBus1Timetable()
+{
+    auto *bus = new Bus(1);
+    bus->CreateTimetable(text);
+}
