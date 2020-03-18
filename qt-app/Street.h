@@ -43,6 +43,11 @@ public:
      */
     std::list<Coordinates*> GetCoordinatesList();
 
+    /**
+     * @brief adds image of bus stop on square
+     * where bus stops of each street are
+     * @param scene scene where to put image
+     */
     void AddStopsToScene(QGraphicsScene *scene);
 
     std::string name;                       //!< name of street
@@ -51,7 +56,7 @@ public:
 
 protected:
     std::list<Coordinates*> coordinatesList;    //!< list of coordinates of street
-    std::vector<Stop*> busStopsList;        //!< bus stops list
+    std::vector<Stop*> busStopsList;            //!< bus stops list
 };
 
 #endif // STREET_H

@@ -14,9 +14,8 @@ Scene::CreateMap()
     /* initialize streets and bus stops */
     map->AddStreets("/home/alexandra/Projects/icp_project/files/ulice.txt");
     map->AddStops("/home/alexandra/Projects/icp_project/files/zastavky.txt");
-    /* add whole map to scene */
+
     AddMap(map);
-    /* add image of bus stop on map */
     AddBusStops(map);
 
     /* add buses */

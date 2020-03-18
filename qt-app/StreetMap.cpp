@@ -33,7 +33,7 @@ StreetMap::~StreetMap()
 }
 
 bool
-StreetMap::AddStreet(Street *s, const QString &name)
+StreetMap::AddStreet(Street *s, const QString &color)
 {
     int counter = 0;
     static std::string crossedStreet;
@@ -66,7 +66,7 @@ StreetMap::AddStreet(Street *s, const QString &name)
                 IF(positionOnMap.front() == nullptr, positionOnMap.erase(positionOnMap.begin()))
                 positionOnMap.push_back(s);
                 /* change background of street */
-                layout[x][y]->SetColor(name);
+                layout[x][y]->SetColor(color);
             }
         }
     }

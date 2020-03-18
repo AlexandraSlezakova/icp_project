@@ -25,9 +25,10 @@ public:
     /**
      * @brief add street on map
      * @param s street
+     * @param color color of square in hex format
      * @return true if street on coordinates does not exists, otherwise false
      */
-    bool AddStreet(Street *s, const QString &name);
+    bool AddStreet(Street *s, const QString &color);
 
     /**
      * @brief add streets on map from file
