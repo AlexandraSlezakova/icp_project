@@ -18,7 +18,7 @@ public:
     /**
      * @brief initial setup of map
      */
-    StreetMap();
+    explicit StreetMap(QGraphicsRectItem *parent = nullptr);
 
     ~StreetMap();
 
@@ -50,7 +50,7 @@ public:
 
 
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
-    Square *layout[X][Y];
+    Square *layout[X][Y]{};
 };
 
 #endif // STREETMAP_H

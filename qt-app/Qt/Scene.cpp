@@ -1,10 +1,8 @@
 #include "Scene.h"
 
-Scene::Scene(QWidget *parent) : QGraphicsView(parent)
+Scene::Scene(QGraphicsView *parent) : QGraphicsView(parent)
 {
     scene = new QGraphicsScene;
-    /* size of board */
-    scene->setSceneRect(0,0,X * SQUARE_SIZE + 50, Y * SQUARE_SIZE + 50);
 }
 
 void
@@ -12,6 +10,7 @@ Scene::CreateMap()
 {
     /* initialize map */
     auto *map = new StreetMap();
+
     /* initialize streets and bus stops */
     map->AddStreets("/home/alexandra/Projects/icp_project/files/ulice.txt");
     map->AddStops("/home/alexandra/Projects/icp_project/files/zastavky.txt");
@@ -26,6 +25,9 @@ Scene::CreateMap()
     /* create view and add scene */
     view = new QGraphicsView();
     view->setScene(scene);
+    scene->setSceneRect(0, 0, X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    view->setFixedSize((int)(view->scene()->width() / 2), (int)(view->scene()->height() - 600));
+
 }
 
 void

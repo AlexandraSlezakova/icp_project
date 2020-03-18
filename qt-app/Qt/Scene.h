@@ -8,7 +8,7 @@
 class Scene : public QGraphicsView
 {
 public:
-    Scene(QWidget *parent = nullptr);
+    Scene(QGraphicsView *parent = nullptr);
 
     void CreateMap();
 
