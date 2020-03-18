@@ -14,7 +14,10 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
+
+    void ResizeWindow();
 
 private:
     Ui::MainWindow *ui;
