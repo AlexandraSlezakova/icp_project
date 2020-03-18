@@ -21,7 +21,7 @@ Scene::CreateMap()
 
     /* add buses */
     // TODO
-    auto *busRouteMap = new BusRouteMap();
+    //BusRouteMap::DrawLine(map->layout);
 }
 
 void

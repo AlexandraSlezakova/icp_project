@@ -121,6 +121,7 @@ MainWindow::StopTimer()
 void
 MainWindow::ReadInput()
 {
+    /* get time from text area */
     QString data = timeArea->toPlainText();
     std::vector<std::string> time = Functions::Split(data.toStdString(), ":");
     if (time.size() == 3) {

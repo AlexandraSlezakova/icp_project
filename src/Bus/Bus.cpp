@@ -36,7 +36,7 @@ Bus::CreateTimetable(QPlainTextEdit *text)
             stopCoordinates.push_back(coordinates);
         }
         text->appendPlainText(QString::fromStdString(line));
-        text->moveCursor (QTextCursor::End);
+        text->moveCursor(QTextCursor::End);
     }
 
     file.close();
