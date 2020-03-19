@@ -7,6 +7,7 @@
 #define ICP_PROJECT_BUS_H
 
 #include "../View/Square.h"
+#include "BusRouteMap.h"
 #include <sstream>
 #include <QPlainTextEdit>
 
@@ -17,24 +18,52 @@ public:
     /**
      * @brief bus constructor
      * @param id id of bus
+     * @param busNumber number of bus
      */
-    explicit Bus(int id);
+    explicit Bus(int id, int busNumber);
 
     ~Bus() = default;
 
-    void SetCurrentSquare(Square *square);
+    /**
+     * @brief initialize bus
+     * put image of little bus on scene, set scale and initial position
+     * @param scene
+     */
+    void InitBus(QGraphicsScene *scene);
+
+    /**
+     * @brief set position of bus according its timetable
+     */
+    void MoveBus();
+
+    /**
+     * @brief get coordinates of bus
+     * if secNow is greater than 30 and we are moving along the x axis, set x coordinate near to next bus stop
+     * otherwise set it near to current bus stop, same with the y axis
+     * @param secNow seconds right now
+     * @param isC flag if we are moving along the x or y axis
+     * @param halfWay middle of two bus stops
+     * @param current current bus stop coordinate
+     * @param next next bus stop coordinate
+     * @return x or y position of bus
+     */
+    static int GetCoordinate(int secNow, int isC, int halfWay, int current, int next);
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
      * @param text textarea
+     * @param layout layout with squares
+     * @param color color of bus route
      */
-    void CreateTimetable(QPlainTextEdit *text);
+    void CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& color);
 
     Square *currentSquare;                           //!< square where bus is
-    std::vector<Coordinates*> stopCoordinates;       //!< coordinates of all stops of bus
 
 private:
-    int id_;             //!< id of bus
+    int id_;                    //!< id of bus
+    int busNumber_;             //!< number of bus
+    QGraphicsPixmapItem *bus;   //!< picture of bus
+    std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
 };
 
 
