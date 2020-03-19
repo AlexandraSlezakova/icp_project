@@ -21,10 +21,9 @@ public:
     /**
      * @brief add street on map
      * @param s street
-     * @param color color of square in hex format
      * @return true if street on coordinates does not exists, otherwise false
      */
-    bool AddStreet(Street *s, const QString &color);
+    bool AddStreet(Street *s);
 
     /**
      * @brief add streets on map from file
@@ -36,7 +35,7 @@ public:
     * @brief adds bus stops on street
     * @param pathToFile
     */
-    void AddStops(const std::string& pathToFile);
+    void AddStops(const std::string& pathToFile, QGraphicsScene *scene);
 
     /**
      * @brief searches the map with name of street

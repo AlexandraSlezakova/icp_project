@@ -18,7 +18,7 @@ public:
      * @brief scene constructor
      * @param parent parent widget
      */
-    Scene(QWidget *parent = nullptr);
+    explicit Scene(QWidget *parent = nullptr);
 
     /**
      * @brief create map with streets, bus stops and buses
@@ -27,15 +27,9 @@ public:
 
     /**
      * @brief add whole map to scene
-     * @param map map of streets
+     * @param streetMap map of streets
      */
-    void AddMap(StreetMap *map);
-
-    /**
-     * @brief add image of bus stop to scene
-     * @param map map of streets
-     */
-    void AddBusStops(StreetMap *map);
+    void AddMap(StreetMap *streetMap);
 
     /**
      * @brief set up view and add scene
@@ -44,12 +38,17 @@ public:
 
     QGraphicsScene *scene;
     QPlainTextEdit *text;
+    int busId = 0;          //!< id of bus
 
 public slots:
     /**
      * @brief show timetable of bus number 1
      */
     void GetBus1Timetable();
+
+    void MoveBus1();
+private:
+    StreetMap *map;
 };
 
 #endif // SCENE_H

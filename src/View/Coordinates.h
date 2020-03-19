@@ -7,6 +7,7 @@
 #define COORDINATES_H
 
 #include "../Functions.h"
+#include "Timer.h"
 
 class Coordinates
 {
@@ -21,6 +22,12 @@ public:
     Coordinates(int x1, int y1);
 
     ~Coordinates();
+
+    typedef struct busStop {
+        Coordinates *coordinates{};   //!< coordinates of bus stop
+        int stopHour = 0;
+        int stopMin = 0;
+    } BusStop_S;
 };
 
 #endif // COORDINATES_H

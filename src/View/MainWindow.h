@@ -6,7 +6,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "Timer.h"
 #include "Scene.h"
 
 #define TIME_AREA_WIDTH     100

@@ -99,6 +99,7 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     bus1->setFixedSize(140, 30);
     bus1->setText("Timetable of bus #1");
     connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
+    scene->busId++;
 }
 
 void

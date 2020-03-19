@@ -31,31 +31,11 @@ public:
      */
     void SetStop(Stop* stop);
 
-    /**
-     * @brief get list of bus stops on street
-     * @return list of bus stops
-     */
-    std::vector<Stop*> GetBusStopsList();
-
-    /**
-     * @brief get list of coordinates of street
-     * @return list of coordinates
-     */
-    std::list<Coordinates*> GetCoordinatesList();
-
-    /**
-     * @brief adds image of bus stop on square
-     * where bus stops of each street are
-     * @param scene scene where to put image
-     */
-    void AddStopsToScene(QGraphicsScene* scene);
-
     std::string name;                       //!< name of street
     Coordinates* start;                     //!< start of street
     Coordinates* end;                       //!< end of street
 
 protected:
-    std::list<Coordinates*> coordinatesList;    //!< list of coordinates of street
     std::vector<Stop*> busStopsList;            //!< bus stops list
 };
 

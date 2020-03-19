@@ -11,37 +11,23 @@ void
 Scene::CreateMap()
 {
     /* initialize map */
-    auto *map = new StreetMap();
+    map = new StreetMap();
     /* initialize streets and bus stops */
     map->AddStreets(Functions::GetAbsolutePath("../files/ulice.txt"));
-    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"));
-
+    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), scene);
+    /* add it to scene */
     AddMap(map);
-    AddBusStops(map);
 
     /* add buses */
     // TODO
-    //BusRouteMap::DrawLine(map->layout);
 }
 
 void
-Scene::AddMap(StreetMap *map)
+Scene::AddMap(StreetMap *streetMap)
 {
-    for (auto & x : map->layout) {
+    for (auto & x : streetMap->layout) {
         for (auto & y : x) {
             scene->addItem(y);
-        }
-    }
-}
-
-void
-Scene::AddBusStops(StreetMap *map)
-{
-    for (auto& x : map->Map) {
-        for (auto &y : x) {
-            for (auto &street : y) {
-                IF(street, street->AddStopsToScene(scene))
-            }
         }
     }
 }
@@ -58,6 +44,14 @@ Scene::SetUpView()
 void
 Scene::GetBus1Timetable()
 {
-    auto *bus = new Bus(1);
-    bus->CreateTimetable(text);
+    auto *bus = new Bus(busId, 1);
+    bus->CreateTimetable(text, map->layout, "#FF0000");
+    bus->InitBus(scene);
+    bus->MoveBus();
+}
+
+void
+Scene::MoveBus1()
+{
+
 }

@@ -33,7 +33,7 @@ StreetMap::~StreetMap()
 }
 
 bool
-StreetMap::AddStreet(Street *s, const QString &color)
+StreetMap::AddStreet(Street *s)
 {
     int counter = 0;
     static std::string crossedStreet;
@@ -66,7 +66,7 @@ StreetMap::AddStreet(Street *s, const QString &color)
                 IF(positionOnMap.front() == nullptr, positionOnMap.erase(positionOnMap.begin()))
                 positionOnMap.push_back(s);
                 /* change background of street */
-                layout[x][y]->SetColor(color);
+                layout[x][y]->SetColor("#C0C0C0");
             }
         }
     }
@@ -110,13 +110,11 @@ StreetMap::AddStreets(const std::string& pathToFile)
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
         IF(tokens.empty(), break)
-        /* color of street */
-        color = QString::fromStdString(tokens[5]);
         /* coordinates of street */
         start = new Coordinates(std::stoi(tokens[1]), std::stoi(tokens[2]));
         end = new Coordinates(std::stoi(tokens[3]), std::stoi(tokens[4]));
         /* add street to map */
-        insert = StreetMap::AddStreet(new Street(tokens[0], start, end), color);
+        insert = StreetMap::AddStreet(new Street(tokens[0], start, end));
         if (!insert) std::cerr << "Warning: Street " << tokens[0] <<  " cannot be added to map" << std::endl;
     }
 
@@ -124,7 +122,7 @@ StreetMap::AddStreets(const std::string& pathToFile)
 }
 
 void
-StreetMap::AddStops(const std::string& pathToFile)
+StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
 {
     std::ifstream file;
     std::string line, streetName;
@@ -132,6 +130,9 @@ StreetMap::AddStops(const std::string& pathToFile)
     Square *square;
     Street *street = nullptr;
     int x, y;
+
+    /* path to image */
+    QString path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
 
     file.open(pathToFile);
     IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
@@ -151,8 +152,12 @@ StreetMap::AddStops(const std::string& pathToFile)
             square = layout[x][y];
             square->SetColor("#FFFFFF");
             square->hasStop = true;
+
+            Stop *stop = new Stop(tokens[0],new Coordinates(x, y));
             /* add stop to list for each street */
-            street->SetStop(new Stop(tokens[0],new Coordinates(x, y)));
+            street->SetStop(stop);
+            /* add stop to scene */
+            stop->AddStopToScene(scene, path);
         } else {
             std::cerr << "Error: Couldn't find street " << streetName << std::endl;
         }

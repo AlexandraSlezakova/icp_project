@@ -1,7 +1,5 @@
 #include "Square.h"
 
-#include <utility>
-
 Square::Square(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
 {
     /* set square size */
