@@ -32,6 +32,24 @@ public:
     static void ChangeTime(int h, int m, int s, const QString& previousTime);
 
     /**
+     * @brief get seconds of current time
+     * @return seconds
+     */
+    static int GetSecond();
+
+    /**
+     * @brief get minutes of current time
+     * @return minutes
+     */
+    static int GetMinute();
+
+    /**
+     * @brief get hour of current time
+     * @return minutes
+     */
+    static int GetHour();
+
+    /**
      * @brief reset timer
      */
     static void ResetTime();
@@ -40,6 +58,7 @@ private:
     static int hour;        //!< hour
     static int min;         //!< minute
     static int sec;         //!< second
+    static tm *ltm;
 
 };
 

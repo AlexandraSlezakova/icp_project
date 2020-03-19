@@ -3,13 +3,32 @@
 int Timer::hour;
 int Timer::min;
 int Timer::sec;
+tm *Timer::ltm;
+
+int
+Timer::GetHour()
+{
+    return ltm->tm_hour - hour;
+}
+
+int
+Timer::GetMinute()
+{
+    return ltm->tm_min - min;
+}
+
+int
+Timer::GetSecond()
+{
+    return ltm->tm_sec - sec;
+}
 
 QString
 Timer::GetTime()
 {
     std::stringstream ss;
     time_t now = std::time(nullptr);
-    tm *ltm = localtime(&now);
+    ltm = localtime(&now);
     ss << ltm->tm_hour - hour << ":" << ltm->tm_min - min << ":" << ltm->tm_sec - sec;
     return QString::fromStdString(ss.str());
 }
