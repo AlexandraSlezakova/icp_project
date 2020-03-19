@@ -12,6 +12,8 @@
 #include <QtWidgets>
 #include "../View/Coordinates.h"
 
+#define SQUARE_SIZE     20
+
 class Stop
 {
 public:
@@ -30,6 +32,14 @@ public:
      * @return coordinates of stop or nullptr
      */
     static Coordinates *GetStop(const std::string& name);
+
+    /**
+     * @brief adds image of bus stop on square
+     * where bus stops of each street are
+     * @param scene scene where to put image
+     * @param pathToFile path to image
+     */
+    void AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
 
     Coordinates *coordinates;                               //!< coordinates of bus stop
     std::string stopName;                                   //!< bus stop name
