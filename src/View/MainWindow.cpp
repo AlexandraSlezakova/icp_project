@@ -1,12 +1,12 @@
 #include "MainWindow.h"
-#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // TODO v qt_creator len ui_mainwindow.h
-
+#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h"
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     timerId = startTimer(1000);
     ResizeWindow();
     CreateScene();
+
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +38,7 @@ MainWindow::CreateScene()
     QScrollArea *scrollArea = new QScrollArea(this);
     scrollArea->setMinimumSize(width * 0.7, height * 0.9);
     /* create scene */
-    auto *scene = new Scene(scrollArea);
+    scene = new Scene(scrollArea);
     scrollArea->setWidget(scene);
 
     QWidget *widget = new QWidget(this);
@@ -53,6 +53,9 @@ MainWindow::CreateScene()
 
     /* text area with time */
     InitTimeArea(widget);
+
+    // pohgyb autobusů
+    //scene->MoveBus1();
 
     /* buttons */
     InitButtons(widget, scene);
@@ -87,6 +90,27 @@ MainWindow::InitTimeArea(QWidget *parent)
     resetButton->setFixedSize(90, 30);
     resetButton->setText("Reset timer");
     connect(resetButton, SIGNAL (released()), this , SLOT(ResetTimer()));
+
+    //Zooms buttons
+    zoomButtonAdd = new QPushButton(parent);
+    zoomButtonAdd->move(TIME_AREA_WIDTH + 70, 915);
+    zoomButtonAdd->setFixedSize(30, 30);
+    zoomButtonAdd->setText("+");
+    connect(zoomButtonAdd, SIGNAL (released()), this , SLOT(ZoomAdd()));
+
+    zoomButtonSub = new QPushButton(parent);
+    zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
+    zoomButtonSub->setFixedSize(30, 30);
+    zoomButtonSub->setText("-");
+    connect(zoomButtonSub, SIGNAL (released()), this , SLOT(ZoomSub()));
+
+    // Print numb. expression of zoom
+    scene->zoomText = new QLabel(parent);
+    scene->zoomText->move(TIME_AREA_WIDTH-80, 915);
+    scene->zoomText->setFixedSize(150,30);
+    scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
+    scene->zoomText->show();
+
 }
 
 void
@@ -135,5 +159,17 @@ void
 MainWindow::ResetTimer()
 {
     Timer::ResetTime();
+}
+
+void
+MainWindow::ZoomAdd()
+{
+    scene->zoomAdd();
+}
+
+void
+MainWindow::ZoomSub()
+{
+    scene->zoomSub();
 }
 

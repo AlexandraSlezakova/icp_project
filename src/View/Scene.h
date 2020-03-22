@@ -6,9 +6,12 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <QtWidgets>
+#include <QWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "StreetMap.h"
+
 
 class Scene : public QGraphicsView
 {
@@ -36,9 +39,30 @@ public:
      */
     void SetUpView();
 
+    /**
+    * @brief zoom in scene
+     */
+    void zoomAdd();
+
+    /**
+    * @brief zooms out scene
+    */
+    void zoomSub();
+
     QGraphicsScene *scene;
     QPlainTextEdit *text;
+    QLabel *zoomText;
     int busId = 0;          //!< id of bus
+    double zoom_act = 100;  //!< double expression of zoom
+
+
+
+protected:
+    /**
+    * @brief zooms in and out scene by mouse
+    * @param event Mouse wheel event chager
+    */
+    virtual void wheelEvent(QWheelEvent *event);
 
 
 public slots:

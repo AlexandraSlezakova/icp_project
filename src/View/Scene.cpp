@@ -55,3 +55,35 @@ Scene::MoveBus1()
 {
 
 }
+
+void Scene::wheelEvent(QWheelEvent *event) {
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    double scaleFactor = 1.15;
+
+    if(event->delta() > 0)
+    {
+        scale(scaleFactor,scaleFactor);
+        zoom_act *= scaleFactor;
+    }
+
+    else
+    {
+        scale(1/scaleFactor,1/scaleFactor);
+        zoom_act = zoom_act*(1/scaleFactor);
+    }
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
+
+void Scene::zoomAdd() {
+    double scaleFactor = 1.15;
+    scale(scaleFactor,scaleFactor);
+    zoom_act *= scaleFactor;
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
+
+void Scene::zoomSub() {
+    double scaleFactor = 1.15;
+    scale(1/scaleFactor,1/scaleFactor);
+    zoom_act = zoom_act*(1/scaleFactor);
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
