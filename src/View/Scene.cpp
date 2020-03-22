@@ -74,14 +74,14 @@ void Scene::wheelEvent(QWheelEvent *event) {
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }
 
-void Scene::zoomAdd() {
+void Scene::ZoomAdd() {
     double scaleFactor = 1.15;
     scale(scaleFactor,scaleFactor);
     zoom_act *= scaleFactor;
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }
 
-void Scene::zoomSub() {
+void Scene::ZoomSub() {
     double scaleFactor = 1.15;
     scale(1/scaleFactor,1/scaleFactor);
     zoom_act = zoom_act*(1/scaleFactor);

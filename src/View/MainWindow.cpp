@@ -1,5 +1,6 @@
 #include "MainWindow.h"
-#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h"
+//#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // Cesta Alex  TODO v qt_creator len ui_mainwindow.h
+#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h" // Cesta Martin
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -54,8 +55,6 @@ MainWindow::CreateScene()
     /* text area with time */
     InitTimeArea(widget);
 
-    // pohgyb autobusů
-    //scene->MoveBus1();
 
     /* buttons */
     InitButtons(widget, scene);
@@ -91,26 +90,6 @@ MainWindow::InitTimeArea(QWidget *parent)
     resetButton->setText("Reset timer");
     connect(resetButton, SIGNAL (released()), this , SLOT(ResetTimer()));
 
-    //Zooms buttons
-    zoomButtonAdd = new QPushButton(parent);
-    zoomButtonAdd->move(TIME_AREA_WIDTH + 70, 915);
-    zoomButtonAdd->setFixedSize(30, 30);
-    zoomButtonAdd->setText("+");
-    connect(zoomButtonAdd, SIGNAL (released()), this , SLOT(ZoomAdd()));
-
-    zoomButtonSub = new QPushButton(parent);
-    zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
-    zoomButtonSub->setFixedSize(30, 30);
-    zoomButtonSub->setText("-");
-    connect(zoomButtonSub, SIGNAL (released()), this , SLOT(ZoomSub()));
-
-    // Print numb. expression of zoom
-    scene->zoomText = new QLabel(parent);
-    scene->zoomText->move(TIME_AREA_WIDTH-80, 915);
-    scene->zoomText->setFixedSize(150,30);
-    scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
-    scene->zoomText->show();
-
 }
 
 void
@@ -124,6 +103,28 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     bus1->setText("Timetable of bus #1");
     connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
     scene->busId++;
+
+    /*Zooms buttons */
+    zoomButtonAdd = new QPushButton(parent);
+    zoomButtonAdd->move(TIME_AREA_WIDTH + 70, 915);
+    zoomButtonAdd->setFixedSize(30, 30);
+    zoomButtonAdd->setText("+");
+    connect(zoomButtonAdd, SIGNAL (released()), scene, SLOT(ZoomAdd()));
+
+
+    zoomButtonSub = new QPushButton(parent);
+    zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
+    zoomButtonSub->setFixedSize(30, 30);
+    zoomButtonSub->setText("-");
+    connect(zoomButtonSub, SIGNAL (released()), scene, SLOT(ZoomSub()));
+
+    /* Print numb. expression of zoom */
+    scene->zoomText = new QLabel(parent);
+    scene->zoomText->move(TIME_AREA_WIDTH-80, 915);
+    scene->zoomText->setFixedSize(150,30);
+    scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
+    scene->zoomText->show();
+
 }
 
 void
@@ -161,15 +162,4 @@ MainWindow::ResetTimer()
     Timer::ResetTime();
 }
 
-void
-MainWindow::ZoomAdd()
-{
-    scene->zoomAdd();
-}
-
-void
-MainWindow::ZoomSub()
-{
-    scene->zoomSub();
-}
 

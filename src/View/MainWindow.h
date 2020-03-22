@@ -66,15 +66,7 @@ public slots:
      */
     void ResetTimer();
 
-    /**
-     * @brief zoom in scene thought button
-     */
-    void ZoomAdd();
 
-    /**
-     * @brief zoom out scene thought button
-     */
-    void ZoomSub();
 
 protected:
     /**

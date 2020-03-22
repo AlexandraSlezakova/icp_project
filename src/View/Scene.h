@@ -39,15 +39,6 @@ public:
      */
     void SetUpView();
 
-    /**
-    * @brief zoom in scene
-     */
-    void zoomAdd();
-
-    /**
-    * @brief zooms out scene
-    */
-    void zoomSub();
 
     QGraphicsScene *scene;
     QPlainTextEdit *text;
@@ -72,6 +63,17 @@ public slots:
     void GetBus1Timetable();
 
     void MoveBus1();
+
+    /**
+    * @brief zoom in scene
+    */
+    void ZoomAdd();
+
+    /**
+    * @brief zooms out scene
+    */
+    void ZoomSub();
+
 private:
     StreetMap *map;
 };

@@ -107,7 +107,11 @@ Bus::MoveBus()
             else {
                 IF_ELSE(current.coordinates->y < next.coordinates->y, bus->setRotation(90),
                         bus->setRotation(-90))
-                xShift = -8;
+
+                if(current.coordinates->y<next.coordinates->y)
+                    xShift = +25;
+                else
+                    xShift = -5;
             }
 
             x = Bus::GetCoordinate(secNow, isX, halfWay, current.coordinates->x, next.coordinates->x);
