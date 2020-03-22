@@ -19,10 +19,6 @@ Scene::CreateMap()
     AddMap(map);
 
     /* add buses */
-    auto *bus = new Bus(busId, 1);
-    bus->InitBus(scene);
-
-    BusesOnRoad.push_back(bus);
     // TODO
 }
 
@@ -48,18 +44,46 @@ Scene::SetUpView()
 void
 Scene::GetBus1Timetable()
 {
-
-    // zde se bude získávat jen list zastávek ne vytvoření busu
-    auto *bus = BusesOnRoad.back();
+    auto *bus = new Bus(busId, 1);
     bus->CreateTimetable(text, map->layout, "#FF0000");
-    //bus->InitBus(scene);
-    //bus->MoveBus();
+    bus->InitBus(scene);
+    bus->MoveBus();
 }
 
 void
 Scene::MoveBus1()
 {
-    QTimer *timer = new QTimer(this);
-    //bus->MoveBus();
-    //connect(timer,SIGNAL(timeout()),))
+
+}
+
+void Scene::wheelEvent(QWheelEvent *event) {
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    double scaleFactor = 1.15;
+
+    if(event->delta() > 0)
+    {
+        scale(scaleFactor,scaleFactor);
+        zoom_act *= scaleFactor;
+    }
+
+    else
+    {
+        scale(1/scaleFactor,1/scaleFactor);
+        zoom_act = zoom_act*(1/scaleFactor);
+    }
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
+
+void Scene::ZoomAdd() {
+    double scaleFactor = 1.15;
+    scale(scaleFactor,scaleFactor);
+    zoom_act *= scaleFactor;
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
+
+void Scene::ZoomSub() {
+    double scaleFactor = 1.15;
+    scale(1/scaleFactor,1/scaleFactor);
+    zoom_act = zoom_act*(1/scaleFactor);
+    zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }

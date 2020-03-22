@@ -10,7 +10,7 @@
 0 22 Hutařova-Karlova
 0 24 Hutařova-Krajní
 0 26 Krajní-68/78
-0 28 Hutařova-Kamanova
+0 28 Krajní-Kamanova
 0 30 Kamanova-Psotova
 0 33 Bystřinova-Psotova
 0 35 Edisonova-Psotova

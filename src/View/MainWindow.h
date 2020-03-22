@@ -66,6 +66,8 @@ public slots:
      */
     void ResetTimer();
 
+
+
 protected:
     /**
      * @brief display current time
@@ -75,13 +77,17 @@ protected:
 
 private:
     QPushButton *timerButton;       //!< button to start or stop timer
+    QPushButton *zoomButtonAdd;     //!< button to zoom in scene
+    QPushButton *zoomButtonSub;     //!< button to zoom out scene
     QPlainTextEdit *timeArea;       //!< textarea with time
     QString previousTime;           //!< time before change
     Ui::MainWindow *ui;
+    Scene *scene;
 
     int timerId = 0;
     int width = 0;          //!< width of screen
     int height = 0;         //!< height of screen
     int stopFlag = 0;       //!< timer is active or inactive
+
 };
 #endif // MAINWINDOW_H
