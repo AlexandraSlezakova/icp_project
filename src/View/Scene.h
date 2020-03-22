@@ -40,6 +40,8 @@ public:
     QPlainTextEdit *text;
     int busId = 0;          //!< id of bus
 
+    std::list<Bus*> BusesOnRoad;
+
 public slots:
     /**
      * @brief show timetable of bus number 1
