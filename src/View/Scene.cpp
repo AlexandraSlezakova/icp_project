@@ -19,10 +19,6 @@ Scene::CreateMap()
     AddMap(map);
 
     /* add buses */
-    auto *bus = new Bus(busId, 1);
-    bus->InitBus(scene);
-
-    BusesOnRoad.push_back(bus);
     // TODO
 }
 
@@ -48,18 +44,14 @@ Scene::SetUpView()
 void
 Scene::GetBus1Timetable()
 {
-
-    // zde se bude získávat jen list zastávek ne vytvoření busu
-    auto *bus = BusesOnRoad.back();
+    auto *bus = new Bus(busId, 1);
     bus->CreateTimetable(text, map->layout, "#FF0000");
-    //bus->InitBus(scene);
-    //bus->MoveBus();
+    bus->InitBus(scene);
+    bus->MoveBus();
 }
 
 void
 Scene::MoveBus1()
 {
-    QTimer *timer = new QTimer(this);
-    //bus->MoveBus();
-    //connect(timer,SIGNAL(timeout()),))
+
 }

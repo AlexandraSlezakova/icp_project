@@ -28,8 +28,15 @@ Bus::CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& 
 
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
+
+        // načítalo se mi rádek i s \r, odstranění \r
+        size_t eol = tokens[2].find('\r');
+        if( eol != std::string::npos)
+            tokens[2]=tokens[2].substr(0,tokens[2].size()-1);
+
         coordinates = Stop::GetStop(tokens[2]);
         timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
+
 
         if (!coordinates) {
             std::cerr << "Error: bus stop -- " << tokens[2] << " -- wasn't found" << std::endl;
