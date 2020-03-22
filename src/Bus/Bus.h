@@ -32,11 +32,6 @@ public:
     void InitBus(QGraphicsScene *scene);
 
     /**
-     * @brief set position of bus according its timetable
-     */
-    void MoveBus();
-
-    /**
      * @brief get coordinates of bus
      * if secNow is greater than 30 and we are moving along the x axis, set x coordinate near to next bus stop
      * otherwise set it near to current bus stop, same with the y axis
@@ -48,6 +43,11 @@ public:
      * @return x or y position of bus
      */
     static int GetCoordinate(int secNow, int isC, int halfWay, int current, int next);
+
+    /**
+     * @brief set position of bus according its timetable
+     */
+    void MoveBus();
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea

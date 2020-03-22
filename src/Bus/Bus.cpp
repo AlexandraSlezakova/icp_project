@@ -114,8 +114,8 @@ Bus::MoveBus()
                     xShift = -5;
             }
 
-            x = Bus::GetCoordinate(secNow, isX, halfWay, current.coordinates->x, next.coordinates->x);
-            y = Bus::GetCoordinate(secNow, isY, halfWay, current.coordinates->y, next.coordinates->y);
+            x = GetCoordinate(secNow, isX, halfWay, current.coordinates->x, next.coordinates->x);
+            y = GetCoordinate(secNow, isY, halfWay, current.coordinates->y, next.coordinates->y);
 
 
             bus->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
