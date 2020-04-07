@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "Bus.h"
 #include "BusRouteMap.h"
 #include "../View/Timer.h"
@@ -6,6 +7,47 @@ Bus::Bus(int id, int busNumber)
 {
     id_ = id;
     busNumber_ = busNumber;
+
+    std::ifstream file;
+    std::ostringstream ss;
+    std::string line;
+    std::vector<std::string> tokens;
+    int timeFrom;
+    std::vector<std::string> stop;
+    Coordinates *coordinates;
+
+    ss << "../files/bus-route-map/" << std::to_string(busNumber_) << ".txt";
+    std::string path = Functions::GetAbsolutePath(ss.str().c_str());
+    ss.clear();
+
+    file.open(path);
+    IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
+
+    /* save busstop to array [count], witch each line has own array with hour [0] minutes [1] and name of bus stops [3] */
+    while (std::getline(file, line)) {
+        tokens = Functions::Split(line, " ");
+
+        size_t eol = tokens[2].find('\r');
+        if( eol != std::string::npos)
+            tokens[2]=tokens[2].substr(0,tokens[2].size()-1);
+
+        timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
+        coordinates = Stop::GetStop(tokens[2]);
+
+        stop.push_back(std::to_string(timeFrom));
+        stop.push_back(tokens[1]);
+        stop.push_back(tokens[2]);
+        busStop.push_back(stop);
+
+        Coordinates::BusStop_S information;
+        information.coordinates = coordinates;
+        information.stopHour = timeFrom;
+        information.stopMin = std::stoi(tokens[1]);
+        /* save information */
+        stopInformation.push_back(information);
+    }
+
+    file.close();
 }
 
 void
@@ -80,7 +122,7 @@ Bus::MoveBus()
     int minuteNow = Timer::GetMinute();
     Coordinates::BusStop_S next, current;
 
-    for (int i = 0; i < stopInformation.size() - 1; i++) {
+    for (int i = 0; i < busStop.size() - 1; i++) {
         current = stopInformation[i];
         next = stopInformation[i + 1];
 
@@ -89,35 +131,28 @@ Bus::MoveBus()
             x = current.coordinates->x;
             y = current.coordinates->y;
 
-            /* get halfway of path between 2 bus stops */
-            if (next.coordinates->x == x) {
-                halfWay = next.coordinates->y > y ? next.coordinates->y - y : y - next.coordinates->y;
-                isY = 1;
-            } else {
-                halfWay = next.coordinates->x > x ? next.coordinates->x - x : x - next.coordinates->x;
-                isX = 1;
-            }
-            halfWay /= 2;
 
             /* moving along the X axis */
-            if (isX) {
+            if (next.coordinates->x > x)
+            {
                 IF(next.coordinates->x < current.coordinates->x, bus->setTransform(QTransform::fromScale(-1, 1));)
+
+                x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, current, next);
+
                 yShift = -5;
+
             } /* moving along the Y axis */
             else {
                 IF_ELSE(current.coordinates->y < next.coordinates->y, bus->setRotation(90),
                         bus->setRotation(-90))
+
+                y = Bus::GetCoordinate(hourNow, minuteNow, secNow, 0, current, next);
 
                 if(current.coordinates->y<next.coordinates->y)
                     xShift = +25;
                 else
                     xShift = -5;
             }
-
-            x = Bus::GetCoordinate(secNow, isX, halfWay, current.coordinates->x, next.coordinates->x);
-            y = Bus::GetCoordinate(secNow, isY, halfWay, current.coordinates->y, next.coordinates->y);
-
-
             bus->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
             break;
         }
@@ -125,16 +160,44 @@ Bus::MoveBus()
 }
 
 int
-Bus::GetCoordinate(int secNow, int isC, int halfWay, int current, int next)
+Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next)
 {
-    int coordinate = next;
+    int coordinate;
 
-    if (isC && secNow > 30) {
-        IF_ELSE(coordinate < current, coordinate = next + halfWay - (halfWay / 2),
-                coordinate = next - halfWay + (halfWay / 2))
-    } else if (isC && secNow < 30) {
-        IF_ELSE(coordinate < current, coordinate = next + halfWay + (halfWay / 2),
-                coordinate = next - halfWay - (halfWay / 2))
+    /* Get number square between current a and next stop */
+    int countSquare = next.coordinates->x + next.coordinates->y - current.coordinates->x - current.coordinates->y;
+
+    /* Time in sex between current a next stop */
+    int timerStop = 0;
+
+    if ( next.stopMin > current.stopMin )
+        timerStop = abs(next.stopMin - current.stopMin) * 60;
+    else
+        timerStop = abs( (next.stopMin+60) - current.stopMin) * 60;
+
+    /* avg bus movomet  one square for x sex */
+    int avgMove = timerStop / countSquare;
+
+    /*  time when bus past last stop */
+    int moved = 0;
+
+    if (hourNow > current.stopHour)
+        minNow += 60;
+
+    if (minNow == current.stopMin)
+        moved = secNow;
+    else
+        moved += ((minNow - current.stopMin) * 60) + secNow;
+
+    /* x axis */
+    if (isC == 1)
+    {
+        coordinate = current.coordinates->x + (int)round(moved / avgMove );
+
+    }
+    else /* y axis */
+    {
+        coordinate = current.coordinates->y + (int)round(moved / avgMove );
     }
 
     return coordinate;

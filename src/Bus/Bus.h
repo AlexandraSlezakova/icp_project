@@ -14,7 +14,8 @@
 class Bus
 {
 public:
-
+    int id_;                    //!< id of bus
+    std::vector<std::vector<std::string>> busStop; //!< array with busstops
     /**
      * @brief bus constructor
      * @param id id of bus
@@ -47,7 +48,7 @@ public:
      * @param next next bus stop coordinate
      * @return x or y position of bus
      */
-    static int GetCoordinate(int secNow, int isC, int halfWay, int current, int next);
+    static int GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next);
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
@@ -60,8 +61,9 @@ public:
     Square *currentSquare;                           //!< square where bus is
 
 private:
-    int id_;                    //!< id of bus
+
     int busNumber_;             //!< number of bus
+
     QGraphicsPixmapItem *bus;   //!< picture of bus
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
 };

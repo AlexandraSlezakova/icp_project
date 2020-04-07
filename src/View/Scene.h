@@ -11,7 +11,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "StreetMap.h"
-
+#include "../Bus/Garage.h"
 
 class Scene : public QGraphicsView
 {
@@ -45,6 +45,7 @@ public:
     QLabel *zoomText;
     int busId = 0;          //!< id of bus
     double zoom_act = 100;  //!< double expression of zoom
+    Garage *garage; //!< All busses
 
 
 
@@ -62,7 +63,9 @@ public slots:
      */
     void GetBus1Timetable();
 
-    void MoveBus1();
+    void MoveBus();
+
+    void MoveBuses();
 
     /**
     * @brief zoom in scene

@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
     scene = new QGraphicsScene();
@@ -10,6 +11,7 @@ Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 void
 Scene::CreateMap()
 {
+    Timer::GetTime();
     /* initialize map */
     map = new StreetMap();
     /* initialize streets and bus stops */
@@ -19,7 +21,9 @@ Scene::CreateMap()
     AddMap(map);
 
     /* add buses */
-    // TODO
+    garage = new Garage(busId,1,scene);
+
+    MoveBuses();
 }
 
 void
@@ -44,16 +48,18 @@ Scene::SetUpView()
 void
 Scene::GetBus1Timetable()
 {
-    auto *bus = new Bus(busId, 1);
+    Bus* bus = garage->GetBus(busId, 1);
     bus->CreateTimetable(text, map->layout, "#FF0000");
     bus->InitBus(scene);
     bus->MoveBus();
 }
 
 void
-Scene::MoveBus1()
+Scene::MoveBuses()
 {
-
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(MoveBus()));
+    timer->start(1000); //time specified in ms
 }
 
 void Scene::wheelEvent(QWheelEvent *event) {
@@ -86,4 +92,9 @@ void Scene::ZoomSub() {
     scale(1/scaleFactor,1/scaleFactor);
     zoom_act = zoom_act*(1/scaleFactor);
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
+}
+
+void Scene::MoveBus() {
+    Bus* bus = garage->GetBus(0, 1);
+    bus->MoveBus();
 }
