@@ -93,6 +93,27 @@ StreetMap::GetStreet(const std::string& name)
     return nullptr;
 }
 
+void StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
+{
+    for (auto & x : Map) {
+        for (auto & y : x) {
+            if (!y.empty()) {
+                if (y.front() && y.front()->name == name)
+                {
+                    y.front()->slowdown = updateSlowdown;
+                    return;
+                }
+                    /* two crossed streets */
+                if (y.size() > 1 && y.back()->name == name)
+                {
+                    y.back()->slowdown = updateSlowdown;
+                    return;
+                }
+            }
+        }
+    }
+}
+
 void
 StreetMap::AddStreets(const std::string& pathToFile)
 {
@@ -114,7 +135,7 @@ StreetMap::AddStreets(const std::string& pathToFile)
         start = new Coordinates(std::stoi(tokens[1]), std::stoi(tokens[2]));
         end = new Coordinates(std::stoi(tokens[3]), std::stoi(tokens[4]));
         /* add street to map */
-        insert = StreetMap::AddStreet(new Street(tokens[0], start, end));
+        insert = StreetMap::AddStreet(new Street(tokens[0], start, end, 1));
         if (!insert) std::cerr << "Warning: Street " << tokens[0] <<  " cannot be added to map" << std::endl;
     }
 

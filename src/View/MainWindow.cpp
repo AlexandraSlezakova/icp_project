@@ -58,8 +58,12 @@ MainWindow::CreateScene()
 
     /* buttons */
     InitButtons(widget, scene);
+
+    InitSliders(widget,scene);
 }
 
+
+// autobuse se vymažua a npíšse se jinde, timer na to obnovení
 void
 MainWindow::timerEvent(QTimerEvent *event)
 {
@@ -125,6 +129,33 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
     scene->zoomText->show();
 
+
+}
+
+void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
+
+    std::ifstream file;
+    std::string line;
+    std::vector<std::string> street;
+
+    combobox = new QComboBox(parent);
+    combobox->move(TIME_AREA_WIDTH + 20, 815);
+    combobox->setFixedSize(60,40);
+
+    file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
+
+    while (std::getline(file, line)) {
+
+        street = Functions::Split(line, " ");
+        combobox->addItem(QString::fromStdString(street[0]));
+    }
+
+
+
+    slider = new QSlider(Qt::Horizontal,parent);
+    slider->move(TIME_AREA_WIDTH + 70, 815);
+    slider->setFixedSize(60,40);
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(value(int)));
 }
 
 void
@@ -161,5 +192,13 @@ MainWindow::ResetTimer()
 {
     Timer::ResetTime();
 }
+
+void MainWindow::value(int slowDown) {
+
+    scene->map->UpdateStreet(combobox->currentText().toStdString(),(float)slowDown / 100 + 1);
+
+}
+
+
 
 

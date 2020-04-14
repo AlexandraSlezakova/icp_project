@@ -39,6 +39,8 @@ public:
      */
     void SetUpView();
 
+    void StreetUpdate(float updateSlowdown, std::string name);
+
 
     QGraphicsScene *scene;
     QPlainTextEdit *text;
@@ -46,7 +48,11 @@ public:
     int busId = 0;          //!< id of bus
     double zoom_act = 100;  //!< double expression of zoom
     Garage *garage; //!< All busses
+    StreetMap *map;
 
+    int  m_originalX = 0;
+    int  m_originalY = 0;
+    bool m_moving = false;
 
 
 protected:
@@ -77,8 +83,15 @@ public slots:
     */
     void ZoomSub();
 
+
+
 private:
-    StreetMap *map;
+
+    void mouseMoveEvent(QMouseEvent *event);
+
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // SCENE_H

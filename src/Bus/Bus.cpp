@@ -2,18 +2,21 @@
 #include "Bus.h"
 #include "BusRouteMap.h"
 #include "../View/Timer.h"
+#include "../View/StreetMap.h"
 
-Bus::Bus(int id, int busNumber)
+Bus::Bus(int id, int busNumber, Coordinates *position)
 {
     id_ = id;
     busNumber_ = busNumber;
+    busPosition = position;
+    rotation = 0;
+    avgspeed = 11;
 
     std::ifstream file;
     std::ostringstream ss;
     std::string line;
     std::vector<std::string> tokens;
     int timeFrom;
-    std::vector<std::string> stop;
     Coordinates *coordinates;
 
     ss << "../files/bus-route-map/" << std::to_string(busNumber_) << ".txt";
@@ -34,18 +37,24 @@ Bus::Bus(int id, int busNumber)
         timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
         coordinates = Stop::GetStop(tokens[2]);
 
-        stop.push_back(std::to_string(timeFrom));
-        stop.push_back(tokens[1]);
-        stop.push_back(tokens[2]);
-        busStop.push_back(stop);
-
         Coordinates::BusStop_S information;
         information.coordinates = coordinates;
         information.stopHour = timeFrom;
         information.stopMin = std::stoi(tokens[1]);
+        information.name = tokens[2];
         /* save information */
         stopInformation.push_back(information);
     }
+
+    currentBusStop.coordinates = new Coordinates(stopInformation[0].coordinates->x, stopInformation[0].coordinates->y);
+    currentBusStop.stopHour = stopInformation[0].stopHour;
+    currentBusStop.stopMin = stopInformation[0].stopMin;
+    currentBusStop.name = stopInformation[0].name;
+
+    nextBusStop.coordinates = new Coordinates(stopInformation[1].coordinates->x, stopInformation[1].coordinates->y);
+    nextBusStop.stopHour = stopInformation[1].stopHour;
+    nextBusStop.stopMin = stopInformation[1].stopMin;
+    nextBusStop.name = stopInformation[1].name;
 
     file.close();
 }
@@ -122,37 +131,59 @@ Bus::MoveBus()
     int minuteNow = Timer::GetMinute();
     Coordinates::BusStop_S next, current;
 
-    for (int i = 0; i < busStop.size() - 1; i++) {
+    for (int i = 0; i < stopInformation.size() - 1; i++) {
         current = stopInformation[i];
         next = stopInformation[i + 1];
+
 
         if (next.stopHour == hourNow && next.stopMin > minuteNow) {
             secNow = Timer::GetSecond();
             x = current.coordinates->x;
             y = current.coordinates->y;
 
+            if(next.coordinates->x > x)
+            {
+                rotation = 0;
+                bus->setTransform(QTransform::fromScale(1, 1));
+            }
+            else if (next.coordinates->x < x)
+            {
+                rotation = 0;
+                bus->setTransform(QTransform::fromScale(-1, 1));
+            }
+            else{
+                if( next.coordinates->y > y )
+                {
+                    rotation = 90;
+                    bus->setTransform(QTransform::fromScale(1, 1));
+                }
+                else
+                {
+                    rotation = -90;
+                    bus->setTransform(QTransform::fromScale(1, 1));
+                }
+            }
+
+            bus->setRotation(rotation);
+
 
             /* moving along the X axis */
-            if (next.coordinates->x > x)
+            if (next.coordinates->y == y)
             {
-                IF(next.coordinates->x < current.coordinates->x, bus->setTransform(QTransform::fromScale(-1, 1));)
-
                 x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, current, next);
-
                 yShift = -5;
 
             } /* moving along the Y axis */
-            else {
-                IF_ELSE(current.coordinates->y < next.coordinates->y, bus->setRotation(90),
-                        bus->setRotation(-90))
-
+            else if (next.coordinates->x == x){
                 y = Bus::GetCoordinate(hourNow, minuteNow, secNow, 0, current, next);
 
-                if(current.coordinates->y<next.coordinates->y)
+                if(current.coordinates->y < next.coordinates->y)
                     xShift = +25;
                 else
                     xShift = -5;
             }
+            busPosition->x = x;
+            busPosition->y = y;
             bus->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
             break;
         }
@@ -162,18 +193,20 @@ Bus::MoveBus()
 int
 Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next)
 {
-    int coordinate;
 
     /* Get number square between current a and next stop */
-    int countSquare = next.coordinates->x + next.coordinates->y - current.coordinates->x - current.coordinates->y;
-
+     int countSquare = next.coordinates->x + next.coordinates->y - currentBusStop.coordinates->x - currentBusStop.coordinates->y;
     /* Time in sex between current a next stop */
     int timerStop = 0;
 
-    if ( next.stopMin > current.stopMin )
-        timerStop = abs(next.stopMin - current.stopMin) * 60;
+
+    std::cerr<< "BUS MOVE time current " << current.name << " = " << current.stopMin<< " \n";
+    std::cerr<< "BUS MOVE time next " << next.name << " = " << next.stopMin<< " \n";
+
+    if ( next.stopMin > minNow)
+        timerStop = abs(next.stopMin - currentBusStop.stopMin) * 60;
     else
-        timerStop = abs( (next.stopMin+60) - current.stopMin) * 60;
+        timerStop = abs( (next.stopMin + 60) - currentBusStop.stopMin) * 60;
 
     /* avg bus movomet  one square for x sex */
     int avgMove = timerStop / countSquare;
@@ -189,16 +222,17 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::Bu
     else
         moved += ((minNow - current.stopMin) * 60) + secNow;
 
-    /* x axis */
-    if (isC == 1)
-    {
-        coordinate = current.coordinates->x + (int)round(moved / avgMove );
+    moved = moved / avgMove;
 
-    }
-    else /* y axis */
-    {
-        coordinate = current.coordinates->y + (int)round(moved / avgMove );
-    }
+    if(isC)
+        return current.coordinates->x + moved;
+    else
+        return current.coordinates->y + moved;
 
-    return coordinate;
+
+
+
+
 }
+
+

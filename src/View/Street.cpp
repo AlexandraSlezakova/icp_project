@@ -1,10 +1,12 @@
 #include "Street.h"
 
-Street::Street(std::string s, Coordinates *start, Coordinates *end)
+Street::Street(std::string s, Coordinates *start, Coordinates *end, float slowdown)
 {
     this->name = std::move(s);
     this->start = start;
     this->end = end;
+    this->slowdown = slowdown;
+    pastslowdown = slowdown;
 }
 
 Street::~Street() =default;

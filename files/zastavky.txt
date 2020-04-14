@@ -1,4 +1,4 @@
-Mojžíšova-0/0 0 0 
+Mojžíšova-Vnitřní 0 0
 Mojžíšova-Tábor 0 10
 Mojžíšova-0/29 0 29
 Mojžíšova-Tyršova 0 39 

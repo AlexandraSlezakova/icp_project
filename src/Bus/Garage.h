@@ -8,12 +8,12 @@
 #define ICP_PROJECT_GARAGE_H
 
 #include "Bus.h"
-
+#include "../View/StreetMap.h"
 class Garage
 {
 public:
     std::vector<std::vector<Bus>> allBusses;
-    std::vector<Bus> line1;
+    std::vector<Bus*> line1;
     std::vector<Bus> line2;
     std::vector<Bus> line3;
     explicit Garage(int busId, int busNumber,QGraphicsScene *scene);
@@ -26,7 +26,12 @@ public:
 
     void DeleteBus();
 
+    void MoveAllBusses(StreetMap *streetMap);
+
     Bus* GetBus(int busId, int busLine);
+
+    Bus* CheckSlowDown(StreetMap *streetMap, Bus *bus);
+
 
 private:
 

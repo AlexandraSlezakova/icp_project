@@ -39,7 +39,7 @@ Scene::AddMap(StreetMap *streetMap)
 void
 Scene::SetUpView()
 {
-    setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    //setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
@@ -48,9 +48,8 @@ Scene::SetUpView()
 void
 Scene::GetBus1Timetable()
 {
-    Bus* bus = garage->GetBus(busId, 1);
+    Bus* bus = garage->GetBus(0, 1);
     bus->CreateTimetable(text, map->layout, "#FF0000");
-    bus->InitBus(scene);
     bus->MoveBus();
 }
 
@@ -80,6 +79,43 @@ void Scene::wheelEvent(QWheelEvent *event) {
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }
 
+void Scene::mousePressEvent(QMouseEvent *event){
+    if (event->button() == Qt::RightButton)
+    {
+        m_moving = true;
+        m_originalX = event->x();
+        m_originalY = event->y();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+}
+
+void Scene::mouseReleaseEvent(QMouseEvent *event){
+    if (event->button() == Qt::RightButton)
+    {
+        m_moving = false;
+        setCursor(Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+    event->ignore();
+}
+
+void Scene::mouseMoveEvent(QMouseEvent *event){
+    if (m_moving)
+    {
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->x() - m_originalX));
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->y() - m_originalY));
+        m_originalX = event->x();
+        m_originalY = event->y();
+        event->accept();
+        return;
+    }
+    event->ignore();
+
+}
+
 void Scene::ZoomAdd() {
     double scaleFactor = 1.15;
     scale(scaleFactor,scaleFactor);
@@ -95,6 +131,13 @@ void Scene::ZoomSub() {
 }
 
 void Scene::MoveBus() {
-    Bus* bus = garage->GetBus(0, 1);
-    bus->MoveBus();
+    garage->MoveAllBusses(map);
 }
+
+void Scene::StreetUpdate(float updateSlowdown, std::string name)
+{
+    map->UpdateStreet(name, updateSlowdown);
+}
+
+
+

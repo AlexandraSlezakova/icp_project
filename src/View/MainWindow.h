@@ -50,6 +50,8 @@ public:
      */
     void InitButtons(QWidget *parent, Scene *scene);
 
+    void InitSliders(QWidget *parent, Scene *scene);
+
 public slots:
     /**
      * @bried stop timer to read input
@@ -66,6 +68,8 @@ public slots:
      */
     void ResetTimer();
 
+    void value(int slowDown);
+
 
 
 protected:
@@ -76,6 +80,10 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 private:
+    QComboBox *combobox;
+    QSlider *slider;
+    std::string streetUpdate;           //!<
+
     QPushButton *timerButton;       //!< button to start or stop timer
     QPushButton *zoomButtonAdd;     //!< button to zoom in scene
     QPushButton *zoomButtonSub;     //!< button to zoom out scene
