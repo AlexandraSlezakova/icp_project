@@ -194,22 +194,27 @@ int
 Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next)
 {
 
+    int coordinates;
     /* Get number square between current a and next stop */
      int countSquare = next.coordinates->x + next.coordinates->y - currentBusStop.coordinates->x - currentBusStop.coordinates->y;
-    /* Time in sex between current a next stop */
+    /* Time in sec between current a next stop */
     int timerStop = 0;
 
 
-    std::cerr<< "BUS MOVE time current " << current.name << " = " << current.stopMin<< " \n";
-    std::cerr<< "BUS MOVE time next " << next.name << " = " << next.stopMin<< " \n";
+    /*std::cerr<< "BUS MOVE time current " << current.name << " = " << current.stopMin<< " \n";
+    std::cerr<< "BUS MOVE current position       x: " << currentBusStop.coordinates->x << "    y: " << currentBusStop.coordinates->y<< " \n";
+    std::cerr<< "BUS position                    x: " << busPosition->x << "    y: " << busPosition->y<< " \n";*/
+
 
     if ( next.stopMin > minNow)
-        timerStop = abs(next.stopMin - currentBusStop.stopMin) * 60;
+        timerStop = abs(next.stopMin - currentBusStop.stopMin) * 60 ;
     else
-        timerStop = abs( (next.stopMin + 60) - currentBusStop.stopMin) * 60;
+        timerStop = abs( (next.stopMin + 60) - currentBusStop.stopMin) * 60 ;
 
-    /* avg bus movomet  one square for x sex */
-    int avgMove = timerStop / countSquare;
+    /* avg bus movemet  one square for x sec */
+    //std::cerr<< "BUS avgMove: " << timerStop << " / " << countSquare << " \n";
+    int avgMove = nearbyint(timerStop / countSquare);
+    //std::cerr<< "BUS avgMove: " << avgMove << " \n";
 
     /*  time when bus past last stop */
     int moved = 0;
@@ -220,18 +225,28 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::Bu
     if (minNow == current.stopMin)
         moved = secNow;
     else
-        moved += ((minNow - current.stopMin) * 60) + secNow;
+        moved += ((minNow - currentBusStop.stopMin) * 60) + secNow;
 
-    moved = moved / avgMove;
+    //std::cerr<< "BUS moved in sec: " << moved << " \n";
+    moved = nearbyint(moved / avgMove);
 
-    if(isC)
-        return current.coordinates->x + moved;
+    //std::cerr<< "BUS moved in pol: " << moved << " \n";
+
+    if (isC)
+    {
+        coordinates = currentBusStop.coordinates->x + moved;
+        //std::cerr<< "BUS now position   x:" << busPosition->x + moved << " \n";
+        //std::cerr<< "BUS next position  x:" << current.coordinates->x + moved << " \n";
+    }
     else
-        return current.coordinates->y + moved;
+    {
+        coordinates = currentBusStop.coordinates->y + moved;
+       // std::cerr<< "BUS now position   y:" << busPosition->y + moved << " \n";
+      //  std::cerr<< "BUS next position  y:" << current.coordinates->y + moved << " \n";
+    }
 
-
-
-
+    //std::cerr<< "BUS MOVE time current " << next.name << " = " << next.stopMin<< " \n";
+    return coordinates;
 
 }
 

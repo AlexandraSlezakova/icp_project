@@ -129,6 +129,13 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
     scene->zoomText->show();
 
+    roadBlockButton = new QPushButton(parent);
+    roadBlockButton->move(TIME_AREA_WIDTH + 100, 515);
+    roadBlockButton->setFixedSize(200, 30);
+    roadBlockButton->setText("RoadBlockMood OFF");
+    roadBlockButton->setStyleSheet("background-color: red");
+    connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
+
 
 }
 
@@ -197,6 +204,22 @@ void MainWindow::value(int slowDown) {
 
     scene->map->UpdateStreet(combobox->currentText().toStdString(),(float)slowDown / 100 + 1);
 
+}
+
+void MainWindow::RoadBlockSwitcher()
+{
+    if (!scene->roadBlockMode)
+    {
+        roadBlockButton->setText("RoadBlockMood ON");
+        roadBlockButton->setStyleSheet("background-color: green");
+        scene->roadBlockMode = true;
+    }
+    else
+    {
+        roadBlockButton->setText("RoadBlockMood OFF");
+        roadBlockButton->setStyleSheet("background-color: red");
+        scene->roadBlockMode = false;
+    }
 }
 
 

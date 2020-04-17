@@ -28,7 +28,6 @@ Bus* Garage::GetBus(int busId, int busLine) {
 void Garage::MoveAllBusses(StreetMap *streetMap) {
     for ( int i = 0; i < line1.size(); i++ )
     {
-
         line1[i] = CheckSlowDown(streetMap,line1[i]);
         line1[i]->MoveBus();
     }
@@ -56,6 +55,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
     int timeadd = 0;
     int i = 0;
     int stopTime = 0;
+    int pop = 0;
 
     for (; i < bus->stopInformation.size() - 2; i++) {
         int nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
@@ -83,17 +83,19 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     street = streetMap->GetStreet(streetname);
 
-    if((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name) or street->pastslowdown != street->slowdown)
-    {
-        if(bus->stopInformation[i].name != bus->currentBusStop.name && bus->stopInformation[i + 1].name != bus->nextBusStop.name)
+    if((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name)
+        or street->pastslowdown != street->slowdown) {
+        if (bus->stopInformation[i].name != bus->currentBusStop.name &&
+            bus->stopInformation[i + 1].name != bus->nextBusStop.name)
         {
             bus->currentBusStop = bus->stopInformation[i];
             bus->nextBusStop = bus->stopInformation[i + 1];
         }
         else{
-            bus->currentBusStop.coordinates = bus->busPosition;
+             bus->currentBusStop.coordinates = bus->busPosition;
+             bus->currentBusStop.stopHour = hourNow;
+             bus->currentBusStop.stopMin = minuteNow;
         }
-
 
         if ( minuteNow < bus->currentBusStop.stopMin )
             timeadd = 60 + minuteNow - bus->currentBusStop.stopMin;
@@ -101,11 +103,14 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             timeadd = minuteNow - bus->currentBusStop.stopMin;
 
         if(bus->nextBusStop.stopMin < bus->currentBusStop.stopMin )
-            stopTime = 60 + bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeadd;
+            stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin- timeadd;
         else
             stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeadd;
 
+        int k =  stopTime;
         stopTime = round(stopTime * street->slowdown);
+        k = stopTime - k;
+
 
         if(bus->currentBusStop.stopMin + stopTime > 60)
         {
@@ -117,18 +122,27 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeadd + stopTime;
         }
 
-        std::cerr<< "CHECK time next " << bus->stopInformation[i+1].name << " = " << bus->stopInformation[i+1].stopMin<< " \n";
+        //std::cerr<< "CHECK time next " << bus->stopInformation[i+1].name << " = " << bus->stopInformation[i+1].stopMin<< " \n";
         i++;
 
         for (; i < bus->stopInformation.size() - 2; i++) {
-            if(bus->currentBusStop.stopMin + stopTime > 60)
+            if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
+            - bus->stopInformation[i+1].coordinates->x - bus->stopInformation[i+1].coordinates->y == 10 )
+            {
+                pop = 2;
+            } else
+            {
+                pop = 3;
+            }
+
+            if(bus->stopInformation[i].stopMin + pop > 60)
             {
                 bus->stopInformation[i+1].stopHour += 1;
-                bus->stopInformation[i+1].stopMin = bus->stopInformation[i].stopMin +  stopTime - 60;
+                bus->stopInformation[i+1].stopMin = bus->stopInformation[i].stopMin +  pop - 60;
             }
             else
             {
-                bus->stopInformation[i+1].stopMin = bus->stopInformation[i].stopMin + stopTime;
+                bus->stopInformation[i+1].stopMin = bus->stopInformation[i].stopMin + pop;
             }
         }
         street->pastslowdown = street->slowdown;

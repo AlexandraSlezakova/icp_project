@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "Scene.h"
 
 
@@ -20,6 +21,7 @@ Scene::CreateMap()
     /* add it to scene */
     AddMap(map);
 
+
     /* add buses */
     garage = new Garage(busId,1,scene);
 
@@ -39,7 +41,7 @@ Scene::AddMap(StreetMap *streetMap)
 void
 Scene::SetUpView()
 {
-    //setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
@@ -80,7 +82,7 @@ void Scene::wheelEvent(QWheelEvent *event) {
 }
 
 void Scene::mousePressEvent(QMouseEvent *event){
-    if (event->button() == Qt::RightButton)
+    /*if (event->button() == Qt::RightButton)
     {
         m_moving = true;
         m_originalX = event->x();
@@ -89,9 +91,39 @@ void Scene::mousePressEvent(QMouseEvent *event){
         event->accept();
         return;
     }
+    else*/
+    if (event->button() == Qt::LeftButton && roadBlockMode)
+    {
+        QGraphicsItem *item = itemAt(event->pos());
+        auto *square = dynamic_cast<Square*>(item);
+        auto *photo = dynamic_cast<QGraphicsPixmapItem*>(item);
+        if (square)
+        {
+            squareRoadBlock(square,map,!square->roadBlock);
+            std::cerr << "square \n";
+        }
+        else if(photo)
+        {
+            for(int i = 0; i < map->stoped.size(); i++)
+            {
+                if(map->stoped[i].photo == photo)
+                {
+                    map->stoped[i] = busStopRoadBlock(map->stoped[i]);
+                    std::cerr << "stop \n";
+                }
+            }
+            for(auto bus : garage->line1)
+                if(bus->bus == photo)
+                    std::cerr << "bus \n";
+        }
+        else
+        {
+            std::cerr << "Klik mimo \n";
+        }
+    }
 }
 
-void Scene::mouseReleaseEvent(QMouseEvent *event){
+/*void Scene::mouseReleaseEvent(QMouseEvent *event){
     if (event->button() == Qt::RightButton)
     {
         m_moving = false;
@@ -114,7 +146,7 @@ void Scene::mouseMoveEvent(QMouseEvent *event){
     }
     event->ignore();
 
-}
+}*/
 
 void Scene::ZoomAdd() {
     double scaleFactor = 1.15;
@@ -138,6 +170,66 @@ void Scene::StreetUpdate(float updateSlowdown, std::string name)
 {
     map->UpdateStreet(name, updateSlowdown);
 }
+
+void Scene::RoadBlock(int x, int y)
+{
+
+
+}
+
+void Scene::squareRoadBlock(Square* square,  StreetMap *map, bool onoff)
+{
+    if (square == NULL)
+        return;
+    int x = square->row;
+    int y = square->col;
+    if(x < 0 or x >= 138)
+        return;
+    if(y < 0 or y >= 79)
+        return;
+    /* firt for add new roadblock */
+    if(square->road)
+    {
+        if(!square->hasStop and square->roadBlock != onoff)
+        {
+            if(onoff)
+            {
+                square->roadBlock = true;
+                map->layout[x][y]->SetColor("#FF0000");
+            }
+            else
+            {
+                square->roadBlock = false;
+                map->layout[x][y]->SetColor("#C0C0C0");
+            }
+            squareRoadBlock(map->layout[x + 1][y], map,onoff);
+            squareRoadBlock(map->layout[x - 1][y], map,onoff);
+            squareRoadBlock(map->layout[x][y + 1], map,onoff);
+            squareRoadBlock(map->layout[x][y - 1], map,onoff);
+        }
+    }
+}
+
+StreetMap::stopData Scene::busStopRoadBlock(StreetMap::stopData stop)
+{
+    QString path;
+
+    if(!stop.stop->roadStop)
+    {
+        path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop_roadblock.jpg"));
+        stop.stop->roadStop = true;
+    }
+    else
+    {
+        path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
+        stop.stop->roadStop = false;
+    }
+    stop.photo = stop.stop->AddStopToScene(scene, path);
+
+    return stop;
+
+}
+
 
 
 

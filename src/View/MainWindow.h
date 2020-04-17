@@ -69,6 +69,7 @@ public slots:
     void ResetTimer();
 
     void value(int slowDown);
+    void RoadBlockSwitcher();
 
 
 
@@ -83,6 +84,7 @@ private:
     QComboBox *combobox;
     QSlider *slider;
     std::string streetUpdate;           //!<
+    QPushButton *roadBlockButton;
 
     QPushButton *timerButton;       //!< button to start or stop timer
     QPushButton *zoomButtonAdd;     //!< button to zoom in scene
@@ -96,6 +98,7 @@ private:
     int width = 0;          //!< width of screen
     int height = 0;         //!< height of screen
     int stopFlag = 0;       //!< timer is active or inactive
+
 
 };
 #endif // MAINWINDOW_H

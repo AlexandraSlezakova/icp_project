@@ -19,6 +19,7 @@ public:
     Coordinates *busPosition;
     int rotation;
     int avgspeed;
+    QGraphicsPixmapItem *bus;   //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;
 
     /**
@@ -69,7 +70,7 @@ private:
 
     int busNumber_;             //!< number of bus
 
-    QGraphicsPixmapItem *bus;   //!< picture of bus
+
 };
 
 

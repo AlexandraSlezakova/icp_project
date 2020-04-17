@@ -32,6 +32,8 @@ public:
     int row = 0;                //!< row
     int col = 0;                //!< column
     bool hasStop = false;       //!< information about bus stop on square
+    bool roadBlock = false;
+    bool road = false;
 
 private:
     QColor color_;              //!< color of square

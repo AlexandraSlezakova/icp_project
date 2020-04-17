@@ -11,6 +11,11 @@
 class StreetMap : public QGraphicsRectItem
 {
 public:
+    struct stopData
+    {
+        Stop *stop;
+        QGraphicsPixmapItem *photo;
+    };
     /**
      * @brief initial setup of map
      */
@@ -49,6 +54,10 @@ public:
 
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
     Square *layout[X][Y]{};
+
+
+
+    std::vector<stopData> stoped;
 };
 
 #endif // STREETMAP_H
