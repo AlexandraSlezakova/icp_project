@@ -11,7 +11,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "StreetMap.h"
-
+#include "../Bus/Garage.h"
 
 class Scene : public QGraphicsView
 {
@@ -39,13 +39,23 @@ public:
      */
     void SetUpView();
 
+    void StreetUpdate(float updateSlowdown, std::string name);
+
 
     QGraphicsScene *scene;
     QPlainTextEdit *text;
     QLabel *zoomText;
     int busId = 0;          //!< id of bus
     double zoom_act = 100;  //!< double expression of zoom
+    Garage *garage; //!< All busses
+    StreetMap *map;
+    bool roadBlockMode = false;
 
+    int  m_originalX = 0;
+    int  m_originalY = 0;
+    bool m_moving = false;
+
+    std::vector<QGraphicsPixmapItem*> stops;
 
 
 protected:
@@ -62,7 +72,9 @@ public slots:
      */
     void GetBus1Timetable();
 
-    void MoveBus1();
+    void MoveBus();
+
+    void MoveBuses();
 
     /**
     * @brief zoom in scene
@@ -74,8 +86,23 @@ public slots:
     */
     void ZoomSub();
 
+
+
+
 private:
-    StreetMap *map;
+
+    //void mouseMoveEvent(QMouseEvent *event);
+
+    //void mouseReleaseEvent(QMouseEvent *event);
+
+    void mousePressEvent(QMouseEvent *event);
+
+    void RoadBlock(int x, int y);
+
+
+    void squareRoadBlock(Square *square, StreetMap *map, bool onoff);
+
+    StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
 };
 
 #endif // SCENE_H
