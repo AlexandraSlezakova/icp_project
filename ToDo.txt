@@ -1,8 +1,6 @@
 1. Move u Autobusu // uděláné
 2. Čtení zastávek z listu u autobusu // udělané
 3. Garáž pro 1 autobus // Udělané
-4. Spomalení ulic
+4. Spomalení ulic // Udělané ale je tam někde výpočetní chyba!!!
 5. Uzavírka ulic
-6.Udělat garáž
-7. Garáž pro vícero autobusů
-7. Move pro víc autobusů
+6. Garáž pro vícero autobusů
