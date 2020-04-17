@@ -39,11 +39,14 @@ public:
      * @param scene scene where to put image
      * @param pathToFile path to image
      */
-    void AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
+    QGraphicsPixmapItem* AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
 
     Coordinates *coordinates;                               //!< coordinates of bus stop
-    std::string stopName;                                   //!< bus stop name
+    std::string stopName;     //!< bus stop name
+    bool roadStop;
+
     static std::map<std::string, Coordinates*> stopList;    //!< list of stops
+
 
 private:
     QBrush brush;

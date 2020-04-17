@@ -1,4 +1,4 @@
-0 00 Mojžíšova-0/0
+0 00 Mojžíšova-Vnitřní
 0 02 Mojžíšova-Tábor
 0 05 Mojžíšova-0/29
 0 07 Mojžíšova-Tyršova
@@ -40,4 +40,4 @@
 1 29 Pešinova-Tábor
 1 30 Pešinova-Vnitřní
 1 32 Vnitřní-19/0
-1 35 Mojžíšova-0/0
+1 35 Mojžíšova-Vnitřní

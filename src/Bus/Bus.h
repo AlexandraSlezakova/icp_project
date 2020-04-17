@@ -14,13 +14,20 @@
 class Bus
 {
 public:
+    int id_;                    //!< id of bus
+    std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
+    Coordinates *busPosition;
+    int rotation;
+    int avgspeed;
+    QGraphicsPixmapItem *bus;   //!< picture of bus
+    Coordinates::BusStop_S nextBusStop, currentBusStop;
 
     /**
      * @brief bus constructor
      * @param id id of bus
      * @param busNumber number of bus
      */
-    explicit Bus(int id, int busNumber);
+    explicit Bus(int id, int busNumber, Coordinates *position);
 
     ~Bus() = default;
 
@@ -47,7 +54,7 @@ public:
      * @param next next bus stop coordinate
      * @return x or y position of bus
      */
-    static int GetCoordinate(int secNow, int isC, int halfWay, int current, int next);
+     int GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next);
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
@@ -60,10 +67,10 @@ public:
     Square *currentSquare;                           //!< square where bus is
 
 private:
-    int id_;                    //!< id of bus
+
     int busNumber_;             //!< number of bus
-    QGraphicsPixmapItem *bus;   //!< picture of bus
-    std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
+
+
 };
 
 

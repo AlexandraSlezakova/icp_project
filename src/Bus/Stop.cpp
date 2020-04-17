@@ -6,6 +6,7 @@ Stop::Stop(std::string name, Coordinates *coordinate)
     stopName = std::move(name);
     /* add stop to list */
     stopList.emplace(stopName, coordinates);
+    roadStop = false;
 }
 
 Stop::~Stop() =default;
@@ -25,7 +26,7 @@ Stop::GetStop(const std::string& name)
 std::map<std::string, Coordinates*> Stop::stopList{};
 
 
-void
+QGraphicsPixmapItem*
 Stop::AddStopToScene(QGraphicsScene *scene, const QString& pathToFile)
 {
     auto *item = new QGraphicsPixmapItem(QPixmap(pathToFile));
@@ -34,4 +35,5 @@ Stop::AddStopToScene(QGraphicsScene *scene, const QString& pathToFile)
     item->setScale(0.05);
     /* put image in the center of square */
     item->setPos(coordinates->x * SQUARE_SIZE + 2, coordinates->y * SQUARE_SIZE + 1);
+    return item;
 }

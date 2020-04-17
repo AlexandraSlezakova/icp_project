@@ -21,7 +21,7 @@ public:
      * @param start coordinates of start of street
      * @param end coordinates of end of street
      */
-    Street(std::string s, Coordinates *start, Coordinates *end);
+    Street(std::string s, Coordinates *start, Coordinates *end,float slowdown);
 
     ~Street();
 
@@ -34,6 +34,8 @@ public:
     std::string name;                       //!< name of street
     Coordinates* start;                     //!< start of street
     Coordinates* end;                       //!< end of street
+    float slowdown;                           //!< slowdown on street
+    float pastslowdown;
 
 protected:
     std::vector<Stop*> busStopsList;            //!< bus stops list
