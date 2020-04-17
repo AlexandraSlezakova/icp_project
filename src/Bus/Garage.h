@@ -3,7 +3,6 @@
  * @brief Garage header file
  * @author Martin Vadura, Alexandra Slezakova
  */
-
 #ifndef ICP_PROJECT_GARAGE_H
 #define ICP_PROJECT_GARAGE_H
 
@@ -12,7 +11,7 @@
 class Garage
 {
 public:
-    std::vector<std::vector<Bus>> allBusses;
+    std::vector<std::vector<Bus>> allBuses;
     std::vector<Bus*> line1;
     std::vector<Bus> line2;
     std::vector<Bus> line3;
@@ -20,13 +19,9 @@ public:
 
     ~Garage() = default;
 
-    void InitGarage();
-
     void AddBus(Bus bus);
 
-    void DeleteBus();
-
-    void MoveAllBusses(StreetMap *streetMap);
+    void MoveAllBuses(StreetMap *streetMap);
 
     Bus* GetBus(int busId, int busLine);
 

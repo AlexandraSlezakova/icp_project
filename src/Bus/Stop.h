@@ -41,7 +41,7 @@ public:
      */
     QGraphicsPixmapItem* AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
 
-    Coordinates *coordinates;                               //!< coordinates of bus stop
+    Coordinates *coordinates;  //!< coordinates of bus stop
     std::string stopName;     //!< bus stop name
     bool roadStop;
 

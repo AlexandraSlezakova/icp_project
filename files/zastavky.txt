@@ -10,6 +10,7 @@ Remešova-Škálova 19 49
 Remešova-Karlova 19 68 
 Remešova-Krajní 19 78 
 Vnitřní-19/0 19 0
+Tábor-19/11 19 10
 Pešinova-Vnitřní 29 0
 Pešinova-Tábor 29 10
 Pešinova-29/29 29 29
@@ -31,7 +32,7 @@ Hutařova-Tyršova 58 39
 Hutařova-58/49 58 49
 Hutařova-Karlova 58 68
 Hutařova-Krajní 58 78
-Hutařova-Kamanova 78 78
+Krajní-Kamanova 78 78
 Vnitřní-68/0 68 0
 Tererova-68/29 68 29
 Tyršova-68/39 68 39 
@@ -41,7 +42,6 @@ Tererova-78/29 78 29
 Kamanova-Tyršova 78 39
 Kamanova-68/49 78 49
 Kamanova-Psotova 78 68
-Kamanova-Krajní 68 78
 Bystřinova-Vnitřní 97 0
 Bystřinova-97/10 97 10
 Bystřinova-Tererova 97 29

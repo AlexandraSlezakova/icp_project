@@ -99,8 +99,7 @@ private:
 
     void RoadBlock(int x, int y);
 
-
-    void squareRoadBlock(Square *square, StreetMap *map, bool onoff);
+    void squareRoadBlock(Square *square, bool onOff);
 
     StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
 };

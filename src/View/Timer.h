@@ -59,7 +59,6 @@ private:
     static int min;         //!< minute
     static int sec;         //!< second
     static tm *ltm;
-
 };
 
 

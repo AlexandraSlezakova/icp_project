@@ -69,9 +69,8 @@ public slots:
     void ResetTimer();
 
     void value(int slowDown);
+
     void RoadBlockSwitcher();
-
-
 
 protected:
     /**
@@ -83,7 +82,7 @@ protected:
 private:
     QComboBox *combobox;
     QSlider *slider;
-    std::string streetUpdate;           //!<
+    std::string streetUpdate;
     QPushButton *roadBlockButton;
 
     QPushButton *timerButton;       //!< button to start or stop timer
