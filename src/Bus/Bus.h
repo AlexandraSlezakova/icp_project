@@ -14,13 +14,11 @@
 class Bus
 {
 public:
-    int id_;                    //!< id of bus
+    int id_;                                                //!< id of bus
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
-    Coordinates *busPosition;
-    int rotation;
-    int avgspeed;
-    QGraphicsPixmapItem *bus;   //!< picture of bus
-    Coordinates::BusStop_S nextBusStop, currentBusStop;
+    Coordinates *busPosition;                               //!< position of bus
+    QGraphicsPixmapItem *bus;                               //!< picture of bus
+    Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
 
     /**
      * @brief bus constructor
@@ -39,11 +37,6 @@ public:
     void InitBus(QGraphicsScene *scene);
 
     /**
-     * @brief set position of bus according its timetable
-     */
-    void MoveBus();
-
-    /**
      * @brief get coordinates of bus
      * if secNow is greater than 30 and we are moving along the x axis, set x coordinate near to next bus stop
      * otherwise set it near to current bus stop, same with the y axis
@@ -54,7 +47,12 @@ public:
      * @param next next bus stop coordinate
      * @return x or y position of bus
      */
-     int GetCoordinate(int hourNow, int minNow, int secNow, int isC, Coordinates::BusStop_S current,Coordinates::BusStop_S next);
+     int GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next);
+
+    /**
+     * @brief set position of bus according its timetable
+     */
+    void MoveBus();
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
@@ -64,11 +62,13 @@ public:
      */
     void CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& color);
 
-    Square *currentSquare;                           //!< square where bus is
-
 private:
-
     int busNumber_;             //!< number of bus
+
+    /**
+     * @brief load timetable of bus from file and save all information
+     */
+    void LoadTimetable();
 
 
 };

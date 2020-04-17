@@ -2,7 +2,6 @@
 
 StreetMap::StreetMap(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
 {
-
     for (int x = 0; x < X; x++) {
         for (int y = 0; y < Y; y++) {
             Map[x][y].push_back(nullptr);
@@ -20,7 +19,6 @@ StreetMap::StreetMap(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
         }
     }
 }
-
 
 StreetMap::~StreetMap()
 {
@@ -94,19 +92,19 @@ StreetMap::GetStreet(const std::string& name)
     return nullptr;
 }
 
-void StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
+void
+StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 {
     for (auto & x : Map) {
         for (auto & y : x) {
             if (!y.empty()) {
-                if (y.front() && y.front()->name == name)
-                {
+                if (y.front() && y.front()->name == name) {
                     y.front()->slowdown = updateSlowdown;
                     return;
                 }
-                    /* two crossed streets */
-                if (y.size() > 1 && y.back()->name == name)
-                {
+
+                /* two crossed streets */
+                if (y.size() > 1 && y.back()->name == name) {
                     y.back()->slowdown = updateSlowdown;
                     return;
                 }
@@ -152,7 +150,7 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
     Square *square;
     Street *street = nullptr;
     int x, y;
-    int i = 0;
+    int i;
 
     /* path to image */
     QString path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
@@ -185,10 +183,9 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
 
             /* add stop to scene */
             stopInfo.photo = stop->AddStopToScene(scene, path);
-            this->stoped.push_back(stopInfo);
-
-
-        } else {
+            this->stopped.push_back(stopInfo);
+        }
+        else {
             std::cerr << "Error: Couldn't find street " << streetName << std::endl;
         }
 

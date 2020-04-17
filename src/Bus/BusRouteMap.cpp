@@ -10,7 +10,7 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Squar
         currentCoordinate = stopInformation[i].coordinates;
         nextCoordinate = stopInformation[i + 1].coordinates;
 
-        /* moving in x axis */
+        /* moving along the X axis */
         if (nextCoordinate->x == currentCoordinate->x) {
             from = currentCoordinate->y;
             to = nextCoordinate->y;
@@ -27,7 +27,7 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Squar
                 layout[currentCoordinate->x][y]->SetColor(color);
             }
 
-        } /* moving in y axis */
+        } /* moving along the Y axis */
         else {
             from = currentCoordinate->x;
             to = nextCoordinate->x;

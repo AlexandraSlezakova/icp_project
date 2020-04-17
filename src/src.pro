@@ -27,6 +27,7 @@ SOURCES += \
     View/StreetMap.cpp \
     Bus/Bus.cpp \
     Bus/BusRouteMap.cpp \
+    View/Timer.cpp \
 
 HEADERS += \
     View/MainWindow.h \
@@ -40,6 +41,7 @@ HEADERS += \
     View/StreetMap.h \
     Bus/Bus.h \
     Bus/BusRouteMap.h \
+    View/Timer.h \
 
 FORMS += \
     mainwindow.ui

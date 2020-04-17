@@ -25,7 +25,6 @@ Stop::GetStop(const std::string& name)
 
 std::map<std::string, Coordinates*> Stop::stopList{};
 
-
 QGraphicsPixmapItem*
 Stop::AddStopToScene(QGraphicsScene *scene, const QString& pathToFile)
 {
