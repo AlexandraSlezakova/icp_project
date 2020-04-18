@@ -34,8 +34,8 @@ public:
     std::string name;                       //!< name of street
     Coordinates* start;                     //!< start of street
     Coordinates* end;                       //!< end of street
-    float slowdown;                           //!< slowdown on street
-    float pastslowdown;
+    float slowdown;                         //!< slowdown on street
+    float pastslowdown;                     //!< history slowdown on street
 
 protected:
     std::vector<Stop*> busStopsList;            //!< bus stops list

@@ -49,6 +49,11 @@ public:
      */
     Street *GetStreet(const std::string& name);
 
+    /**
+     * @brief update slowdown on street
+     * @param name name of street
+     * @param updateSlowdown value to change
+     */
     void UpdateStreet(const std::string& name, float updateSlowdown);
 
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
