@@ -80,10 +80,10 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 private:
-    QComboBox *combobox;
-    QSlider *slider;
-    std::string streetUpdate;
-    QPushButton *roadBlockButton;
+    QComboBox *combobox;            //!< combobox on pick street to slowdown
+    QSlider *slider;                //!< slider to change street slowdown
+    std::string streetUpdate;       //!< street name
+    QPushButton *roadBlockButton;   //!< button to add roadblock
 
     QPushButton *timerButton;       //!< button to start or stop timer
     QPushButton *zoomButtonAdd;     //!< button to zoom in scene

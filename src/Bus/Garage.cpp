@@ -3,12 +3,10 @@
 
 Garage::Garage(int busId, int busNumber,QGraphicsScene *scene)
 {
-    Coordinates *pos = new Coordinates(0,0);
-    Bus *bus = new Bus(busId, busNumber, pos);
+    Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
     bus->InitBus(scene);
     bus->MoveBus();
     line1.push_back(bus);
-    //allBusses.push_back(line1);
 }
 
 void
@@ -19,9 +17,9 @@ Garage::AddBus(Bus bus)
 
 Bus* Garage::GetBus(int busId, int busLine) {
     if (busLine == 1) {
-        for (auto & i : line1) {
-            if (busId == i->id_)
-                return i;
+        for (auto & bus : line1) {
+            if (busId == bus->id_)
+                return bus;
         }
     }
     return nullptr;
@@ -59,6 +57,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
     int stopTime;
     int pop;
 
+    /* zjištěný na základě času mezi kterými zastávkami se autobuse nalézá */
     int nxt, nw, mn;
     for (; i < bus->stopInformation.size() - 2; i++) {
         nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
@@ -86,9 +85,14 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     street = streetMap->GetStreet(streetName);
 
+    /*výpočet nového času u zastávky je počítáno jen když se změní:
+     * název minulé a budoucí zastávky
+     * zpomalení ulice
+     * */
     if ((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name)
         or street->pastslowdown != street->slowdown) {
 
+        /* rozhodování které změná možnost proběhla */
         if (bus->stopInformation[i].name != bus->currentBusStop.name
             && bus->stopInformation[i + 1].name != bus->nextBusStop.name)
         {
@@ -101,20 +105,24 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
              bus->currentBusStop.stopMin = minuteNow;
         }
 
+        /* výpočet kolik minut je už bus na cestě */
         if (minuteNow < bus->currentBusStop.stopMin)
             timeAdd = 60 + minuteNow - bus->currentBusStop.stopMin;
         else
             timeAdd = minuteNow - bus->currentBusStop.stopMin;
 
+        /* dopočítání času, který se bude zpomalovat */
         if (bus->nextBusStop.stopMin < bus->currentBusStop.stopMin)
             stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
         else
             stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
 
-        int k =  stopTime;
+        /* výpočet zpomalení času */
         stopTime = round(stopTime * street->slowdown);
-        k = stopTime - k;
 
+        /* změna času následující zastávky
+         * čas minuté zastávky + čas který autobus ujel + vypočítaného času, který ještě zbývá do další zastávky
+         * */
         if(bus->currentBusStop.stopMin + stopTime > 60) {
             bus->stopInformation[i+1].stopHour += 1;
             bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
@@ -124,6 +132,20 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         }
 
         i++;
+
+        /* změna všech následujích zastávek o čas na základě vzdálenosti v dílcíhc
+         * 10 dílků - 2 minuty
+         * 19 dílku - 3 minuty
+         * zpoždění je už započítané z předchozího výpočtu
+         * example
+         * mezi zastávkami jede autobus 2 minuty 10:02, 10:04
+         * minutu už ujel
+         * minuta zbývá
+         * zpomalená ulice 2
+         * dopočítaná hodnota 2 minuty
+         * nově vypočítaná hodnota 10:02 + ujetá vzdálenost (1) + dopočítané zpoždění (2)
+         * = dojezdový čas 10:05
+         * */
         for (; i < bus->stopInformation.size() - 2; i++) {
             if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
             - bus->stopInformation[i+1].coordinates->x - bus->stopInformation[i+1].coordinates->y == 10) {
@@ -141,6 +163,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
                 bus->stopInformation[i+1].stopMin = bus->stopInformation[i].stopMin + pop;
             }
         }
+        /* uležní aktuální zpomalení */
         street->pastslowdown = street->slowdown;
     }
         return bus;

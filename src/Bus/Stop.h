@@ -38,12 +38,13 @@ public:
      * where bus stops of each street are
      * @param scene scene where to put image
      * @param pathToFile path to image
+     * @return to save stop photo
      */
     QGraphicsPixmapItem* AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
 
     Coordinates *coordinates;  //!< coordinates of bus stop
-    std::string stopName;     //!< bus stop name
-    bool roadStop;
+    std::string stopName;      //!< bus stop name
+    bool roadStop;             //!< save information abot roadstop on Stops
 
     static std::map<std::string, Coordinates*> stopList;    //!< list of stops
 

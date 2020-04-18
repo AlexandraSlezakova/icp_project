@@ -144,12 +144,14 @@ void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
     std::string line;
     std::vector<std::string> street;
 
+    /* streetpicker */
     combobox = new QComboBox(parent);
     combobox->move(TIME_AREA_WIDTH + 20, 815);
     combobox->setFixedSize(60,40);
 
     file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
 
+    /* add choice to streetpicker */
     while (std::getline(file, line)) {
 
         street = Functions::Split(line, " ");
@@ -157,7 +159,7 @@ void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
     }
 
 
-
+    /* slider on changing street slowdown */
     slider = new QSlider(Qt::Horizontal,parent);
     slider->move(TIME_AREA_WIDTH + 70, 815);
     slider->setFixedSize(60,40);

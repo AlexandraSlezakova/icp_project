@@ -51,15 +51,8 @@ Bus::LoadTimetable()
         stopInformation.push_back(information);
     }
 
-    currentBusStop.coordinates = new Coordinates(stopInformation[0].coordinates->x, stopInformation[0].coordinates->y);
-    currentBusStop.stopHour = stopInformation[0].stopHour;
-    currentBusStop.stopMin = stopInformation[0].stopMin;
-    currentBusStop.name = stopInformation[0].name;
-
-    nextBusStop.coordinates = new Coordinates(stopInformation[1].coordinates->x, stopInformation[1].coordinates->y);
-    nextBusStop.stopHour = stopInformation[1].stopHour;
-    nextBusStop.stopMin = stopInformation[1].stopMin;
-    nextBusStop.name = stopInformation[1].name;
+    currentBusStop = stopInformation[0];
+    nextBusStop = stopInformation[1];
 
     file.close();
 }

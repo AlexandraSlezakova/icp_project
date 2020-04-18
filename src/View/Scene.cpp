@@ -80,8 +80,7 @@ Scene::wheelEvent(QWheelEvent *event)
 }
 
 void Scene::mousePressEvent(QMouseEvent *event){
-    /*if (event->button() == Qt::RightButton)
-    {
+    if (event->button() == Qt::RightButton) {
         m_moving = true;
         m_originalX = event->x();
         m_originalY = event->y();
@@ -89,8 +88,7 @@ void Scene::mousePressEvent(QMouseEvent *event){
         event->accept();
         return;
     }
-    else*/
-    if (event->button() == Qt::LeftButton && roadBlockMode) {
+    else if (event->button() == Qt::LeftButton && roadBlockMode) {
         QGraphicsItem *item = itemAt(event->pos());
         auto *square = dynamic_cast<Square*>(item);
         auto *photo = dynamic_cast<QGraphicsPixmapItem*>(item);
@@ -112,7 +110,7 @@ void Scene::mousePressEvent(QMouseEvent *event){
     }
 }
 
-/*void Scene::mouseReleaseEvent(QMouseEvent *event){
+void Scene::mouseReleaseEvent(QMouseEvent *event){
     if (event->button() == Qt::RightButton)
     {
         m_moving = false;
@@ -135,7 +133,7 @@ void Scene::mouseMoveEvent(QMouseEvent *event){
     }
     event->ignore();
 
-}*/
+}
 
 void
 Scene::ZoomAdd()
@@ -165,11 +163,6 @@ void
 Scene::StreetUpdate(float updateSlowdown, std::string name)
 {
     map->UpdateStreet(name, updateSlowdown);
-}
-
-void
-Scene::RoadBlock(int x, int y)
-{
 }
 
 void
