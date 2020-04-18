@@ -7,6 +7,7 @@ Garage::Garage(int busId, int busNumber,QGraphicsScene *scene)
     bus->InitBus(scene);
     bus->MoveBus();
     line1.push_back(bus);
+    allbus.push_back(bus);
 }
 
 void
@@ -26,20 +27,9 @@ Bus* Garage::GetBus(int busId, int busLine) {
 }
 
 void Garage::MoveAllBuses(StreetMap *streetMap) {
-    for (int i = 0; i < line1.size(); i++ ) {
-        line1[i] = CheckSlowDown(streetMap,line1[i]);
-        line1[i]->MoveBus();
-    }
-
-    for(auto bus : line2)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
-    }
-    for(auto bus : line3)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
+    for (int i = 0; i < allbus.size(); i++ ) {
+        allbus[i] = CheckSlowDown(streetMap,allbus[i]);
+        allbus[i]->MoveBus();
     }
 }
 

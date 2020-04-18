@@ -52,7 +52,7 @@ public:
     /**
      * @brief update slowdown on street
      * @param name name of street
-     * @param updateSlowdown value to change
+     * @param updateSlowdown ChangedSlowDownValue to change
      */
     void UpdateStreet(const std::string& name, float updateSlowdown);
 

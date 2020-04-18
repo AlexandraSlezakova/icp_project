@@ -163,7 +163,7 @@ void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
     slider = new QSlider(Qt::Horizontal,parent);
     slider->move(TIME_AREA_WIDTH + 70, 815);
     slider->setFixedSize(60,40);
-    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(value(int)));
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(ChangedSlowDownValue(int)));
 }
 
 void
@@ -201,7 +201,7 @@ MainWindow::ResetTimer()
     Timer::ResetTime();
 }
 
-void MainWindow::value(int slowDown) {
+void MainWindow::ChangedSlowDownValue(int slowDown) {
 
     scene->map->UpdateStreet(combobox->currentText().toStdString(),(float)slowDown / 100 + 1);
 

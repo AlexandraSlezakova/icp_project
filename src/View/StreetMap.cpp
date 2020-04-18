@@ -77,7 +77,7 @@ StreetMap::AddStreet(Street *s)
 Street*
 StreetMap::GetStreet(const std::string& name)
 {
-    for (auto & x : Map) {
+    for (auto &x : Map) {
         for (auto & y : x) {
             if (!y.empty()) {
                 IF_RETURN(y.front() && y.front()->name == name, y.front())
@@ -95,19 +95,57 @@ StreetMap::GetStreet(const std::string& name)
 void
 StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 {
+    Street *street;
     for (auto & x : Map) {
         for (auto & y : x) {
             if (!y.empty()) {
                 if (y.front() && y.front()->name == name) {
                     y.front()->slowdown = updateSlowdown;
-                    return;
+                    street = y.front();
+                    continue;
                 }
 
                 /* two crossed streets */
                 if (y.size() > 1 && y.back()->name == name) {
                     y.back()->slowdown = updateSlowdown;
-                    return;
+                    street = y.back();
+                    continue;
                 }
+            }
+        }
+    }
+
+
+    /* změna barvy ulice podle provozu */           // Přepsat na ternální operátor aby se to neopakovalo?
+    if (street->start->x == street->end->x) {
+        for(int i = street->start->y; i <= street->end->y; i++) {
+            if( updateSlowdown < 1.33) {
+                if (!layout[street->start->x][i]->roadBlock)
+                    layout[street->start->x][i]->SetColor("#C0C0C0");
+            }
+            else if (updateSlowdown < 1.66) {
+                if (!layout[street->start->x][i]->roadBlock)
+                    layout[street->start->x][i]->SetColor("#FFFF66");
+            }
+            else {
+                if (!layout[street->start->x][i]->roadBlock)
+                    layout[street->start->x][i]->SetColor("#FF6600");
+            }
+        }
+    }
+    else {
+        for(int i = street->start->x; i <= street->end->x; i++) {
+            if( updateSlowdown < 1.33) {
+                if (!layout[i][street->start->y]->roadBlock)
+                    layout[i][street->start->y]->SetColor("#C0C0C0");
+            }
+            else if (updateSlowdown < 1.66) {
+                if (!layout[i][street->start->y]->roadBlock)
+                    layout[i][street->start->y]->SetColor("#FFFF66");
+            }
+            else {
+                if (!layout[i][street->start->y]->roadBlock)
+                    layout[i][street->start->y]->SetColor("#FF6600");
             }
         }
     }

@@ -38,7 +38,7 @@ Scene::AddMap(StreetMap *streetMap)
 void
 Scene::SetUpView()
 {
-    setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    //setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
@@ -95,18 +95,20 @@ void Scene::mousePressEvent(QMouseEvent *event){
 
         if (square) {
             squareRoadBlock(square, !square->roadBlock);
-            std::cerr << "square \n";
+            //std::cerr << "square \n";
         }
         else if (photo) {
-            for (auto & i : map->stopped) {
-                if (i.photo == photo) {
-                    i = busStopRoadBlock(i);
+            for (auto & stop : map->stopped) {
+                if (stop.photo == photo) {
+                    stop = busStopRoadBlock(stop);
                 }
             }
         }
         else {
             std::cerr << "Warning: off-road click\n";
+            return;
         }
+        //volání funkce kontrola autobusu
     }
 }
 
@@ -168,35 +170,94 @@ Scene::StreetUpdate(float updateSlowdown, std::string name)
 void
 Scene::squareRoadBlock(Square* square, bool onOff)
 {
-    if (!square)
+    if (!square || !square->road)
         return;
 
     int x = square->row;
     int y = square->col;
+    int start_int,end_int;
+    Coordinates *start,*end;
+    QMessageBox Msgbox;
+    bool xy;
+    Msgbox.setText("Na trase je autobus, ulice nejde uzavřít");
 
-    if (x < 0 or x >= 138)
+    if (x < 0 or x > 138)
         return;
 
-    if (y < 0 or y >= 79)
+    if (y < 0 or y > 79)
         return;
 
-    if (square->road) {
+    if (x + 1 >= 0 and x + 1 < 138)
+        start_int = x + 1;
+    else
+        start_int = x - 1;
 
-         if (!square->hasStop and square->roadBlock != onOff) {
 
-            if (onOff) {
-                square->roadBlock = true;
-                map->layout[x][y]->SetColor("#FF0000");
+    /* délka mezi zastávkami x osa */
+    if(map->layout[start_int][y]->road) {
+        start_int = x;
+        end_int = x;
+        xy = true;
+        for(; !map->layout[end_int + 1][y]->hasStop; end_int++) {
+        }
+        for(; !map->layout[start_int - 1][y]->hasStop; start_int--) {
+        }
+
+        start = new Coordinates(start_int, y);
+        end = new Coordinates(end_int, y);
+    }
+    /* y osa */
+    else {
+        start_int = y;
+        end_int = y;
+        xy = false;
+        for(; !map->layout[x][end_int + 1]->hasStop; end_int++) {
+        }
+        for(; !map->layout[x][start_int - 1]->hasStop; start_int--) {
+        }
+        start = new Coordinates(x, start_int);
+        end = new Coordinates(x, end_int);
+
+    }
+
+    //std::cerr << start_int << " " << end_int << "\n";
+    /* kontrola jestli se na požadované ulici, která se chce zavřit, je autobus */
+    for(auto *bus : garage->allbus) {
+        if (bus->busPosition->x == x) {
+            if (end->y >= bus->busPosition->y && bus->busPosition->y >= start->y) {
+                Msgbox.exec();
+                return;
+            }
+        }
+        else if (bus->busPosition->y == y) {
+            if (end->x >= bus->busPosition->x && bus->busPosition->x >= start->x) {
+                Msgbox.exec();
+                return;
+            }
+        }
+    }
+
+    /* přidání uzavírky */
+    for(;start_int <= end_int; start_int++) {
+        if (onOff) {
+            if (xy) {
+                map->layout[start_int][y]->roadBlock = true;
+                map->layout[start_int][y]->SetColor("#FF0000");
             }
             else {
-                square->roadBlock = false;
-                map->layout[x][y]->SetColor("#C0C0C0");
+                map->layout[x][start_int]->roadBlock = true;
+                map->layout[x][start_int]->SetColor("#FF0000");
             }
-
-            squareRoadBlock(map->layout[x + 1][y], onOff);
-            squareRoadBlock(map->layout[x - 1][y], onOff);
-            squareRoadBlock(map->layout[x][y + 1], onOff);
-            squareRoadBlock(map->layout[x][y - 1], onOff);
+        }
+        else {
+            if (xy) {
+                map->layout[start_int][y]->roadBlock = false;
+                map->layout[start_int][y]->SetColor("#C0C0C0");
+            }
+            else {
+                map->layout[x][start_int]->roadBlock = false;
+                map->layout[x][start_int]->SetColor("#C0C0C0");
+            }
         }
     }
 }
@@ -218,6 +279,12 @@ Scene::busStopRoadBlock(StreetMap::stopData stop)
     stop.photo = stop.stop->AddStopToScene(scene, path);
 
     return stop;
+}
+
+void
+Scene::checkRoadBlockBus()
+{
+
 }
 
 

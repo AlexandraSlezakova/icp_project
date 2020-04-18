@@ -130,6 +130,8 @@ private:
     * @return stopData to update data
     */
     StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
+
+    void checkRoadBlockBus();
 };
 
 #endif // SCENE_H
