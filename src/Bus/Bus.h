@@ -6,7 +6,6 @@
 #ifndef ICP_PROJECT_BUS_H
 #define ICP_PROJECT_BUS_H
 
-#include "../View/Square.h"
 #include "BusRouteMap.h"
 #include <sstream>
 #include <QPlainTextEdit>
@@ -15,17 +14,20 @@ class Bus
 {
 public:
     int id_;                                                //!< id of bus
+    int busNumber_;                                         //!< number of bus
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
     Coordinates *busPosition;                               //!< position of bus
-    QGraphicsPixmapItem *bus;                               //!< picture of bus
+    QGraphicsPixmapItem *busPhoto{};                             //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
+
 
     /**
      * @brief bus constructor
      * @param id id of bus
      * @param busNumber number of bus
+     * @param position position
      */
-    explicit Bus(int id, int busNumber, Coordinates *position);
+    Bus(int id, int busNumber, Coordinates *position);
 
     ~Bus() = default;
 
@@ -57,20 +59,30 @@ public:
 
     /**
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
-     * @param text textarea
-     * @param layout layout with squares
      * @param color color of bus route
      */
-    void CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& color);
+    void CreateTimetable(const QString& color);
+
+    /**
+     * @brief initialize text area for timetable
+     * @param parent parent widget
+     * @param width width of textarea
+     * @param height height of textarea
+     */
+    static void InitTimetableArea(QWidget *parent, int width, int height);
+
+    /**
+     * @brief clear text area with timetable of bus
+     */
+    void ClearTextArea();
 
 private:
-    int busNumber_;             //!< number of bus
+    static QPlainTextEdit *textArea;   //!< text area for bus timetable
 
     /**
      * @brief load timetable of bus from file and save all information
      */
     void LoadTimetable();
-
 
 };
 

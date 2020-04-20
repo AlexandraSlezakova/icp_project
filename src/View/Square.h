@@ -8,7 +8,6 @@
 
 #include <QGraphicsRectItem>
 #include <QBrush>
-#include "../Bus/Stop.h"
 
 #define SQUARE_SIZE     20
 #define X    138
@@ -29,11 +28,12 @@ public:
      */
     void SetColor(const QString &name);
 
-    int row = 0;                //!< row
-    int col = 0;                //!< column
-    bool hasStop = false;       //!< information about bus stop on square
-    bool roadBlock = false;     //!< information about roadblock on square
-    bool road = false;          //!< information about type square ( road / grass )
+    int row = 0;                       //!< row
+    int col = 0;                       //!< column
+    bool hasStop = false;              //!< information about bus stop on square
+    bool roadBlock = false;            //!< information about roadblock on square
+    bool road = false;                 //!< information about type square ( road / grass )
+    static Square *layout[X][Y];       //!< layout with squares
 
 private:
     QColor color_;              //!< color of square

@@ -1,56 +1,54 @@
 
 #include "Garage.h"
 
-Garage::Garage(int busId, int busNumber,QGraphicsScene *scene)
+Garage::Garage() = default;
+
+void
+Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene)
 {
     Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
     bus->InitBus(scene);
     bus->MoveBus();
-    line1.push_back(bus);
+    allBuses.push_back(bus);
 }
 
-void
-Garage::AddBus(Bus bus)
-{
-
-}
-
-Bus* Garage::GetBus(int busId, int busLine) {
-    if (busLine == 1) {
-        for (auto & bus : line1) {
-            if (busId == bus->id_)
-                return bus;
-        }
+Bus*
+Garage::GetBus(int busId) {
+    for (auto &bus : allBuses) {
+        if (busId == bus->id_)
+            return bus;
     }
+
     return nullptr;
 }
 
-void Garage::MoveAllBuses(StreetMap *streetMap) {
-    for (int i = 0; i < line1.size(); i++ ) {
-        line1[i] = CheckSlowDown(streetMap,line1[i]);
-        line1[i]->MoveBus();
+Bus*
+Garage::GetBusByPhoto(QGraphicsItem *photo)
+{
+    for (auto &bus : allBuses) {
+        if (photo == bus->busPhoto)
+            return bus;
     }
 
-    for(auto bus : line2)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
-    }
-    for(auto bus : line3)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
+    return nullptr;
+}
+
+void
+Garage::MoveAllBuses(StreetMap *streetMap) {
+    for (Bus *bus : allBuses) {
+        bus = CheckSlowDown(streetMap, bus);
+        bus->MoveBus();
     }
 }
 
-Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
+Bus*
+Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     std::vector<std::string> currentSplit;
     std::vector<std::string> nextSplit;
-    std::string streetName = "a";
+    std::string streetName;
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    int secNow = Timer::GetSecond();
     Street *street;
     int timeAdd;
     int i = 0;
@@ -80,15 +78,12 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             ? currentSplit[0]
             : currentSplit[1];
 
-    if (streetName == "a")
-        std::cerr << "Error: Street name wasn't found" << std::endl;
-
     street = streetMap->GetStreet(streetName);
 
     /* change time in timetable
      * used in street slowdown */
     if ((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name)
-        or street->pastslowdown != street->slowdown) {
+        or street->previousSlowdown != street->slowdown) {
 
         if (bus->stopInformation[i].name != bus->currentBusStop.name
             && bus->stopInformation[i + 1].name != bus->nextBusStop.name)
@@ -160,7 +155,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             }
         }
         /* current slowdown */
-        street->pastslowdown = street->slowdown;
+        street->previousSlowdown = street->slowdown;
     }
         return bus;
 }

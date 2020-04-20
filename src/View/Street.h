@@ -8,7 +8,8 @@
 
 #include <iostream>
 #include <list>
-#include "../Bus/Bus.h"
+#include "../Bus/Stop.h"
+#include "../View/Square.h"
 
 #define SQUARE_SIZE     20
 class Street
@@ -35,7 +36,7 @@ public:
     Coordinates* start;                     //!< start of street
     Coordinates* end;                       //!< end of street
     float slowdown;                         //!< slowdown on street
-    float pastslowdown;                     //!< history slowdown on street
+    float previousSlowdown;                 //!< previous slowdown on street
 
 protected:
     std::vector<Stop*> busStopsList;            //!< bus stops list
