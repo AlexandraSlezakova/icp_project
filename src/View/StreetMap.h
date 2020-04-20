@@ -16,6 +16,7 @@ public:
         Stop *stop;
         QGraphicsPixmapItem *photo;
     };
+    
     /**
      * @brief initial setup of map
      */

@@ -47,7 +47,8 @@ public:
      * @param next next bus stop coordinate
      * @return x or y position of bus
      */
-     int GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next);
+     int GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,
+                       const Coordinates::BusStop_S& next);
 
     /**
      * @brief set position of bus according its timetable
