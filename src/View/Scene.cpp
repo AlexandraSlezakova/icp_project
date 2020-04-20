@@ -95,7 +95,6 @@ void Scene::mousePressEvent(QMouseEvent *event){
 
         if (square) {
             squareRoadBlock(square, !square->roadBlock);
-            std::cerr << "square \n";
         }
         else if (photo) {
             for (auto & i : map->stopped) {
@@ -111,8 +110,7 @@ void Scene::mousePressEvent(QMouseEvent *event){
 }
 
 void Scene::mouseReleaseEvent(QMouseEvent *event){
-    if (event->button() == Qt::RightButton)
-    {
+    if (event->button() == Qt::RightButton) {
         m_moving = false;
         setCursor(Qt::ArrowCursor);
         event->accept();
@@ -122,8 +120,7 @@ void Scene::mouseReleaseEvent(QMouseEvent *event){
 }
 
 void Scene::mouseMoveEvent(QMouseEvent *event){
-    if (m_moving)
-    {
+    if (m_moving) {
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->x() - m_originalX));
         verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->y() - m_originalY));
         m_originalX = event->x();
@@ -160,7 +157,7 @@ Scene::MoveBus()
 }
 
 void
-Scene::StreetUpdate(float updateSlowdown, std::string name)
+Scene::StreetUpdate(float updateSlowdown, const std::string& name)
 {
     map->UpdateStreet(name, updateSlowdown);
 }
@@ -186,7 +183,7 @@ Scene::squareRoadBlock(Square* square, bool onOff)
 
             if (onOff) {
                 square->roadBlock = true;
-                map->layout[x][y]->SetColor("#FF0000");
+                map->layout[x][y]->SetColor("#ffff00");
             }
             else {
                 square->roadBlock = false;

@@ -54,15 +54,12 @@ MainWindow::CreateScene()
     /* text area with time */
     InitTimeArea(widget);
 
-
     /* buttons */
-    InitButtons(widget, scene);
-
-    InitSliders(widget,scene);
+    InitButtons(widget);
+    /* slider */
+    InitSliders(widget);
 }
 
-
-// autobuse se vymažua a npíšse se jinde, timer na to obnovení
 void
 MainWindow::timerEvent(QTimerEvent *event)
 {
@@ -96,7 +93,7 @@ MainWindow::InitTimeArea(QWidget *parent)
 }
 
 void
-MainWindow::InitButtons(QWidget *parent, Scene *scene)
+MainWindow::InitButtons(QWidget *parent)
 {
     QWidget *buttons = new QWidget(parent);
     buttons->move(0, TIME_AREA_HEIGHT);
@@ -114,7 +111,6 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     zoomButtonAdd->setText("+");
     connect(zoomButtonAdd, SIGNAL (released()), scene, SLOT(ZoomAdd()));
 
-
     zoomButtonSub = new QPushButton(parent);
     zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
     zoomButtonSub->setFixedSize(30, 30);
@@ -131,14 +127,14 @@ MainWindow::InitButtons(QWidget *parent, Scene *scene)
     roadBlockButton = new QPushButton(parent);
     roadBlockButton->move(TIME_AREA_WIDTH + 100, 515);
     roadBlockButton->setFixedSize(200, 30);
-    roadBlockButton->setText("RoadBlockMood OFF");
+    roadBlockButton->setText("RoadBlockMode OFF");
     roadBlockButton->setStyleSheet("background-color: red");
     connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
 
 
 }
 
-void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
+void MainWindow::InitSliders(QWidget *parent) {
 
     std::ifstream file;
     std::string line;
@@ -153,13 +149,11 @@ void MainWindow::InitSliders(QWidget *parent, Scene *scene) {
 
     /* add choice to streetpicker */
     while (std::getline(file, line)) {
-
         street = Functions::Split(line, " ");
         combobox->addItem(QString::fromStdString(street[0]));
     }
 
-
-    /* slider on changing street slowdown */
+    /* slider for changing street slowdown */
     slider = new QSlider(Qt::Horizontal,parent);
     slider->move(TIME_AREA_WIDTH + 70, 815);
     slider->setFixedSize(60,40);
@@ -209,15 +203,13 @@ void MainWindow::value(int slowDown) {
 
 void MainWindow::RoadBlockSwitcher()
 {
-    if (!scene->roadBlockMode)
-    {
-        roadBlockButton->setText("RoadBlockMood ON");
+    if (!scene->roadBlockMode) {
+        roadBlockButton->setText("RoadBlockMode ON");
         roadBlockButton->setStyleSheet("background-color: green");
         scene->roadBlockMode = true;
     }
-    else
-    {
-        roadBlockButton->setText("RoadBlockMood OFF");
+    else {
+        roadBlockButton->setText("RoadBlockMode OFF");
         roadBlockButton->setStyleSheet("background-color: red");
         scene->roadBlockMode = false;
     }

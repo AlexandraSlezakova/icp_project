@@ -46,11 +46,14 @@ public:
     /**
      * @brief initialize all buttons
      * @param parent parent widget
-     * @param scene
      */
-    void InitButtons(QWidget *parent, Scene *scene);
+    void InitButtons(QWidget *parent);
 
-    void InitSliders(QWidget *parent, Scene *scene);
+    /**
+     * @brief initialize slider
+     * @param parent parent widget
+     */
+    void InitSliders(QWidget *parent);
 
 public slots:
     /**
@@ -94,9 +97,9 @@ private:
     Scene *scene;
 
     int timerId = 0;
-    int width = 0;          //!< width of screen
-    int height = 0;         //!< height of screen
-    int stopFlag = 0;       //!< timer is active or inactive
+    int width = 0;                  //!< width of screen
+    int height = 0;                 //!< height of screen
+    int stopFlag = 0;               //!< timer is active or inactive
 
 
 };
