@@ -15,11 +15,9 @@ public:
     /**
      * @brief set bus route by changing color of squares
      * @param stopInformation information about bus stop
-     * @param layout layout of squares
      * @param color new color of square
      */
-    static void DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Square *layout[X][Y], const QString& color);
-
+    static void DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, const QString& color);
 };
 
 

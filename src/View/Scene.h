@@ -30,9 +30,8 @@ public:
 
     /**
      * @brief add whole map to scene
-     * @param streetMap map of streets
      */
-    void AddMap(StreetMap *streetMap);
+    void AddSquares();
 
     /**
      * @brief set up view and add scene
@@ -46,13 +45,10 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
-
     QGraphicsScene *scene;
-    QPlainTextEdit *text;
     QLabel *zoomText;           //!< text with information about scale scene
-    int busId = 0;              //!< id of bus
     double zoom_act = 100;      //!< double expression of zoom
-    Garage *garage;             //!< All busses
+    Garage garage;              //!< all buses
     StreetMap *map;             //!< map
     bool roadBlockMode = false; //!< Mode to add and sub roadblock
 
@@ -63,17 +59,11 @@ public:
 protected:
     /**
     * @brief zooms in and out scene by mouse
-    * @param event Mouse wheel event chager
+    * @param event mouse wheel event changer
     */
-    virtual void wheelEvent(QWheelEvent *event);
-
+    void wheelEvent(QWheelEvent *event) override;
 
 public slots:
-    /**
-     * @brief show timetable of bus number 1
-     */
-    void GetBus1Timetable();
-
     /**
     * @brief move all buses
     */
@@ -95,24 +85,23 @@ public slots:
     void ZoomSub();
 
 private:
-
     /**
     * @brief moving map with mouse
     * @param event mouse moving event
     */
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event) override;
 
     /**
     * @brief end moving map release click on mouse
     * @param event mouse moving event
     */
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     /**
     * @brief start moving map with click on mouse and add roadblock on map
     * @param event mouse moving event
     */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
     /**
     * @brief add and delete roadblock between two stops
@@ -127,6 +116,12 @@ private:
     * @return stopData to update data
     */
     StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
+
+    /**
+     * @brief show route of clicked bus
+     * @param photo bus photo
+     */
+    void ShowRoute(QGraphicsItem *photo);
 };
 
 #endif // SCENE_H

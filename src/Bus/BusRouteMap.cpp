@@ -1,7 +1,7 @@
 #include "BusRouteMap.h"
 
 void
-BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Square *layout[X][Y], const QString& color)
+BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, const QString& color)
 {
     Coordinates *currentCoordinate, *nextCoordinate;
     int from , to;
@@ -21,10 +21,10 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Squar
             }
 
             for (int y = from; y < to; y++) {
-                if (layout[currentCoordinate->x][y]->hasStop)
+                if (Square::layout[currentCoordinate->x][y]->hasStop)
                     continue;
 
-                layout[currentCoordinate->x][y]->SetColor(color);
+                Square::layout[currentCoordinate->x][y]->SetColor(color);
             }
 
         } /* moving along the Y axis */
@@ -38,10 +38,10 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Squar
             }
 
             for (int x = from; x < to; x++) {
-                if (layout[x][currentCoordinate->y]->hasStop)
+                if (Square::layout[x][currentCoordinate->y]->hasStop)
                     continue;
 
-                layout[x][currentCoordinate->y]->SetColor(color);
+                Square::layout[x][currentCoordinate->y]->SetColor(color);
             }
         }
     }

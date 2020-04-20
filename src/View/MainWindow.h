@@ -23,7 +23,7 @@ public:
      * @brief main Window constructor
      * @param parent parent widget
      */
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow();
 

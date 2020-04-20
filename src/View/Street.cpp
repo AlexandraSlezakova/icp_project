@@ -5,8 +5,7 @@ Street::Street(std::string s, Coordinates *start, Coordinates *end, float slowdo
     this->name = std::move(s);
     this->start = start;
     this->end = end;
-    this->slowdown = slowdown;
-    pastslowdown = slowdown;
+    this->slowdown = previousSlowdown = slowdown;
 }
 
 Street::~Street() =default;
