@@ -4,7 +4,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    timerId = startTimer(1000);
+    timerInterval = 1000;
+    timerId = startTimer(timerInterval);
     ResizeWindow();
     CreateScene();
 }
@@ -71,18 +72,20 @@ void
 MainWindow::InitTimeArea(QWidget *parent)
 {
     QFont font;
-    font.setPointSize(16);
+    font.setPointSize(23);
     /* text area with time */
     timeArea = new QPlainTextEdit(parent);
     timeArea->setFixedSize(TIME_AREA_WIDTH, TIME_AREA_HEIGHT);
     timeArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     timeArea->setFont(font);
+
     /* button for stopping and starting time */
     timerButton = new QPushButton(parent);
     timerButton->move(TIME_AREA_WIDTH + 5, 0);
     timerButton->setFixedSize(90, 30);
     timerButton->setText("Change time");
     connect(timerButton, SIGNAL (released()), this , SLOT(StopTimer()));
+
     /* reset button */
     QPushButton *resetButton = new QPushButton(parent);
     resetButton->move(TIME_AREA_WIDTH + 95, 0);
@@ -90,6 +93,23 @@ MainWindow::InitTimeArea(QWidget *parent)
     resetButton->setText("Reset timer");
     connect(resetButton, SIGNAL (released()), this , SLOT(ResetTimer()));
 
+    /* change interval of timer button */
+    timerLabel = new QLabel(parent);
+    timerLabel->move(TIME_AREA_WIDTH + 5, 30);
+    timerLabel->setFixedSize(150,40);
+    timerLabel->setText("Timer interval = " + QString::number(100) + "%");
+
+    QPushButton *timerButtonAdd = new QPushButton(parent);
+    timerButtonAdd->move(TIME_AREA_WIDTH + 155, 30);
+    timerButtonAdd->setFixedSize(30, 30);
+    timerButtonAdd->setText("+");
+    connect(timerButtonAdd, SIGNAL (released()), this, SLOT(TimerPlus()));
+
+    QPushButton *timerButtonSub = new QPushButton(parent);
+    timerButtonSub->move(TIME_AREA_WIDTH + 185, 30);
+    timerButtonSub->setFixedSize(30, 30);
+    timerButtonSub->setText("-");
+    connect(timerButtonSub, SIGNAL (released()), this, SLOT(TimerSub()));
 }
 
 void
@@ -104,22 +124,22 @@ MainWindow::InitButtons(QWidget *parent)
     connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
     scene->busId++;
 
-    /*Zooms buttons */
-    zoomButtonAdd = new QPushButton(parent);
+    /* zoom buttons */
+    QPushButton *zoomButtonAdd = new QPushButton(parent);
     zoomButtonAdd->move(TIME_AREA_WIDTH + 70, 915);
     zoomButtonAdd->setFixedSize(30, 30);
     zoomButtonAdd->setText("+");
     connect(zoomButtonAdd, SIGNAL (released()), scene, SLOT(ZoomAdd()));
 
-    zoomButtonSub = new QPushButton(parent);
+    QPushButton *zoomButtonSub = new QPushButton(parent);
     zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
     zoomButtonSub->setFixedSize(30, 30);
     zoomButtonSub->setText("-");
     connect(zoomButtonSub, SIGNAL (released()), scene, SLOT(ZoomSub()));
 
-    /* Print numb. expression of zoom */
+    /* print numb. expression of zoom */
     scene->zoomText = new QLabel(parent);
-    scene->zoomText->move(TIME_AREA_WIDTH-80, 915);
+    scene->zoomText->move(TIME_AREA_WIDTH - 80, 915);
     scene->zoomText->setFixedSize(150,30);
     scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
     scene->zoomText->show();
@@ -130,8 +150,6 @@ MainWindow::InitButtons(QWidget *parent)
     roadBlockButton->setText("RoadBlockMode OFF");
     roadBlockButton->setStyleSheet("background-color: red");
     connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
-
-
 }
 
 void MainWindow::InitSliders(QWidget *parent) {
@@ -154,10 +172,10 @@ void MainWindow::InitSliders(QWidget *parent) {
     }
 
     /* slider for changing street slowdown */
-    slider = new QSlider(Qt::Horizontal,parent);
+    QSlider *slider = new QSlider(Qt::Horizontal,parent);
     slider->move(TIME_AREA_WIDTH + 70, 815);
     slider->setFixedSize(60,40);
-    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(value(int)));
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(Value(int)));
 }
 
 void
@@ -167,7 +185,6 @@ MainWindow::StopTimer()
         killTimer(timerId);
         timerButton->setText("Start timer");
         stopFlag = 1;
-        previousTime = timeArea->toPlainText();
         connect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
     } else {
         timerButton->setText("Change time");
@@ -184,8 +201,7 @@ MainWindow::ReadInput()
     QString data = timeArea->toPlainText();
     std::vector<std::string> time = Functions::Split(data.toStdString(), ":");
     if (time.size() == 3) {
-        Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]),
-                previousTime);
+        Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]));
     }
 }
 
@@ -195,13 +211,14 @@ MainWindow::ResetTimer()
     Timer::ResetTime();
 }
 
-void MainWindow::value(int slowDown) {
-
+void
+MainWindow::Value(int slowDown)
+{
     scene->map->UpdateStreet(combobox->currentText().toStdString(),(float)slowDown / 100 + 1);
-
 }
 
-void MainWindow::RoadBlockSwitcher()
+void
+MainWindow::RoadBlockSwitcher()
 {
     if (!scene->roadBlockMode) {
         roadBlockButton->setText("RoadBlockMode ON");
@@ -215,6 +232,30 @@ void MainWindow::RoadBlockSwitcher()
     }
 }
 
+void
+MainWindow::TimerPlus()
+{
+    /* value of interval cannot be negative integer */
+    if (timerInterval > 0) {
+        timerInterval = timerInterval <= 200 ? timerInterval - 25 : timerInterval - 200;
+    }
+    killTimer(timerId);
+    timerId = startTimer(timerInterval);
+    int percentage = (timerInterval * 100) / 1000;
+    percentage = 100 + (100 - percentage);
+    QString warning;
+    IF(!timerInterval, warning = "\nWarning: maximum speed")
+    timerLabel->setText("Timer interval = " + QString::number(percentage) + "%" + warning);
+}
 
-
+void
+MainWindow::TimerSub()
+{
+    killTimer(timerId);
+    timerInterval += 200;
+    timerId = startTimer(timerInterval);
+    int percentage = ((timerInterval * 100) / 1000) - 100;
+    percentage = 100 - percentage;
+    timerLabel->setText("Timer interval = " + QString::number(percentage) + "%");
+}
 

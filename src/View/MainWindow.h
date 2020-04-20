@@ -8,8 +8,8 @@
 
 #include "Scene.h"
 
-#define TIME_AREA_WIDTH     100
-#define TIME_AREA_HEIGHT    45
+#define TIME_AREA_WIDTH     140
+#define TIME_AREA_HEIGHT    60
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -68,12 +68,25 @@ public slots:
 
     /**
      * @brief reset timer
+     * and set interval to default value
      */
     void ResetTimer();
 
-    void value(int slowDown);
+    void Value(int slowDown);
 
     void RoadBlockSwitcher();
+
+    /**
+     * @brief decrease timer interval
+     * the time goes faster
+     */
+    void TimerPlus();
+
+    /**
+     * @breif increase timer interval
+     * the time does slower
+     */
+    void TimerSub();
 
 protected:
     /**
@@ -84,23 +97,18 @@ protected:
 
 private:
     QComboBox *combobox;            //!< combobox on pick street to slowdown
-    QSlider *slider;                //!< slider to change street slowdown
     std::string streetUpdate;       //!< street name
     QPushButton *roadBlockButton;   //!< button to add roadblock
-
     QPushButton *timerButton;       //!< button to start or stop timer
-    QPushButton *zoomButtonAdd;     //!< button to zoom in scene
-    QPushButton *zoomButtonSub;     //!< button to zoom out scene
     QPlainTextEdit *timeArea;       //!< textarea with time
-    QString previousTime;           //!< time before change
+    QLabel *timerLabel;
     Ui::MainWindow *ui;
     Scene *scene;
 
     int timerId = 0;
+    int timerInterval = 0;
     int width = 0;                  //!< width of screen
     int height = 0;                 //!< height of screen
     int stopFlag = 0;               //!< timer is active or inactive
-
-
 };
 #endif // MAINWINDOW_H
