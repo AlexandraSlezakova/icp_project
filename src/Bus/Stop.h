@@ -44,7 +44,7 @@ public:
 
     Coordinates *coordinates;  //!< coordinates of bus stop
     std::string stopName;      //!< bus stop name
-    bool roadStop;             //!< save information abot roadstop on Stops
+    bool roadStop;             //!< save information about roadstop on Stops
 
     static std::map<std::string, Coordinates*> stopList;    //!< list of stops
 

@@ -29,7 +29,7 @@ public:
     void AddBus(Bus bus);
 
     /**
-    * @brief move to all buses on scene
+    * @brief move all buses on the scene
     * @param streetMap for CheckSlowDown function
     */
     void MoveAllBuses(StreetMap *streetMap);
@@ -43,7 +43,7 @@ public:
     Bus* GetBus(int busId, int busLine);
 
     /**
-    * @brief chcek street slow down for bus
+    * @brief check street slow down for bus
     * @param streetMap for get slowdown on street
     * @param bus for which check is in running
     * @return bus to update data

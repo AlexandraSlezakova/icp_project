@@ -44,7 +44,7 @@ public:
      * @param updateSlowdown changed float streetSlowdown
      * @param name streetname of which slowdown should be changed
      */
-    void StreetUpdate(float updateSlowdown, std::string name);
+    void StreetUpdate(float updateSlowdown, const std::string& name);
 
     void checkRoadBlockBus();
 
@@ -95,9 +95,7 @@ protected:
     * @param event Mouse wheel event chager
     */
     virtual void wheelEvent(QWheelEvent *event);
-
-
-
+    
 private:
 
     /**
