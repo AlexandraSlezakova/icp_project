@@ -5,21 +5,21 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
 {
     Coordinates *currentCoordinate, *nextCoordinate;
     Square *square;
-    QString square_color, previous_color, original_color = color;
+    QString squareColor, previousColor, originalColor = color;
     int from, to, all_same, iterations, value;
-    int x, y, x_value, y_value, y_axis;
+    int x, y, xValue, yValue, yAxis;
 
     for (int i = 0; i < stopInformation.size() - 1; i++) {
         currentCoordinate = stopInformation[i].coordinates;
         nextCoordinate = stopInformation[i + 1].coordinates;
-        IF(original_color != color, color = original_color)
+        IF(originalColor != color, color = originalColor)
         iterations = all_same = 0;
-        y_axis = 0;
+        yAxis = 0;
 
         if (nextCoordinate->x == currentCoordinate->x) {
             from = currentCoordinate->y;
             to = nextCoordinate->y;
-            y_axis = 1;
+            yAxis = 1;
         }
         else {
             from = currentCoordinate->x;
@@ -33,32 +33,32 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
             to = value;
         }
 
-        if (y_axis) {
-            x_value = currentCoordinate->x;
+        if (yAxis) {
+            xValue = currentCoordinate->x;
         }
         else {
-            y_value = currentCoordinate->y;
+            yValue = currentCoordinate->y;
         }
 
         for (int index = from; index < to; index++) {
-            if (y_axis) {
-                y_value = index;
+            if (yAxis) {
+                yValue = index;
             }
             else {
-                x_value = index;
+                xValue = index;
             }
 
-            square = Square::layout[x_value][y_value];
+            square = Square::layout[xValue][yValue];
             if (square->hasStop)
                 continue;
 
-            square_color = square->GetColor();
+            squareColor = square->GetColor();
 
             if (color == "#c0c0c0" && !all_same) {
-                if (!previous_color.isEmpty()) {
+                if (!previousColor.isEmpty()) {
                     /* difference was found */
-                    if (previous_color != square_color) {
-                        color = square_color;
+                    if (previousColor != squareColor) {
+                        color = squareColor;
                         index = from - 1;
                         all_same = 1;
                         iterations = 0;
@@ -69,21 +69,21 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
                     }
                 }
                 else {
-                    previous_color = square_color;
+                    previousColor = squareColor;
                 }
                 continue;
             }
 
-            if (square_color == "#c0c0c0" || (index % 2) || color == "#c0c0c0" || color != original_color) {
+            if (squareColor == "#c0c0c0" || (index % 2) || color == "#c0c0c0" || color != originalColor) {
                 /* color of previous 3 squares wasn't changed, change it now */
                 if (all_same && iterations == 2) {
                     for (int j = 1; j < 4; j++) {
-                        if (y_axis) {
-                            x = x_value;
+                        if (yAxis) {
+                            x = xValue;
                             y = index - j;
                         }
                         else {
-                            y = y_value;
+                            y = yValue;
                             x = index - j;
                         }
                         Square::layout[x][y]->SetColor(color);
