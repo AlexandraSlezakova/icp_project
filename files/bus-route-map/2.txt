@@ -1,0 +1,16 @@
+0 00 Mojžíšova-Škálova
+0 03 Remešova-Škálova
+0 06 Remešova-Karlova
+0 08 Pešinova-Karlova
+0 10 Pešinova-Krajní
+0 12 Matulkova-Krajní
+0 15 Hutařova-Krajní
+0 17 Hutařova-Karlova
+0 20 Hutařova-58/49
+0 22 Hutařova-Tyršova
+0 24 Tyršova-68/39
+0 26 Kamanova-Tyršova
+0 29 Bystřinova-Tyršova
+0 31 Bystřinova-Tererova
+0 34 Bystřinova-97/10
+0 36 Bystřinova-Vnitřní
