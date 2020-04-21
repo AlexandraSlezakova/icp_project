@@ -18,7 +18,7 @@ Bus::LoadTimetable()
 {
     std::ifstream file;
     std::ostringstream ss;
-    std::string line;
+    std::string line, minute;
     std::vector<std::string> tokens;
     int timeFrom;
     Coordinates *coordinates;
@@ -38,7 +38,7 @@ Bus::LoadTimetable()
 
         size_t eol = tokens[2].find('\r');
         if( eol != std::string::npos)
-            tokens[2]=tokens[2].substr(0,tokens[2].size()-1);
+            tokens[2] = tokens[2].substr(0,tokens[2].size() - 1);
 
         timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
         coordinates = Stop::GetStop(tokens[2]);
@@ -61,14 +61,21 @@ Bus::LoadTimetable()
 void
 Bus::CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& color)
 {
+    std::string minute;
     for (const Coordinates::BusStop_S& info : stopInformation) {
         /* show bus timetable in text area */
         std::ostringstream stream;
-        stream << std::to_string(info.stopHour) << ":" << std::to_string(info.stopMin) << " " << info.name;
+
+        minute = std::to_string(info.stopMin);
+        if (minute.size() == 1) {
+            minute = "0" + minute;
+        }
+
+        stream << std::to_string(info.stopHour) << ":" << minute << " " << info.name;
         text->appendPlainText(QString::fromStdString(stream.str()));
     }
 
-    /* draw lines on map */
+    /* draw bus route on map */
     BusRouteMap::DrawLine(stopInformation, layout, color);
 }
 

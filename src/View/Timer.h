@@ -27,9 +27,8 @@ public:
      * @param h new hour
      * @param m new minute
      * @param s new second
-     * @param previousTime previous time
      */
-    static void ChangeTime(int h, int m, int s, const QString& previousTime);
+    static void ChangeTime(int h, int m, int s);
 
     /**
      * @brief get seconds of current time
@@ -59,6 +58,7 @@ private:
     static int min;         //!< minute
     static int sec;         //!< second
     static tm *ltm;
+
 };
 
 
