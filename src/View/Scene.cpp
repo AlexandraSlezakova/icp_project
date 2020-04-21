@@ -101,6 +101,7 @@ void Scene::mousePressEvent(QMouseEvent *event){
             for (auto & stop : map->stopped) {
                 if (stop.photo == photo) {
                     stop = busStopRoadBlock(stop);
+                    break;
                 }
             }
         }
@@ -266,14 +267,22 @@ StreetMap::stopData
 Scene::busStopRoadBlock(StreetMap::stopData stop)
 {
     QString path;
+    QMessageBox Msgbox;
+    Msgbox.setText("Na trase je autobus, zastávku nejde uzavřít");
 
     if(!stop.stop->roadStop) {
+        for(auto *bus : garage->allbus) {
+            if (bus->nextBusStop.name == stop.stop->stopName ) {
+                Msgbox.exec();
+                return stop;
+            }
+        }
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop_roadblock.jpg"));
-        stop.stop->roadStop = true;
+        map->layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = true;
     }
     else {
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
-        stop.stop->roadStop = false;
+        map->layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = false;
     }
 
     stop.photo = stop.stop->AddStopToScene(scene, path);
@@ -284,7 +293,44 @@ Scene::busStopRoadBlock(StreetMap::stopData stop)
 void
 Scene::checkRoadBlockBus()
 {
+    int hourNow = Timer::GetHour();
+    int minuteNow = Timer::GetMinute();
+    int secNow = Timer::GetSecond();
+    int i = 0;
 
+    for( auto *bus : garage->allbus) {
+        int nxt, nw, mn;
+        for (; i < bus->stopInformation.size() - 2; i++) {
+            nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
+            nw  = hourNow * 60 + minuteNow;
+            mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
+
+            if (nxt > nw and nw >= mn) {
+                i++;
+                break;
+            }
+        }
+
+        for (; i < bus->stopInformation.size() - 2; i++) {
+            if ( map->layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock ) {
+                //uzavírka na cestě
+                std::cerr << "Uzavírka zastávky " << bus->stopInformation[i].name << "\n";
+                bus->roadstoponroad = true;
+            }
+            /* Ulice jde svisle */
+            if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
+                if ( map->layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock ) {
+                    std::cerr << "Uzavírka mezi " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
+                    //uzavírka
+                    bus->roadstoponroad = true;
+                }
+            }
+        }
+
+
+
+
+    }
 }
 
 

@@ -53,7 +53,7 @@ public:
 
 private:
 
-
+    bool CheckRoadBlock(StreetMap *streetMap, Bus *bus);
 };
 
 

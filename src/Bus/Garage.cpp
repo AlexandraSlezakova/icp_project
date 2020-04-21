@@ -28,9 +28,30 @@ Bus* Garage::GetBus(int busId, int busLine) {
 
 void Garage::MoveAllBuses(StreetMap *streetMap) {
     for (int i = 0; i < allbus.size(); i++ ) {
+        //if (allbus[i]->roadstoponroad || )
+        CheckRoadBlock(streetMap,allbus[i]);
         allbus[i] = CheckSlowDown(streetMap,allbus[i]);
         allbus[i]->MoveBus();
     }
+}
+
+bool
+Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
+    Street *afternextstreet;
+    int i = 0;
+    for(;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
+    }
+    if (bus->stopInformation[i].name == bus->nextBusStop.name) {
+        std::cerr << "joo \n";
+    }
+    if (streetMap->layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
+        if(bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
+            if (streetMap->layout[bus->nextBusStop.coordinates->x][( bus->nextBusStop.coordinates->y + bus->stopInformation[i].coordinates->y ) / 2]->roadBlock) {
+
+            }
+        }
+    }
+
 }
 
 Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {

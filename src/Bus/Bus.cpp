@@ -9,6 +9,7 @@ Bus::Bus(int id, int busNumber, Coordinates *position)
     id_ = id;
     busNumber_ = busNumber;
     busPosition = position;
+    roadstoponroad = false;
     LoadTimetable();
 }
 
