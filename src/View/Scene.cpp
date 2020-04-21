@@ -1,6 +1,4 @@
-#include <unistd.h>
 #include "Scene.h"
-
 
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
@@ -18,17 +16,24 @@ Scene::CreateMap()
     /* initialize streets and bus stops */
     map->AddStreets(Functions::GetAbsolutePath("../files/ulice.txt"));
     map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), scene);
-    /* add it to scene */
-    AddMap(map);
+    /* add squares to scene */
+    AddSquares();
     /* add buses */
-    garage = new Garage(busId,1,scene);
-    MoveBuses();
+    AddBuses();
 }
 
 void
-Scene::AddMap(StreetMap *streetMap)
+Scene::AddBuses(int iteration)
 {
-    for (auto &x : streetMap->layout) {
+    static int busId = 0;
+    garage.AddBus(busId++, 1, scene, iteration);
+    garage.AddBus(busId++, 2, scene, iteration);
+}
+
+void
+Scene::AddSquares()
+{
+    for (auto &x : Square::layout) {
         for (auto &y : x) {
             scene->addItem(y);
         }
@@ -42,23 +47,6 @@ Scene::SetUpView()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
-}
-
-void
-Scene::GetBus1Timetable()
-{
-    Bus* bus = garage->GetBus(0, 1);
-    bus->CreateTimetable(text, map->layout, "#FF0000");
-    bus->MoveBus();
-}
-
-void
-Scene::MoveBuses()
-{
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(MoveBus()));
-    /* time in ms */
-    timer->start(1000);
 }
 
 void
@@ -90,27 +78,32 @@ Scene::mousePressEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-    else if (event->button() == Qt::LeftButton && roadBlockMode) {
+    else if (event->button() == Qt::LeftButton) {
         QGraphicsItem *item = itemAt(event->pos());
         auto *square = dynamic_cast<Square*>(item);
         auto *photo = dynamic_cast<QGraphicsPixmapItem*>(item);
 
-        if (square) {
-            squareRoadBlock(square, !square->roadBlock);
-        }
-        else if (photo) {
-            for (auto & stop : map->stopped) {
-                if (stop.photo == photo) {
-                    stop = busStopRoadBlock(stop);
-                    break;
+        if (roadBlockMode) {
+            if (square) {
+                SquareRoadBlock(square, !square->roadBlock);
+            }
+            else if (photo) {
+                for (auto & i : map->stopped) {
+                    if (i.photo == photo) {
+                        i = BusStopRoadBlock(i);
+                    }
                 }
+            }
+            else {
+                std::cerr << "Warning: off-road click\n";
             }
         }
         else {
-            std::cerr << "Warning: off-road click\n";
-            return;
+            /* tooltip of bus is number, size is 1 */
+            if (photo && photo->toolTip().size() == 1) {
+                ShowRoute(photo);
+            }
         }
-        //volání funkce kontrola autobusu
     }
 }
 
@@ -137,7 +130,6 @@ Scene::mouseMoveEvent(QMouseEvent *event)
         return;
     }
     event->ignore();
-
 }
 
 void
@@ -159,9 +151,9 @@ Scene::ZoomSub()
 }
 
 void
-Scene::MoveBus()
+Scene::MoveBuses()
 {
-    garage->MoveAllBuses(map);
+    garage.MoveAllBuses(map);
 }
 
 void
@@ -171,7 +163,7 @@ Scene::StreetUpdate(float updateSlowdown, const std::string& name)
 }
 
 void
-Scene::squareRoadBlock(Square* square, bool onOff)
+Scene::SquareRoadBlock(Square* square, bool onOff)
 {
     if (!square || !square->road)
         return;
@@ -264,7 +256,7 @@ Scene::squareRoadBlock(Square* square, bool onOff)
 }
 
 StreetMap::stopData
-Scene::busStopRoadBlock(StreetMap::stopData stop)
+Scene::BusStopRoadBlock(StreetMap::stopData stop)
 {
     QString path;
     QMessageBox Msgbox;
@@ -291,6 +283,34 @@ Scene::busStopRoadBlock(StreetMap::stopData stop)
 }
 
 void
+Scene::ShowRoute(QGraphicsItem *photo)
+{
+    static std::vector<QGraphicsItem*> busPhotoStorage;
+    static Bus *bus;
+    QString colors[4] = {"", "#ff4040", "#75a298", "#daccc4"};
+    std::string routeColor = "#c0c0c0";
+
+    /* find photo in storage */
+    auto end = std::end(busPhotoStorage);
+    auto found = std::find(std::begin(busPhotoStorage), end, photo);
+    bus = garage.GetBusByPhoto(photo);
+
+    if (found == end) {
+        if (!bus) {
+            std::cerr << "Error: Bus not found\n";
+        }
+        else {
+            busPhotoStorage.push_back(photo);
+            bus->CreateTimetable(colors[bus->busNumber_]);
+        }
+    } /* second click on same bus changes route to default color */
+    else {
+        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(routeColor));
+        bus->ClearTextArea();
+        busPhotoStorage.erase(found);
+    }
+}
+
 Scene::checkRoadBlockBus()
 {
     int hourNow = Timer::GetHour();
@@ -326,13 +346,5 @@ Scene::checkRoadBlockBus()
                 }
             }
         }
-
-
-
-
     }
 }
-
-
-
-

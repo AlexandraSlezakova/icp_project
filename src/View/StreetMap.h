@@ -58,7 +58,6 @@ public:
     void UpdateStreet(const std::string& name, float updateSlowdown);
 
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
-    Square *layout[X][Y]{};
     std::vector<stopData> stopped;
 };
 

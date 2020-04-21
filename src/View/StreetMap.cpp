@@ -15,7 +15,7 @@ StreetMap::StreetMap(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
             /* set color */
             square->SetColor("#CCFFCC");
             /* save square into layout */
-            layout[x][y] = square;
+            Square::layout[x][y] = square;
         }
     }
 }
@@ -64,8 +64,8 @@ StreetMap::AddStreet(Street *s)
                 IF(positionOnMap.front() == nullptr, positionOnMap.erase(positionOnMap.begin()))
                 positionOnMap.push_back(s);
                 /* change background of street */
-                layout[x][y]->SetColor("#C0C0C0");
-                layout[x][y]->road = true;
+                Square::layout[x][y]->SetColor("#C0C0C0");
+                Square::layout[x][y]->road = true;
             }
         }
     }
@@ -209,7 +209,7 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
             y = std::stoi(tokens[2]);
 
             /* add stop on square */
-            square = layout[x][y];
+            square = Square::layout[x][y];
             square->SetColor("#FFFFFF");
             square->hasStop = true;
 

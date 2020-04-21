@@ -1,5 +1,7 @@
 #include "Square.h"
 
+Square *Square::layout[X][Y];
+
 Square::Square(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
 {
     /* set square size */
@@ -14,4 +16,10 @@ Square::SetColor(const QString &name)
     color_.setNamedColor(name);
     brush.setColor(color_);
     setBrush(brush);
+}
+
+QString
+Square::GetColor()
+{
+    return color_.name();
 }

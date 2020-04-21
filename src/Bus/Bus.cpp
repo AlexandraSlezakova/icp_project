@@ -59,7 +59,7 @@ Bus::LoadTimetable()
 }
 
 void
-Bus::CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& color)
+Bus::CreateTimetable(QString& color)
 {
     std::string minute;
     for (const Coordinates::BusStop_S& info : stopInformation) {
@@ -72,22 +72,28 @@ Bus::CreateTimetable(QPlainTextEdit *text, Square *layout[X][Y], const QString& 
         }
 
         stream << std::to_string(info.stopHour) << ":" << minute << " " << info.name;
-        text->appendPlainText(QString::fromStdString(stream.str()));
+        textArea->appendPlainText(QString::fromStdString(stream.str()));
     }
 
     /* draw bus route on map */
-    BusRouteMap::DrawLine(stopInformation, layout, color);
+    BusRouteMap::DrawLine(stopInformation, color);
+}
+
+void
+Bus::ClearTextArea()
+{
+    textArea->clear();
 }
 
 void
 Bus::InitBus(QGraphicsScene *scene)
 {
     QString path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus.png"));
-    bus = new QGraphicsPixmapItem(QPixmap(path));
-    bus->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
-    bus->setScale(0.06);
-    bus->setPos(0, 0 - 5);
-    scene->addItem(bus);
+    busPhoto = new QGraphicsPixmapItem(QPixmap(path));
+    busPhoto->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
+    busPhoto->setScale(0.06);
+    busPhoto->setPos(0, 0 - 5);
+    scene->addItem(busPhoto);
 }
 
 void
@@ -98,6 +104,18 @@ Bus::MoveBus()
     int minuteNow = Timer::GetMinute();
     int rotation;
     Coordinates::BusStop_S next, current;
+
+    if (iteration) {
+        if (!minuteNow) {
+            hourNow--;
+            minuteNow = 60;
+        }
+        else if (minuteNow > 0 && minuteNow < 10) {
+            hourNow--;
+            minuteNow += 60;
+        }
+        minuteNow -= (iteration * 10);
+    }
 
     for (int i = 0; i < stopInformation.size() - 1; i++) {
         current = stopInformation[i];
@@ -110,23 +128,23 @@ Bus::MoveBus()
 
             rotation = 0;
             if (next.coordinates->x > x) {
-                bus->setTransform(QTransform::fromScale(1, 1));
+                busPhoto->setTransform(QTransform::fromScale(1, 1));
             }
             else if (next.coordinates->x < x) {
-                bus->setTransform(QTransform::fromScale(-1, 1));
+                busPhoto->setTransform(QTransform::fromScale(-1, 1));
             }
             else {
                 if( next.coordinates->y > y ) {
                     rotation = 90;
-                    bus->setTransform(QTransform::fromScale(1, 1));
+                    busPhoto->setTransform(QTransform::fromScale(1, 1));
                 }
                 else {
                     rotation = -90;
-                    bus->setTransform(QTransform::fromScale(1, 1));
+                    busPhoto->setTransform(QTransform::fromScale(1, 1));
                 }
             }
 
-            bus->setRotation(rotation);
+            busPhoto->setRotation(rotation);
 
             /* moving along the X axis */
             if (next.coordinates->y == y) {
@@ -141,7 +159,7 @@ Bus::MoveBus()
 
             busPosition->x = x;
             busPosition->y = y;
-            bus->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
+            busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
             break;
         }
     }
@@ -182,4 +200,13 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
     return coordinates;
 }
 
+QPlainTextEdit *Bus::textArea;
 
+void
+Bus::InitTimetableArea(QWidget *parent, int width, int height)
+{
+    /* text area for bus timetable */
+    textArea = new QPlainTextEdit(parent);
+    textArea->setMinimumSize(width * 0.19, height * 0.6);
+    textArea->move(5, 80);
+}

@@ -1,50 +1,97 @@
 #include "BusRouteMap.h"
 
 void
-BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, Square *layout[X][Y], const QString& color)
+BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QString color)
 {
     Coordinates *currentCoordinate, *nextCoordinate;
-    int from , to;
+    Square *square;
+    QString squareColor, previousColor, originalColor = color;
+    int from, to, allSame, iterations, value;
+    int x, y, xValue, yValue, yAxis;
 
     for (int i = 0; i < stopInformation.size() - 1; i++) {
         currentCoordinate = stopInformation[i].coordinates;
         nextCoordinate = stopInformation[i + 1].coordinates;
+        IF(originalColor != color, color = originalColor)
+        iterations = allSame = 0;
+        yAxis = 0;
 
-        /* moving along the X axis */
         if (nextCoordinate->x == currentCoordinate->x) {
             from = currentCoordinate->y;
             to = nextCoordinate->y;
-
-            if (currentCoordinate->y > nextCoordinate->y) {
-                from = nextCoordinate->y;
-                to = currentCoordinate->y;
-            }
-
-            for (int y = from; y < to; y++) {
-                if (layout[currentCoordinate->x][y]->hasStop)
-                    continue;
-
-                layout[currentCoordinate->x][y]->SetColor(color);
-            }
-
-        } /* moving along the Y axis */
+            yAxis = 1;
+        }
         else {
             from = currentCoordinate->x;
             to = nextCoordinate->x;
+        }
 
-            if (currentCoordinate->x > nextCoordinate->x) {
-                from = nextCoordinate->x;
-                to = currentCoordinate->x;
+        /* swap coordinates */
+        if (from > to) {
+            value = from;
+            from = to;
+            to = value;
+        }
+
+        if (yAxis) {
+            xValue = currentCoordinate->x;
+        }
+        else {
+            yValue = currentCoordinate->y;
+        }
+
+        for (int index = from; index < to; index++) {
+            if (yAxis) {
+                yValue = index;
+            }
+            else {
+                xValue = index;
             }
 
-            for (int x = from; x < to; x++) {
-                if (layout[x][currentCoordinate->y]->hasStop)
-                    continue;
+            square = Square::layout[xValue][yValue];
+            if (square->hasStop)
+                continue;
 
-                layout[x][currentCoordinate->y]->SetColor(color);
+            squareColor = square->GetColor();
+
+            if (color == "#c0c0c0" && !allSame) {
+                if (!previousColor.isEmpty()) {
+                    /* difference was found */
+                    if (previousColor != squareColor) {
+                        color = squareColor;
+                        index = from - 1;
+                        allSame = 1;
+                        iterations = 0;
+                    }
+                    else {
+                        IF(iterations, allSame = 1)
+                        iterations++;
+                    }
+                }
+                else {
+                    previousColor = squareColor;
+                }
+                continue;
+            }
+
+            if (squareColor == "#c0c0c0" || (index % 2) || color == "#c0c0c0" || color != originalColor) {
+                /* color of previous 3 squares wasn't changed, change it now */
+                if (allSame && iterations == 2) {
+                    for (int j = 1; j < 4; j++) {
+                        if (yAxis) {
+                            x = xValue;
+                            y = index - j;
+                        }
+                        else {
+                            y = yValue;
+                            x = index - j;
+                        }
+                        Square::layout[x][y]->SetColor(color);
+                        iterations = 0;
+                    }
+                }
+                square->SetColor(color);
             }
         }
     }
-
 }
-

@@ -4,10 +4,10 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    timerInterval = 1000;
-    timerId = startTimer(timerInterval);
     ResizeWindow();
     CreateScene();
+    timerInterval = 1000;
+    timerId = startTimer(timerInterval);
 }
 
 MainWindow::~MainWindow()
@@ -47,14 +47,10 @@ MainWindow::CreateScene()
     widget->move(width * 0.7, 0);
     widget->setMinimumSize(width * 0.3, height * 0.9);
 
-    /* text area for bus timetable */
-    scene->text = new QPlainTextEdit(widget);
-    scene->text->setMinimumSize(width * 0.3, height * 0.6);
-    scene->text->move(0, TIME_AREA_HEIGHT * 2);
-
+    /* text area with timetable */
+    Bus::InitTimetableArea(widget, width, height);
     /* text area with time */
     InitTimeArea(widget);
-
     /* buttons */
     InitButtons(widget);
     /* slider */
@@ -66,6 +62,16 @@ MainWindow::timerEvent(QTimerEvent *event)
 {
     timeArea->clear();
     timeArea->appendPlainText(Timer::GetTime());
+
+    int minute = Timer::GetMinute();
+    int second = Timer::GetSecond();
+    static int iteration = 0;
+    /* every five minutes create new buses */
+    if (minute > 0 && !(minute % 10) && !second) {
+        iteration++;
+        scene->AddBuses(iteration);
+    }
+    scene->MoveBuses();
 }
 
 void
@@ -76,37 +82,38 @@ MainWindow::InitTimeArea(QWidget *parent)
     /* text area with time */
     timeArea = new QPlainTextEdit(parent);
     timeArea->setFixedSize(TIME_AREA_WIDTH, TIME_AREA_HEIGHT);
+    timeArea->move(5, 5);
     timeArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     timeArea->setFont(font);
 
     /* button for stopping and starting time */
     timerButton = new QPushButton(parent);
-    timerButton->move(TIME_AREA_WIDTH + 5, 0);
+    timerButton->move(TIME_AREA_WIDTH + 10, 5);
     timerButton->setFixedSize(90, 30);
     timerButton->setText("Change time");
     connect(timerButton, SIGNAL (released()), this , SLOT(StopTimer()));
 
     /* reset button */
     QPushButton *resetButton = new QPushButton(parent);
-    resetButton->move(TIME_AREA_WIDTH + 95, 0);
+    resetButton->move(TIME_AREA_WIDTH + 100, 5);
     resetButton->setFixedSize(90, 30);
     resetButton->setText("Reset timer");
     connect(resetButton, SIGNAL (released()), this , SLOT(ResetTimer()));
 
     /* change interval of timer button */
     timerLabel = new QLabel(parent);
-    timerLabel->move(TIME_AREA_WIDTH + 5, 30);
+    timerLabel->move(TIME_AREA_WIDTH + 10, 35);
     timerLabel->setFixedSize(150,40);
     timerLabel->setText("Timer interval = " + QString::number(100) + "%");
 
     QPushButton *timerButtonAdd = new QPushButton(parent);
-    timerButtonAdd->move(TIME_AREA_WIDTH + 155, 30);
+    timerButtonAdd->move(TIME_AREA_WIDTH + 160, 40);
     timerButtonAdd->setFixedSize(30, 30);
     timerButtonAdd->setText("+");
     connect(timerButtonAdd, SIGNAL (released()), this, SLOT(TimerPlus()));
 
     QPushButton *timerButtonSub = new QPushButton(parent);
-    timerButtonSub->move(TIME_AREA_WIDTH + 185, 30);
+    timerButtonSub->move(TIME_AREA_WIDTH + 190, 40);
     timerButtonSub->setFixedSize(30, 30);
     timerButtonSub->setText("-");
     connect(timerButtonSub, SIGNAL (released()), this, SLOT(TimerSub()));
@@ -117,38 +124,31 @@ MainWindow::InitButtons(QWidget *parent)
 {
     QWidget *buttons = new QWidget(parent);
     buttons->move(0, TIME_AREA_HEIGHT);
-    /* button for bus 1 */
-    QPushButton *bus1 = new QPushButton(buttons);
-    bus1->setFixedSize(140, 30);
-    bus1->setText("Timetable of bus #1");
-    connect(bus1, SIGNAL (released()), scene , SLOT(GetBus1Timetable()));
-    scene->busId++;
 
     /* zoom buttons */
     QPushButton *zoomButtonAdd = new QPushButton(parent);
-    zoomButtonAdd->move(TIME_AREA_WIDTH + 70, 915);
+    zoomButtonAdd->move(TIME_AREA_WIDTH, 770);
     zoomButtonAdd->setFixedSize(30, 30);
     zoomButtonAdd->setText("+");
     connect(zoomButtonAdd, SIGNAL (released()), scene, SLOT(ZoomAdd()));
 
     QPushButton *zoomButtonSub = new QPushButton(parent);
-    zoomButtonSub->move(TIME_AREA_WIDTH + 100, 915);
+    zoomButtonSub->move(TIME_AREA_WIDTH + 30, 770);
     zoomButtonSub->setFixedSize(30, 30);
     zoomButtonSub->setText("-");
     connect(zoomButtonSub, SIGNAL (released()), scene, SLOT(ZoomSub()));
 
     /* print numb. expression of zoom */
     scene->zoomText = new QLabel(parent);
-    scene->zoomText->move(TIME_AREA_WIDTH - 80, 915);
+    scene->zoomText->move(5, 770);
     scene->zoomText->setFixedSize(150,30);
     scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
-    scene->zoomText->show();
 
     roadBlockButton = new QPushButton(parent);
-    roadBlockButton->move(TIME_AREA_WIDTH + 100, 515);
+    roadBlockButton->move(5, 725);
     roadBlockButton->setFixedSize(200, 30);
     roadBlockButton->setText("RoadBlockMode OFF");
-    roadBlockButton->setStyleSheet("background-color: red");
+    roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
     connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
 }
 
@@ -160,8 +160,8 @@ void MainWindow::InitSliders(QWidget *parent) {
 
     /* streetpicker */
     combobox = new QComboBox(parent);
-    combobox->move(TIME_AREA_WIDTH + 20, 815);
-    combobox->setFixedSize(60,40);
+    combobox->move(5,820);
+    combobox->setFixedSize(150, 40);
 
     file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
 
@@ -173,8 +173,8 @@ void MainWindow::InitSliders(QWidget *parent) {
 
     /* slider for changing street slowdown */
     QSlider *slider = new QSlider(Qt::Horizontal,parent);
-    slider->move(TIME_AREA_WIDTH + 70, 815);
-    slider->setFixedSize(60,40);
+    slider->move(160, 827);
+    slider->setFixedSize(80, 40);
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(ChangedSlowDownValue(int)));
 }
 
@@ -209,6 +209,8 @@ void
 MainWindow::ResetTimer()
 {
     Timer::ResetTime();
+    timerInterval = 1000;
+    timerLabel->setText("Timer interval = " + QString::number(100) + "%");
 }
 
 
@@ -223,12 +225,12 @@ MainWindow::RoadBlockSwitcher()
 {
     if (!scene->roadBlockMode) {
         roadBlockButton->setText("RoadBlockMode ON");
-        roadBlockButton->setStyleSheet("background-color: green");
+        roadBlockButton->setStyleSheet("background-color: green; color: white; font-weight: bold;");
         scene->roadBlockMode = true;
     }
     else {
         roadBlockButton->setText("RoadBlockMode OFF");
-        roadBlockButton->setStyleSheet("background-color: red");
+        roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
         scene->roadBlockMode = false;
         scene->checkRoadBlockBus();
     }

@@ -30,14 +30,18 @@ public:
 
     /**
      * @brief add whole map to scene
-     * @param streetMap map of streets
      */
-    void AddMap(StreetMap *streetMap);
+    void AddSquares();
 
     /**
      * @brief set up view and add scene
      */
     void SetUpView();
+
+    /**
+     * @brief move all buses
+     */
+    void MoveBuses();
 
     /**
      * @brief update slowdown on street
@@ -46,15 +50,19 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
+
+    /**
+     * @brief add buses to scene
+     */
+    void AddBuses(int iteration = 0);
+
     void checkRoadBlockBus();
 
 
     QGraphicsScene *scene;
-    QPlainTextEdit *text;
     QLabel *zoomText;           //!< text with information about scale scene
-    int busId = 0;              //!< id of bus
     double zoom_act = 100;      //!< double expression of zoom
-    Garage *garage;             //!< All busses
+    Garage garage;              //!< all buses
     StreetMap *map;             //!< map
     bool roadBlockMode = false; //!< Mode to add and sub roadblock
 
@@ -62,23 +70,14 @@ public:
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
 
+protected:
+    /**
+    * @brief zooms in and out scene by mouse
+    * @param event mouse wheel event changer
+    */
+    void wheelEvent(QWheelEvent *event) override;
 
 public slots:
-    /**
-     * @brief show timetable of bus number 1
-     */
-    void GetBus1Timetable();
-
-    /**
-    * @brief move all buses
-    */
-    void MoveBus();
-
-    /**
-    * @brief timer to move all buses
-    */
-    void MoveBuses();
-
     /**
     * @brief zoom in scene
     */
@@ -97,39 +96,43 @@ protected:
     virtual void wheelEvent(QWheelEvent *event);
     
 private:
-
     /**
     * @brief moving map with mouse
     * @param event mouse moving event
     */
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event) override;
 
     /**
     * @brief end moving map release click on mouse
     * @param event mouse moving event
     */
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     /**
     * @brief start moving map with click on mouse and add roadblock on map
     * @param event mouse moving event
     */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
     /**
     * @brief add and delete roadblock between two stops
     * @param square information on clicked square
     * @param onOff mood on add or delete roadblock
     */
-    void squareRoadBlock(Square *square, bool onOff);
+    void SquareRoadBlock(Square *square, bool onOff); 
 
+    /**
+     * @brief show route of clicked bus
+     * @param photo bus photo
+     */
+    void ShowRoute(QGraphicsItem *photo);
+    
     /**
     * @brief add and delete roadblock on stop
     * @param stop roadblock stop
     * @return stopData to update data
     */
-    StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
-
+    StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 };
 
 #endif // SCENE_H

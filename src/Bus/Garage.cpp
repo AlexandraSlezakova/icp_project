@@ -1,35 +1,44 @@
-
 #include "Garage.h"
 
-Garage::Garage(int busId, int busNumber,QGraphicsScene *scene)
+Garage::Garage() = default;
+
+void
+Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
 {
     Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
+    bus->iteration = iteration;
     bus->InitBus(scene);
     bus->MoveBus();
     allBus.push_back(bus);
 }
 
-void
-Garage::AddBus(Bus bus)
-{
-
-}
-
-Bus* Garage::GetBus(int busId, int busLine) {
-    if (busLine == 1) {
-        for (auto &bus : line1) {
-            if (busId == bus->id_)
-                return bus;
-        }
+Bus*
+Garage::GetBus(int busId) {
+    for (auto &bus : allBuses) {
+        if (busId == bus->id_)
+            return bus;
     }
+
     return nullptr;
 }
 
-void Garage::MoveAllBuses(StreetMap *streetMap) {
-    for (int i = 0; i < allBus.size(); i++ ) {
-        CheckRoadBlock(streetMap, allBus[i]);
-        allBus[i] = CheckSlowDown(streetMap, allBus[i]);
-        allBus[i]->MoveBus();
+Bus*
+Garage::GetBusByPhoto(QGraphicsItem *photo)
+{
+    for (auto &bus : allBuses) {
+        if (photo == bus->busPhoto)
+            return bus;
+    }
+
+    return nullptr;
+}
+
+void
+Garage::MoveAllBuses(StreetMap *streetMap) {
+    for (Bus *bus : allBus) {
+        CheckRoadBlock(streetMap, bus);
+        bus = CheckSlowDown(streetMap, bus);
+        bus->MoveBus();
     }
 }
 
@@ -39,8 +48,7 @@ Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
     int i = 0;
     for (;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
     }
-    if (bus->stopInformation[i].name == bus->nextBusStop.name) {
-    }
+
     if (streetMap->layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
         if (bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
             if (streetMap->layout[bus->nextBusStop.coordinates->x][( bus->nextBusStop.coordinates->y + bus->stopInformation[i].coordinates->y ) / 2]->roadBlock) {
@@ -56,15 +64,26 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     std::vector<std::string> currentSplit;
     std::vector<std::string> nextSplit;
-    std::string streetName = "a";
+    std::string streetName;
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    int secNow = Timer::GetSecond();
     Street *street;
     int timeAdd;
     int i = 0;
     int stopTime;
     int pop;
+
+    if (bus->iteration) {
+        if (!minuteNow) {
+            hourNow--;
+            minuteNow = 60;
+        }
+        else if (minuteNow > 0 && minuteNow < 10) {
+            hourNow--;
+            minuteNow += 60;
+        }
+        minuteNow -= (bus->iteration * 10);
+    }
 
     /* find out where the bus should be according to current time */
     int nxt, nw, mn;
@@ -89,15 +108,12 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             ? currentSplit[0]
             : currentSplit[1];
 
-    if (streetName == "a")
-        std::cerr << "Error: Street name wasn't found" << std::endl;
-
     street = streetMap->GetStreet(streetName);
 
     /* change time in timetable
      * used in street slowdown */
     if ((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name)
-        or street->pastslowdown != street->slowdown) {
+        or street->previousSlowdown != street->slowdown) {
 
         if (bus->stopInformation[i].name != bus->currentBusStop.name
             && bus->stopInformation[i + 1].name != bus->nextBusStop.name)
@@ -111,65 +127,72 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
              bus->currentBusStop.stopMin = minuteNow;
         }
 
-        /* how many minutes the bus is already on the road */
-        if (minuteNow < bus->currentBusStop.stopMin)
-            timeAdd = 60 + minuteNow - bus->currentBusStop.stopMin;
-        else
-            timeAdd = minuteNow - bus->currentBusStop.stopMin;
 
-        /* time affected by slowdown */
-        if (bus->nextBusStop.stopMin < bus->currentBusStop.stopMin)
-            stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
-        else
-            stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
+        if (street->previousSlowdown != street->slowdown) {
+            /* how many minutes the bus is already on the road */
+            if (minuteNow < bus->currentBusStop.stopMin)
+                timeAdd = 60 + minuteNow - bus->currentBusStop.stopMin;
+            else
+                timeAdd = minuteNow - bus->currentBusStop.stopMin;
 
-        /* street slowdown */
-        stopTime = round(stopTime * street->slowdown);
+            /* time affected by slowdown */
+            if (bus->nextBusStop.stopMin < bus->currentBusStop.stopMin)
+                stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
+            else
+                stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
 
-        /* change time in timetable of next bus stop
-         * time in timetable of previous bus stop + time of the bus on the road
-         * + the remaining time needed to arrive at the next bus stop */
-        if (bus->currentBusStop.stopMin + stopTime > 60) {
-            bus->stopInformation[i+1].stopHour += 1;
-            bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
-        }
-        else {
-            bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime;
-        }
+            /* street slowdown */
+            stopTime = round(stopTime * street->slowdown);
 
-        i++;
-
-        /* change of time in timetable
-         * 10 squares on the map  - 2 minutes
-         * 19 squares on the map - 3 minutes
-         * the delay is already counted from the previous calculation
-         * - example:
-         * time in timetable of current bus stop - 10:02
-         * and next bus stop - 10:04
-         * bus is on the road for a minute and one minute left
-         * value of slowdown - 2
-         * so 2 minutes left
-         * new calculated value: 10:02 + traveled distance(1) + delay(2)
-         * = new time 10:05 */
-        for (; i < bus->stopInformation.size() - 2; i++) {
-            if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
-            - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
-                pop = 2;
-            }
-            else {
-                pop = 3;
-            }
-
-            if (bus->stopInformation[i].stopMin + pop > 60) {
+            /* change time in timetable of next bus stop
+             * time in timetable of previous bus stop + time of the bus on the road
+             * + the remaining time needed to arrive at the next bus stop */
+            if(bus->currentBusStop.stopMin + stopTime > 60) {
                 bus->stopInformation[i + 1].stopHour += 1;
-                bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin +  pop - 60;
+                bus->stopInformation[i + 1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
             }
             else {
-                bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin + pop;
+                bus->stopInformation[i + 1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime;
+            }
+
+            i++;
+
+            /* change of time in timetable
+             * 10 squares on the map  - 2 minutes
+             * 19 squares on the map - 3 minutes
+             * the delay is already counted from the previous calculation
+             * - example:
+             * time in timetable of current bus stop - 10:02
+             * and next bus stop - 10:04
+             * bus is on the road for a minute and one minute left
+             * value of slowdown - 2
+             * so 2 minutes left
+             * new calculated value: 10:02 + traveled distance(1) + delay(2)
+             * = new time 10:05 */
+            for (; i < bus->stopInformation.size() - 1; i++) {
+                if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
+                    - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
+                    pop = 2;
+                }
+                else {
+                    pop = 3;
+                }
+
+                if (bus->stopInformation[i].stopMin + pop >= 60) {
+                    bus->stopInformation[i + 1].stopHour += 1;
+                    bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin +  pop - 60;
+                }
+                else {
+                    if (bus->stopInformation[i + 1].stopHour < bus->stopInformation[i].stopHour) {
+                        bus->stopInformation[i + 1].stopHour += 1;
+                    }
+                    bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin + pop;
+                }
             }
         }
+
         /* current slowdown */
-        street->pastslowdown = street->slowdown;
+        street->previousSlowdown = street->slowdown;
     }
         return bus;
 }

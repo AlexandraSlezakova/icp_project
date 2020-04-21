@@ -11,22 +11,22 @@
 class Garage
 {
 public:
-    std::vector<Bus*> line1;    //!< array for all bus line 1
-    std::vector<Bus*> line2;     //!< array for all bus line 2
-    std::vector<Bus*> line3;     //!< array for all bus line 3
     std::vector<Bus*> allBus;     //!< array for all bus
 
     /**
     * @brief garage constructor
-    * @param id id of bus
-    * @param busNumber number of bus
-    * @param scene
     */
-    explicit Garage(int busId, int busNumber,QGraphicsScene *scene);
+    Garage();
 
     ~Garage() = default;
 
-    void AddBus(Bus bus);
+    /**
+     * @brief add bus to garage
+     * @param id id of bus
+     * @param busNumber number of bus
+     * @param scene
+     */
+    void AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration = 0);
 
     /**
     * @brief move all buses on the scene
@@ -35,18 +35,24 @@ public:
     void MoveAllBuses(StreetMap *streetMap);
 
     /**
-    * @brief return right bus from line array
+    * @brief get bus from bus storage
     * @param busId id of bus
-    * @param busLine number of bus
-    * @return bus
+    * @return bus found bus | nullptr
     */
-    Bus* GetBus(int busId, int busLine);
+    Bus* GetBus(int busId);
+
+    /**
+     * @brief get bus by photo
+     * @param photo photo of bus
+     * @return found bus | nullptr
+     */
+    Bus *GetBusByPhoto(QGraphicsItem *photo);
 
     /**
     * @brief check street slow down for bus
-    * @param streetMap for get slowdown on street
-    * @param bus for which check is in running
-    * @return bus to update data
+    * @param streetMap find street in map with slowdown
+    * @param bus a bus for which a slowdown applies
+    * @return bus with updated data
     */
     Bus* CheckSlowDown(StreetMap *streetMap, Bus *bus);
 
