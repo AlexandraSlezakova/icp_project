@@ -1,6 +1,6 @@
 #include "MainWindow.h"
-#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // Cesta Alex  TODO v qt_creator len ui_mainwindow.h
-//#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h" // Cesta Martin
+//#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // Cesta Alex  TODO v qt_creator len ui_mainwindow.h
+#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h" // Cesta Martin
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -175,7 +175,7 @@ void MainWindow::InitSliders(QWidget *parent) {
     QSlider *slider = new QSlider(Qt::Horizontal,parent);
     slider->move(TIME_AREA_WIDTH + 70, 815);
     slider->setFixedSize(60,40);
-    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(Value(int)));
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(ChangedSlowDownValue(int)));
 }
 
 void
@@ -211,8 +211,9 @@ MainWindow::ResetTimer()
     Timer::ResetTime();
 }
 
-void
-MainWindow::Value(int slowDown)
+
+void 
+MainWindow::ChangedSlowDownValue(int slowDown) 
 {
     scene->map->UpdateStreet(combobox->currentText().toStdString(),(float)slowDown / 100 + 1);
 }
@@ -229,6 +230,7 @@ MainWindow::RoadBlockSwitcher()
         roadBlockButton->setText("RoadBlockMode OFF");
         roadBlockButton->setStyleSheet("background-color: red");
         scene->roadBlockMode = false;
+        scene->checkRoadBlockBus();
     }
 }
 

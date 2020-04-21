@@ -6,7 +6,7 @@ Garage::Garage(int busId, int busNumber,QGraphicsScene *scene)
     Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
     bus->InitBus(scene);
     bus->MoveBus();
-    line1.push_back(bus);
+    allBus.push_back(bus);
 }
 
 void
@@ -17,7 +17,7 @@ Garage::AddBus(Bus bus)
 
 Bus* Garage::GetBus(int busId, int busLine) {
     if (busLine == 1) {
-        for (auto & bus : line1) {
+        for (auto &bus : line1) {
             if (busId == bus->id_)
                 return bus;
         }
@@ -26,24 +26,33 @@ Bus* Garage::GetBus(int busId, int busLine) {
 }
 
 void Garage::MoveAllBuses(StreetMap *streetMap) {
-    for (int i = 0; i < line1.size(); i++ ) {
-        line1[i] = CheckSlowDown(streetMap,line1[i]);
-        line1[i]->MoveBus();
-    }
-
-    for(auto bus : line2)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
-    }
-    for(auto bus : line3)
-    {
-        //this->CheckSlowDown(streetMap,&bus);
-        bus.MoveBus();
+    for (int i = 0; i < allBus.size(); i++ ) {
+        CheckRoadBlock(streetMap, allBus[i]);
+        allBus[i] = CheckSlowDown(streetMap, allBus[i]);
+        allBus[i]->MoveBus();
     }
 }
 
-Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
+bool
+Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
+    Street *afterNextStreet;
+    int i = 0;
+    for (;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
+    }
+    if (bus->stopInformation[i].name == bus->nextBusStop.name) {
+    }
+    if (streetMap->layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
+        if (bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
+            if (streetMap->layout[bus->nextBusStop.coordinates->x][( bus->nextBusStop.coordinates->y + bus->stopInformation[i].coordinates->y ) / 2]->roadBlock) {
+
+            }
+        }
+    }
+
+}
+
+Bus*
+Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     std::vector<std::string> currentSplit;
     std::vector<std::string> nextSplit;
@@ -120,7 +129,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         /* change time in timetable of next bus stop
          * time in timetable of previous bus stop + time of the bus on the road
          * + the remaining time needed to arrive at the next bus stop */
-        if(bus->currentBusStop.stopMin + stopTime > 60) {
+        if (bus->currentBusStop.stopMin + stopTime > 60) {
             bus->stopInformation[i+1].stopHour += 1;
             bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
         }

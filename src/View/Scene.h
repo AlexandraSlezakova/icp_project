@@ -46,6 +46,8 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
+    void checkRoadBlockBus();
+
 
     QGraphicsScene *scene;
     QPlainTextEdit *text;
@@ -59,13 +61,6 @@ public:
     int  m_originalX = 0;       //!< x mouse position to move map
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
-
-protected:
-    /**
-    * @brief zooms in and out scene by mouse
-    * @param event Mouse wheel event chager
-    */
-    virtual void wheelEvent(QWheelEvent *event);
 
 
 public slots:
@@ -94,6 +89,13 @@ public slots:
     */
     void ZoomSub();
 
+protected:
+    /**
+    * @brief zooms in and out scene by mouse
+    * @param event Mouse wheel event chager
+    */
+    virtual void wheelEvent(QWheelEvent *event);
+    
 private:
 
     /**
@@ -127,6 +129,7 @@ private:
     * @return stopData to update data
     */
     StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
+
 };
 
 #endif // SCENE_H

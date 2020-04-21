@@ -5,3 +5,4 @@
 4. Spomalení ulic // Udělané ale je tam někde výpočetní chyba!!!
 5. Uzavírka ulic
 6. Garáž pro vícero autobusů
+7. Prokontrolovat route 1 autobusu tak aby sedělo 10 dílků 2 min 18 3 min nebo to takto načítat a oddělat čas z texťáku

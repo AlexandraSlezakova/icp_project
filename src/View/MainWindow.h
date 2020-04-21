@@ -72,7 +72,9 @@ public slots:
      */
     void ResetTimer();
 
-    void Value(int slowDown);
+
+    void ChangedSlowDownValue(int slowDown);
+
 
     void RoadBlockSwitcher();
 

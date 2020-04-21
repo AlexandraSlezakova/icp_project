@@ -9,6 +9,7 @@ Bus::Bus(int id, int busNumber, Coordinates *position)
     id_ = id;
     busNumber_ = busNumber;
     busPosition = position;
+    roadStopOnRoad = false;
     LoadTimetable();
 }
 
@@ -108,13 +109,13 @@ Bus::MoveBus()
             y = current.coordinates->y;
 
             rotation = 0;
-            if(next.coordinates->x > x) {
+            if (next.coordinates->x > x) {
                 bus->setTransform(QTransform::fromScale(1, 1));
             }
             else if (next.coordinates->x < x) {
                 bus->setTransform(QTransform::fromScale(-1, 1));
             }
-            else{
+            else {
                 if( next.coordinates->y > y ) {
                     rotation = 90;
                     bus->setTransform(QTransform::fromScale(1, 1));
@@ -147,8 +148,7 @@ Bus::MoveBus()
 }
 
 int
-Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC,
-                   const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next)
+Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next)
 {
 
     int coordinates;

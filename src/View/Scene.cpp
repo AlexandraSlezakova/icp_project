@@ -28,8 +28,8 @@ Scene::CreateMap()
 void
 Scene::AddMap(StreetMap *streetMap)
 {
-    for (auto & x : streetMap->layout) {
-        for (auto & y : x) {
+    for (auto &x : streetMap->layout) {
+        for (auto &y : x) {
             scene->addItem(y);
         }
     }
@@ -38,7 +38,7 @@ Scene::AddMap(StreetMap *streetMap)
 void
 Scene::SetUpView()
 {
-    setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
+    //setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
@@ -79,7 +79,9 @@ Scene::wheelEvent(QWheelEvent *event)
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }
 
-void Scene::mousePressEvent(QMouseEvent *event){
+void
+Scene::mousePressEvent(QMouseEvent *event)
+{
     if (event->button() == Qt::RightButton) {
         m_moving = true;
         m_originalX = event->x();
@@ -97,19 +99,23 @@ void Scene::mousePressEvent(QMouseEvent *event){
             squareRoadBlock(square, !square->roadBlock);
         }
         else if (photo) {
-            for (auto & i : map->stopped) {
-                if (i.photo == photo) {
-                    i = busStopRoadBlock(i);
+            for (auto & stop : map->stopped) {
+                if (stop.photo == photo) {
+                    stop = busStopRoadBlock(stop);
+                    break;
                 }
             }
         }
         else {
             std::cerr << "Warning: off-road click\n";
+            return;
         }
+        //volání funkce kontrola autobusu
     }
 }
 
-void Scene::mouseReleaseEvent(QMouseEvent *event){
+void
+Scene::mouseReleaseEvent(QMouseEvent *event){
     if (event->button() == Qt::RightButton) {
         m_moving = false;
         setCursor(Qt::ArrowCursor);
@@ -119,7 +125,9 @@ void Scene::mouseReleaseEvent(QMouseEvent *event){
     event->ignore();
 }
 
-void Scene::mouseMoveEvent(QMouseEvent *event){
+void
+Scene::mouseMoveEvent(QMouseEvent *event)
+{
     if (m_moving) {
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->x() - m_originalX));
         verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->y() - m_originalY));
@@ -165,35 +173,92 @@ Scene::StreetUpdate(float updateSlowdown, const std::string& name)
 void
 Scene::squareRoadBlock(Square* square, bool onOff)
 {
-    if (!square)
+    if (!square || !square->road)
         return;
 
     int x = square->row;
     int y = square->col;
+    int start_int,end_int;
+    Coordinates *start,*end;
+    QMessageBox Msgbox;
+    bool xy;
+    Msgbox.setText("There is a bus on the route, the street cannot be closed!");
 
-    if (x < 0 or x >= 138)
+    if (x < 0 or x > 138)
         return;
 
-    if (y < 0 or y >= 79)
+    if (y < 0 or y > 79)
         return;
 
-    if (square->road) {
+    if (x + 1 >= 0 and x + 1 < 138)
+        start_int = x + 1;
+    else
+        start_int = x - 1;
 
-         if (!square->hasStop and square->roadBlock != onOff) {
+    /* distance between stops x axis */
+    if (map->layout[start_int][y]->road) {
+        start_int = x;
+        end_int = x;
+        xy = true;
+        for (; !map->layout[end_int + 1][y]->hasStop; end_int++) {
+        }
+        for (; !map->layout[start_int - 1][y]->hasStop; start_int--) {
+        }
 
-            if (onOff) {
-                square->roadBlock = true;
-                map->layout[x][y]->SetColor("#ffff00");
+        start = new Coordinates(start_int, y);
+        end = new Coordinates(end_int, y);
+    }
+    /* y axis */
+    else {
+        start_int = y;
+        end_int = y;
+        xy = false;
+        for (; !map->layout[x][end_int + 1]->hasStop; end_int++) {
+        }
+        for (; !map->layout[x][start_int - 1]->hasStop; start_int--) {
+        }
+        start = new Coordinates(x, start_int);
+        end = new Coordinates(x, end_int);
+
+    }
+
+    /* Check if there is a bus on the desired street that wants to close */
+    for (auto *bus : garage->allBus) {
+        if (bus->busPosition->x == x) {
+            if (end->y >= bus->busPosition->y && bus->busPosition->y >= start->y) {
+                Msgbox.exec();
+                return;
+            }
+        }
+        else if (bus->busPosition->y == y) {
+            if (end->x >= bus->busPosition->x && bus->busPosition->x >= start->x) {
+                Msgbox.exec();
+                return;
+            }
+        }
+    }
+
+    /* Add RoadStop */
+    for (; start_int <= end_int; start_int++) {
+        if (onOff) {
+            if (xy) {
+                map->layout[start_int][y]->roadBlock = true;
+                map->layout[start_int][y]->SetColor("#FF0000");
             }
             else {
-                square->roadBlock = false;
-                map->layout[x][y]->SetColor("#C0C0C0");
+                map->layout[x][start_int]->roadBlock = true;
+                map->layout[x][start_int]->SetColor("#FF0000");
             }
-
-            squareRoadBlock(map->layout[x + 1][y], onOff);
-            squareRoadBlock(map->layout[x - 1][y], onOff);
-            squareRoadBlock(map->layout[x][y + 1], onOff);
-            squareRoadBlock(map->layout[x][y - 1], onOff);
+        }
+        else {
+            if (xy) {
+                map->layout[start_int][y]->roadBlock = false;
+                map->layout[start_int][y]->SetColor("#C0C0C0");
+            }
+            else {
+                map->layout[x][start_int]->roadBlock = false;
+                map->layout[x][start_int]->SetColor("#C0C0C0");
+            }
         }
     }
 }
@@ -202,19 +267,70 @@ StreetMap::stopData
 Scene::busStopRoadBlock(StreetMap::stopData stop)
 {
     QString path;
+    QMessageBox Msgbox;
+    Msgbox.setText("On the road is a bus, the stop cannot be closed");
 
-    if(!stop.stop->roadStop) {
+    if (!stop.stop->roadStop) {
+        for (auto *bus : garage->allBus) {
+            if (bus->nextBusStop.name == stop.stop->stopName ) {
+                Msgbox.exec();
+                return stop;
+            }
+        }
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop_roadblock.jpg"));
-        stop.stop->roadStop = true;
+        map->layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = true;
     }
     else {
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
-        stop.stop->roadStop = false;
+        map->layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = false;
     }
 
     stop.photo = stop.stop->AddStopToScene(scene, path);
 
     return stop;
+}
+
+void
+Scene::checkRoadBlockBus()
+{
+    int hourNow = Timer::GetHour();
+    int minuteNow = Timer::GetMinute();
+    int secNow = Timer::GetSecond();
+    int i = 0;
+
+    for (auto *bus : garage->allBus) {
+        int nxt, nw, mn;
+        for (; i < bus->stopInformation.size() - 2; i++) {
+            nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
+            nw  = hourNow * 60 + minuteNow;
+            mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
+
+            if (nxt > nw and nw >= mn) {
+                i++;
+                break;
+            }
+        }
+
+        for (; i < bus->stopInformation.size() - 2; i++) {
+            if (map->layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock) {
+                //RoadStop on road
+                //std::cerr << "Stop Closed " << bus->stopInformation[i].name << "\n";
+                bus->roadStopOnRoad = true;
+            }
+            /* Street going vertically */
+            if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
+                if (map->layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock) {
+                    //std::cerr << "RoadStop between " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
+                    //RoadStop
+                    bus->roadStopOnRoad = true;
+                }
+            }
+        }
+
+
+
+
+    }
 }
 
 
