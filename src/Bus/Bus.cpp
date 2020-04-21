@@ -92,7 +92,6 @@ Bus::InitBus(QGraphicsScene *scene)
     busPhoto->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
     busPhoto->setScale(0.06);
     busPhoto->setPos(0, 0 - 5);
-    busPhoto->setFlag(QGraphicsItem::ItemIsSelectable);
     scene->addItem(busPhoto);
 }
 

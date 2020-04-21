@@ -97,63 +97,69 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
              bus->currentBusStop.stopMin = minuteNow;
         }
 
-        /* how many minutes the bus is already on the road */
-        if (minuteNow < bus->currentBusStop.stopMin)
-            timeAdd = 60 + minuteNow - bus->currentBusStop.stopMin;
-        else
-            timeAdd = minuteNow - bus->currentBusStop.stopMin;
+        if (street->previousSlowdown != street->slowdown) {
+            /* how many minutes the bus is already on the road */
+            if (minuteNow < bus->currentBusStop.stopMin)
+                timeAdd = 60 + minuteNow - bus->currentBusStop.stopMin;
+            else
+                timeAdd = minuteNow - bus->currentBusStop.stopMin;
 
-        /* time affected by slowdown */
-        if (bus->nextBusStop.stopMin < bus->currentBusStop.stopMin)
-            stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
-        else
-            stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
+            /* time affected by slowdown */
+            if (bus->nextBusStop.stopMin < bus->currentBusStop.stopMin)
+                stopTime = 60 +  bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
+            else
+                stopTime = bus->nextBusStop.stopMin - bus->currentBusStop.stopMin - timeAdd;
 
-        /* street slowdown */
-        stopTime = round(stopTime * street->slowdown);
+            /* street slowdown */
+            stopTime = round(stopTime * street->slowdown);
 
-        /* change time in timetable of next bus stop
-         * time in timetable of previous bus stop + time of the bus on the road
-         * + the remaining time needed to arrive at the next bus stop */
-        if(bus->currentBusStop.stopMin + stopTime > 60) {
-            bus->stopInformation[i+1].stopHour += 1;
-            bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
-        }
-        else {
-            bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime;
-        }
-
-        i++;
-
-        /* change of time in timetable
-         * 10 squares on the map  - 2 minutes
-         * 19 squares on the map - 3 minutes
-         * the delay is already counted from the previous calculation
-         * - example:
-         * time in timetable of current bus stop - 10:02
-         * and next bus stop - 10:04
-         * bus is on the road for a minute and one minute left
-         * value of slowdown - 2
-         * so 2 minutes left
-         * new calculated value: 10:02 + traveled distance(1) + delay(2)
-         * = new time 10:05 */
-        for (; i < bus->stopInformation.size() - 2; i++) {
-            if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
-            - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
-                pop = 2;
-            }
-            else {
-                pop = 3;
-            }
-
-            if (bus->stopInformation[i].stopMin + pop > 60) {
+            /* change time in timetable of next bus stop
+             * time in timetable of previous bus stop + time of the bus on the road
+             * + the remaining time needed to arrive at the next bus stop */
+            if(bus->currentBusStop.stopMin + stopTime > 60) {
                 bus->stopInformation[i + 1].stopHour += 1;
-                bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin +  pop - 60;
+                bus->stopInformation[i + 1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
             }
             else {
-                bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin + pop;
+                bus->stopInformation[i + 1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime;
+            }
+
+            i++;
+
+            /* change of time in timetable
+             * 10 squares on the map  - 2 minutes
+             * 19 squares on the map - 3 minutes
+             * the delay is already counted from the previous calculation
+             * - example:
+             * time in timetable of current bus stop - 10:02
+             * and next bus stop - 10:04
+             * bus is on the road for a minute and one minute left
+             * value of slowdown - 2
+             * so 2 minutes left
+             * new calculated value: 10:02 + traveled distance(1) + delay(2)
+             * = new time 10:05 */
+            for (; i < bus->stopInformation.size() - 1; i++) {
+                if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
+                    - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
+                    pop = 2;
+                }
+                else {
+                    pop = 3;
+                }
+
+                if (bus->stopInformation[i].stopMin + pop >= 60) {
+                    bus->stopInformation[i + 1].stopHour += 1;
+                    bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin +  pop - 60;
+                }
+                else {
+                    if (bus->stopInformation[i + 1].stopHour < bus->stopInformation[i].stopHour) {
+                        bus->stopInformation[i + 1].stopHour += 1;
+                    }
+                    bus->stopInformation[i + 1].stopMin = bus->stopInformation[i].stopMin + pop;
+                }
             }
         }
+
         /* current slowdown */
         street->previousSlowdown = street->slowdown;
     }
