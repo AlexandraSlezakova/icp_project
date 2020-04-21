@@ -17,3 +17,9 @@ Square::SetColor(const QString &name)
     brush.setColor(color_);
     setBrush(brush);
 }
+
+QString
+Square::GetColor()
+{
+    return color_.name();
+}

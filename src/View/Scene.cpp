@@ -20,8 +20,7 @@ Scene::CreateMap()
     AddSquares();
     /* add buses */
     garage.AddBus(0, 1, scene);
-
-    MoveBuses();
+    garage.AddBus(1, 2, scene);
 }
 
 void
@@ -41,15 +40,6 @@ Scene::SetUpView()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setScene(scene);
-}
-
-void
-Scene::MoveBuses()
-{
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(MoveBus()));
-    /* time in ms */
-    timer->start(1000);
 }
 
 void
@@ -86,12 +76,12 @@ void Scene::mousePressEvent(QMouseEvent *event){
 
         if (roadBlockMode) {
             if (square) {
-                squareRoadBlock(square, !square->roadBlock);
+                SquareRoadBlock(square, !square->roadBlock);
             }
             else if (photo) {
                 for (auto & i : map->stopped) {
                     if (i.photo == photo) {
-                        i = busStopRoadBlock(i);
+                        i = BusStopRoadBlock(i);
                     }
                 }
             }
@@ -100,7 +90,10 @@ void Scene::mousePressEvent(QMouseEvent *event){
             }
         }
         else {
-            ShowRoute(photo);
+            /* tooltip of bus is number, size is 1 */
+            if (photo && photo->toolTip().size() == 1) {
+                ShowRoute(photo);
+            }
         }
     }
 }
@@ -146,7 +139,7 @@ Scene::ZoomSub()
 }
 
 void
-Scene::MoveBus()
+Scene::MoveBuses()
 {
     garage.MoveAllBuses(map);
 }
@@ -158,7 +151,7 @@ Scene::StreetUpdate(float updateSlowdown, const std::string& name)
 }
 
 void
-Scene::squareRoadBlock(Square* square, bool onOff)
+Scene::SquareRoadBlock(Square* square, bool onOff)
 {
     if (!square)
         return;
@@ -185,16 +178,16 @@ Scene::squareRoadBlock(Square* square, bool onOff)
                 Square::layout[x][y]->SetColor("#C0C0C0");
             }
 
-            squareRoadBlock(Square::layout[x + 1][y], onOff);
-            squareRoadBlock(Square::layout[x - 1][y], onOff);
-            squareRoadBlock(Square::layout[x][y + 1], onOff);
-            squareRoadBlock(Square::layout[x][y - 1], onOff);
+            SquareRoadBlock(Square::layout[x + 1][y], onOff);
+            SquareRoadBlock(Square::layout[x - 1][y], onOff);
+            SquareRoadBlock(Square::layout[x][y + 1], onOff);
+            SquareRoadBlock(Square::layout[x][y - 1], onOff);
         }
     }
 }
 
 StreetMap::stopData
-Scene::busStopRoadBlock(StreetMap::stopData stop)
+Scene::BusStopRoadBlock(StreetMap::stopData stop)
 {
     QString path;
 
@@ -217,8 +210,8 @@ Scene::ShowRoute(QGraphicsItem *photo)
 {
     static std::vector<QGraphicsItem*> busPhotoStorage;
     static Bus *bus;
-    const QString routeColor;
-    const QString colors[4] = {"#", "#ff4040", "#75a298", "#daccc4"};
+    QString colors[4] = {"", "#ff4040", "#75a298", "#daccc4"};
+    std::string route_color = "#c0c0c0";
 
     /* find photo in storage */
     auto end = std::end(busPhotoStorage);
@@ -226,16 +219,16 @@ Scene::ShowRoute(QGraphicsItem *photo)
     bus = garage.GetBusByPhoto(photo);
 
     if (found == end) {
-        busPhotoStorage.push_back(photo);
         if (!bus) {
             std::cerr << "Error: Bus not found\n";
         }
         else {
+            busPhotoStorage.push_back(photo);
             bus->CreateTimetable(colors[bus->busNumber_]);
         }
     } /* second click on same bus changes route to default color */
     else {
-        BusRouteMap::DrawLine(bus->stopInformation, "#C0C0C0");
+        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(route_color));
         bus->ClearTextArea();
         busPhotoStorage.erase(found);
     }

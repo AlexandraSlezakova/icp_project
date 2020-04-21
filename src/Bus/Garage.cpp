@@ -1,4 +1,3 @@
-
 #include "Garage.h"
 
 Garage::Garage() = default;

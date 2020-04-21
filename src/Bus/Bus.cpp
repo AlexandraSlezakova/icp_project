@@ -58,7 +58,7 @@ Bus::LoadTimetable()
 }
 
 void
-Bus::CreateTimetable(const QString& color)
+Bus::CreateTimetable(QString& color)
 {
     std::string minute;
     for (const Coordinates::BusStop_S& info : stopInformation) {

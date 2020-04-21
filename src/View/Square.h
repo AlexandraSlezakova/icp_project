@@ -28,6 +28,12 @@ public:
      */
     void SetColor(const QString &name);
 
+    /**
+     * @brief get color of current square
+     * @return color of square
+     */
+    QString GetColor();
+
     int row = 0;                       //!< row
     int col = 0;                       //!< column
     bool hasStop = false;              //!< information about bus stop on square

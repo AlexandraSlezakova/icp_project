@@ -61,7 +61,7 @@ public:
      * @brief insert coordinates of bus stops to list and append bus timetable to textarea
      * @param color color of bus route
      */
-    void CreateTimetable(const QString& color);
+    void CreateTimetable(QString& color);
 
     /**
      * @brief initialize text area for timetable

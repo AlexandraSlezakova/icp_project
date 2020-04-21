@@ -4,10 +4,10 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    timerInterval = 1000;
-    timerId = startTimer(timerInterval);
     ResizeWindow();
     CreateScene();
+    timerInterval = 1000;
+    timerId = startTimer(timerInterval);
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +62,7 @@ MainWindow::timerEvent(QTimerEvent *event)
 {
     timeArea->clear();
     timeArea->appendPlainText(Timer::GetTime());
+    scene->MoveBuses();
 }
 
 void
@@ -199,6 +200,8 @@ void
 MainWindow::ResetTimer()
 {
     Timer::ResetTime();
+    timerInterval = 1000;
+    timerLabel->setText("Timer interval = " + QString::number(100) + "%");
 }
 
 void

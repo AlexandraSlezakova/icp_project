@@ -39,6 +39,11 @@ public:
     void SetUpView();
 
     /**
+     * @brief move all buses
+     */
+    void MoveBuses();
+
+    /**
      * @brief update slowdown on street
      * @param updateSlowdown changed float streetSlowdown
      * @param name streetname of which slowdown should be changed
@@ -64,16 +69,6 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 public slots:
-    /**
-    * @brief move all buses
-    */
-    void MoveBus();
-
-    /**
-    * @brief timer to move all buses
-    */
-    void MoveBuses();
-
     /**
     * @brief zoom in scene
     */
@@ -108,14 +103,14 @@ private:
     * @param square information on clicked square
     * @param onOff mood on add or delete roadblock
     */
-    void squareRoadBlock(Square *square, bool onOff);
+    void SquareRoadBlock(Square *square, bool onOff);
 
     /**
     * @brief add and delete roadblock on stop
     * @param stop roadblock stop
     * @return stopData to update data
     */
-    StreetMap::stopData busStopRoadBlock(StreetMap::stopData stop);
+    StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
     /**
      * @brief show route of clicked bus
