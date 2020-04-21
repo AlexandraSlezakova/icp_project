@@ -211,7 +211,7 @@ Scene::ShowRoute(QGraphicsItem *photo)
     static std::vector<QGraphicsItem*> busPhotoStorage;
     static Bus *bus;
     QString colors[4] = {"", "#ff4040", "#75a298", "#daccc4"};
-    std::string route_color = "#c0c0c0";
+    std::string routeColor = "#c0c0c0";
 
     /* find photo in storage */
     auto end = std::end(busPhotoStorage);
@@ -228,7 +228,7 @@ Scene::ShowRoute(QGraphicsItem *photo)
         }
     } /* second click on same bus changes route to default color */
     else {
-        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(route_color));
+        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(routeColor));
         bus->ClearTextArea();
         busPhotoStorage.erase(found);
     }
