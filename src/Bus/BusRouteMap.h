@@ -17,7 +17,7 @@ public:
      * @param stopInformation information about bus stop
      * @param color new color of square
      */
-    static void DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, const QString& color);
+    static void DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QString color);
 };
 
 
