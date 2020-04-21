@@ -115,37 +115,39 @@ StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
         }
     }
 
-
-    /* změna barvy ulice podle provozu */           // Přepsat na ternální operátor aby se to neopakovalo?
+    Square *square;
+    /* change street color according to traffic */
     if (street->start->x == street->end->x) {
         for (int i = street->start->y; i <= street->end->y; i++) {
+            square = Square::layout[street->start->x][i];
             if (updateSlowdown < 1.33) {
-                if (!layout[street->start->x][i]->roadBlock)
-                    layout[street->start->x][i]->SetColor("#C0C0C0");
+                if (!square->roadBlock)
+                    square->SetColor("#C0C0C0");
             }
             else if (updateSlowdown < 1.66) {
-                if (!layout[street->start->x][i]->roadBlock)
-                    layout[street->start->x][i]->SetColor("#FFFF66");
+                if (!square->roadBlock)
+                    square->SetColor("#FFFF66");
             }
             else {
-                if (!layout[street->start->x][i]->roadBlock)
-                    layout[street->start->x][i]->SetColor("#FF6600");
+                if (!square->roadBlock)
+                    square->SetColor("#FF6600");
             }
         }
     }
     else {
         for (int i = street->start->x; i <= street->end->x; i++) {
+            square = Square::layout[i][street->start->y];
             if (updateSlowdown < 1.33) {
-                if (!layout[i][street->start->y]->roadBlock)
-                    layout[i][street->start->y]->SetColor("#C0C0C0");
+                if (!square->roadBlock)
+                    square->SetColor("#C0C0C0");
             }
             else if (updateSlowdown < 1.66) {
-                if (!layout[i][street->start->y]->roadBlock)
-                    layout[i][street->start->y]->SetColor("#FFFF66");
+                if (!square->roadBlock)
+                    square->SetColor("#FFFF66");
             }
             else {
-                if (!layout[i][street->start->y]->roadBlock)
-                    layout[i][street->start->y]->SetColor("#FF6600");
+                if (!square->roadBlock)
+                    square->SetColor("#FF6600");
             }
         }
     }

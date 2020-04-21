@@ -50,13 +50,12 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
-
     /**
      * @brief add buses to scene
      */
     void AddBuses(int iteration = 0);
 
-    void checkRoadBlockBus();
+    void CheckRoadBlockBus();
 
 
     QGraphicsScene *scene;
@@ -88,13 +87,6 @@ public slots:
     */
     void ZoomSub();
 
-protected:
-    /**
-    * @brief zooms in and out scene by mouse
-    * @param event Mouse wheel event chager
-    */
-    virtual void wheelEvent(QWheelEvent *event);
-    
 private:
     /**
     * @brief moving map with mouse
