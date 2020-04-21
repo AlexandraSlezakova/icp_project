@@ -28,8 +28,8 @@ Scene::CreateMap()
 void
 Scene::AddMap(StreetMap *streetMap)
 {
-    for (auto & x : streetMap->layout) {
-        for (auto & y : x) {
+    for (auto &x : streetMap->layout) {
+        for (auto &y : x) {
             scene->addItem(y);
         }
     }
@@ -79,7 +79,9 @@ Scene::wheelEvent(QWheelEvent *event)
     zoomText->setText("Actual zoom = " + QString::number(zoom_act,'f',2));
 }
 
-void Scene::mousePressEvent(QMouseEvent *event){
+void
+Scene::mousePressEvent(QMouseEvent *event)
+{
     if (event->button() == Qt::RightButton) {
         m_moving = true;
         m_originalX = event->x();
@@ -112,7 +114,8 @@ void Scene::mousePressEvent(QMouseEvent *event){
     }
 }
 
-void Scene::mouseReleaseEvent(QMouseEvent *event){
+void
+Scene::mouseReleaseEvent(QMouseEvent *event){
     if (event->button() == Qt::RightButton) {
         m_moving = false;
         setCursor(Qt::ArrowCursor);
@@ -122,7 +125,9 @@ void Scene::mouseReleaseEvent(QMouseEvent *event){
     event->ignore();
 }
 
-void Scene::mouseMoveEvent(QMouseEvent *event){
+void
+Scene::mouseMoveEvent(QMouseEvent *event)
+{
     if (m_moving) {
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->x() - m_originalX));
         verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->y() - m_originalY));
@@ -177,7 +182,7 @@ Scene::squareRoadBlock(Square* square, bool onOff)
     Coordinates *start,*end;
     QMessageBox Msgbox;
     bool xy;
-    Msgbox.setText("Na trase je autobus, ulice nejde uzavřít");
+    Msgbox.setText("There is a bus on the route, the street cannot be closed!");
 
     if (x < 0 or x > 138)
         return;
@@ -190,36 +195,35 @@ Scene::squareRoadBlock(Square* square, bool onOff)
     else
         start_int = x - 1;
 
-    /* délka mezi zastávkami x osa */
-    if(map->layout[start_int][y]->road) {
+    /* distance between stops x axis */
+    if (map->layout[start_int][y]->road) {
         start_int = x;
         end_int = x;
         xy = true;
-        for(; !map->layout[end_int + 1][y]->hasStop; end_int++) {
+        for (; !map->layout[end_int + 1][y]->hasStop; end_int++) {
         }
-        for(; !map->layout[start_int - 1][y]->hasStop; start_int--) {
+        for (; !map->layout[start_int - 1][y]->hasStop; start_int--) {
         }
 
         start = new Coordinates(start_int, y);
         end = new Coordinates(end_int, y);
     }
-    /* y osa */
+    /* y axis */
     else {
         start_int = y;
         end_int = y;
         xy = false;
-        for(; !map->layout[x][end_int + 1]->hasStop; end_int++) {
+        for (; !map->layout[x][end_int + 1]->hasStop; end_int++) {
         }
-        for(; !map->layout[x][start_int - 1]->hasStop; start_int--) {
+        for (; !map->layout[x][start_int - 1]->hasStop; start_int--) {
         }
         start = new Coordinates(x, start_int);
         end = new Coordinates(x, end_int);
 
     }
 
-    //std::cerr << start_int << " " << end_int << "\n";
-    /* kontrola jestli se na požadované ulici, která se chce zavřit, je autobus */
-    for(auto *bus : garage->allBus) {
+    /* Check if there is a bus on the desired street that wants to close */
+    for (auto *bus : garage->allBus) {
         if (bus->busPosition->x == x) {
             if (end->y >= bus->busPosition->y && bus->busPosition->y >= start->y) {
                 Msgbox.exec();
@@ -234,8 +238,8 @@ Scene::squareRoadBlock(Square* square, bool onOff)
         }
     }
 
-    /* přidání uzavírky */
-    for(;start_int <= end_int; start_int++) {
+    /* Add RoadStop */
+    for (; start_int <= end_int; start_int++) {
         if (onOff) {
             if (xy) {
                 map->layout[start_int][y]->roadBlock = true;
@@ -264,10 +268,10 @@ Scene::busStopRoadBlock(StreetMap::stopData stop)
 {
     QString path;
     QMessageBox Msgbox;
-    Msgbox.setText("Na trase je autobus, zastávku nejde uzavřít");
+    Msgbox.setText("On the road is a bus, the stop cannot be closed");
 
-    if(!stop.stop->roadStop) {
-        for(auto *bus : garage->allBus) {
+    if (!stop.stop->roadStop) {
+        for (auto *bus : garage->allBus) {
             if (bus->nextBusStop.name == stop.stop->stopName ) {
                 Msgbox.exec();
                 return stop;
@@ -294,10 +298,10 @@ Scene::checkRoadBlockBus()
     int secNow = Timer::GetSecond();
     int i = 0;
 
-    for( auto *bus : garage->allBus) {
+    for (auto *bus : garage->allBus) {
         int nxt, nw, mn;
         for (; i < bus->stopInformation.size() - 2; i++) {
-            nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
+            nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
             nw  = hourNow * 60 + minuteNow;
             mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
 
@@ -308,16 +312,16 @@ Scene::checkRoadBlockBus()
         }
 
         for (; i < bus->stopInformation.size() - 2; i++) {
-            if ( map->layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock ) {
-                //uzavírka na cestě
-                std::cerr << "Uzavírka zastávky " << bus->stopInformation[i].name << "\n";
+            if (map->layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock) {
+                //RoadStop on road
+                //std::cerr << "Stop Closed " << bus->stopInformation[i].name << "\n";
                 bus->roadStopOnRoad = true;
             }
-            /* Ulice jde svisle */
+            /* Street going vertically */
             if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
-                if ( map->layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock ) {
-                    std::cerr << "Uzavírka mezi " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
-                    //uzavírka
+                if (map->layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock) {
+                    //std::cerr << "RoadStop between " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
+                    //RoadStop
                     bus->roadStopOnRoad = true;
                 }
             }

@@ -78,7 +78,7 @@ Street*
 StreetMap::GetStreet(const std::string& name)
 {
     for (auto &x : Map) {
-        for (auto & y : x) {
+        for (auto &y : x) {
             if (!y.empty()) {
                 IF_RETURN(y.front() && y.front()->name == name, y.front())
                 /* two crossed streets */
@@ -96,8 +96,8 @@ void
 StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 {
     Street *street;
-    for (auto & x : Map) {
-        for (auto & y : x) {
+    for (auto &x : Map) {
+        for (auto &y : x) {
             if (!y.empty()) {
                 if (y.front() && y.front()->name == name) {
                     y.front()->slowdown = updateSlowdown;

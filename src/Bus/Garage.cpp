@@ -17,7 +17,7 @@ Garage::AddBus(Bus bus)
 
 Bus* Garage::GetBus(int busId, int busLine) {
     if (busLine == 1) {
-        for (auto & bus : line1) {
+        for (auto &bus : line1) {
             if (busId == bus->id_)
                 return bus;
         }
@@ -27,7 +27,6 @@ Bus* Garage::GetBus(int busId, int busLine) {
 
 void Garage::MoveAllBuses(StreetMap *streetMap) {
     for (int i = 0; i < allBus.size(); i++ ) {
-        //if (allbus[i]->roadstoponroad || )
         CheckRoadBlock(streetMap, allBus[i]);
         allBus[i] = CheckSlowDown(streetMap, allBus[i]);
         allBus[i]->MoveBus();
@@ -36,15 +35,14 @@ void Garage::MoveAllBuses(StreetMap *streetMap) {
 
 bool
 Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
-    Street *afternextstreet;
+    Street *afterNextStreet;
     int i = 0;
-    for(;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
+    for (;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
     }
     if (bus->stopInformation[i].name == bus->nextBusStop.name) {
-        std::cerr << "joo \n";
     }
     if (streetMap->layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
-        if(bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
+        if (bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
             if (streetMap->layout[bus->nextBusStop.coordinates->x][( bus->nextBusStop.coordinates->y + bus->stopInformation[i].coordinates->y ) / 2]->roadBlock) {
 
             }
@@ -53,7 +51,8 @@ Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
 
 }
 
-Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
+Bus*
+Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
 
     std::vector<std::string> currentSplit;
     std::vector<std::string> nextSplit;
@@ -130,7 +129,7 @@ Bus* Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         /* change time in timetable of next bus stop
          * time in timetable of previous bus stop + time of the bus on the road
          * + the remaining time needed to arrive at the next bus stop */
-        if(bus->currentBusStop.stopMin + stopTime > 60) {
+        if (bus->currentBusStop.stopMin + stopTime > 60) {
             bus->stopInformation[i+1].stopHour += 1;
             bus->stopInformation[i+1].stopMin = bus->currentBusStop.stopMin + timeAdd + stopTime - 60;
         }
