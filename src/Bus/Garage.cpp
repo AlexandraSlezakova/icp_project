@@ -3,9 +3,10 @@
 Garage::Garage() = default;
 
 void
-Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene)
+Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
 {
     Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
+    bus->iteration = iteration;
     bus->InitBus(scene);
     bus->MoveBus();
     allBuses.push_back(bus);
@@ -53,6 +54,18 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
     int i = 0;
     int stopTime;
     int pop;
+
+    if (bus->iteration) {
+        if (!minuteNow) {
+            hourNow--;
+            minuteNow = 60;
+        }
+        else if (minuteNow > 0 && minuteNow < 10) {
+            hourNow--;
+            minuteNow += 60;
+        }
+        minuteNow -= (bus->iteration * 10);
+    }
 
     /* find out where the bus should be according to current time */
     int nxt, nw, mn;

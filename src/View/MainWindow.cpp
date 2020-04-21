@@ -62,6 +62,15 @@ MainWindow::timerEvent(QTimerEvent *event)
 {
     timeArea->clear();
     timeArea->appendPlainText(Timer::GetTime());
+
+    int minute = Timer::GetMinute();
+    int second = Timer::GetSecond();
+    static int iteration = 0;
+    /* every five minutes create new buses */
+    if (minute > 0 && !(minute % 10) && !second) {
+        iteration++;
+        scene->AddBuses(iteration);
+    }
     scene->MoveBuses();
 }
 
@@ -151,8 +160,8 @@ void MainWindow::InitSliders(QWidget *parent) {
 
     /* streetpicker */
     combobox = new QComboBox(parent);
-    combobox->move(5, 820);
-    combobox->setFixedSize(150,40);
+    combobox->move(5,820);
+    combobox->setFixedSize(150, 40);
 
     file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
 
@@ -165,7 +174,7 @@ void MainWindow::InitSliders(QWidget *parent) {
     /* slider for changing street slowdown */
     QSlider *slider = new QSlider(Qt::Horizontal,parent);
     slider->move(160, 827);
-    slider->setFixedSize(80,40);
+    slider->setFixedSize(80, 40);
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(Value(int)));
 }
 

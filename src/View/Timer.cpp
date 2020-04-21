@@ -1,26 +1,23 @@
 #include "Timer.h"
 
-int Timer::hour;
-int Timer::min;
-int Timer::sec;
 tm *Timer::ltm;
 
 int
 Timer::GetHour()
 {
-    return ltm->tm_hour - hour;
+    return ltm->tm_hour;
 }
 
 int
 Timer::GetMinute()
 {
-    return ltm->tm_min - min;
+    return ltm->tm_min;
 }
 
 int
 Timer::GetSecond()
 {
-    return ltm->tm_sec - sec;
+    return ltm->tm_sec;
 }
 
 QString

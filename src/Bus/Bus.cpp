@@ -104,6 +104,18 @@ Bus::MoveBus()
     int rotation;
     Coordinates::BusStop_S next, current;
 
+    if (iteration) {
+        if (!minuteNow) {
+            hourNow--;
+            minuteNow = 60;
+        }
+        else if (minuteNow > 0 && minuteNow < 10) {
+            hourNow--;
+            minuteNow += 60;
+        }
+        minuteNow -= (iteration * 10);
+    }
+
     for (int i = 0; i < stopInformation.size() - 1; i++) {
         current = stopInformation[i];
         next = stopInformation[i + 1];
@@ -114,13 +126,13 @@ Bus::MoveBus()
             y = current.coordinates->y;
 
             rotation = 0;
-            if(next.coordinates->x > x) {
+            if (next.coordinates->x > x) {
                 busPhoto->setTransform(QTransform::fromScale(1, 1));
             }
             else if (next.coordinates->x < x) {
                 busPhoto->setTransform(QTransform::fromScale(-1, 1));
             }
-            else{
+            else {
                 if( next.coordinates->y > y ) {
                     rotation = 90;
                     busPhoto->setTransform(QTransform::fromScale(1, 1));

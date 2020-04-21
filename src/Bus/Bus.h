@@ -15,6 +15,7 @@ class Bus
 public:
     int id_;                                                //!< id of bus
     int busNumber_;                                         //!< number of bus
+    int iteration;
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
     Coordinates *busPosition;                               //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                             //!< picture of bus

@@ -50,6 +50,11 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
+    /**
+     * @brief add buses to scene
+     */
+    void AddBuses(int iteration = 0);
+
     QGraphicsScene *scene;
     QLabel *zoomText;           //!< text with information about scale scene
     double zoom_act = 100;      //!< double expression of zoom

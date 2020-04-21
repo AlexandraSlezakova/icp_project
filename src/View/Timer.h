@@ -54,9 +54,6 @@ public:
     static void ResetTime();
 
 private:
-    static int hour;        //!< hour
-    static int min;         //!< minute
-    static int sec;         //!< second
     static tm *ltm;
 
 };

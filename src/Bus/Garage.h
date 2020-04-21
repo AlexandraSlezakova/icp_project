@@ -26,7 +26,7 @@ public:
      * @param busNumber number of bus
      * @param scene
      */
-    void AddBus(int busId, int busNumber, QGraphicsScene *scene);
+    void AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration = 0);
 
     /**
     * @brief move all buses on the scene

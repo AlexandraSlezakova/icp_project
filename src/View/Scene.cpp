@@ -19,8 +19,15 @@ Scene::CreateMap()
     /* add squares to scene */
     AddSquares();
     /* add buses */
-    garage.AddBus(0, 1, scene);
-    garage.AddBus(1, 2, scene);
+    AddBuses();
+}
+
+void
+Scene::AddBuses(int iteration)
+{
+    static int busId = 0;
+    garage.AddBus(busId++, 1, scene, iteration);
+    garage.AddBus(busId++, 2, scene, iteration);
 }
 
 void
