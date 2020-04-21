@@ -9,6 +9,7 @@ Bus::Bus(int id, int busNumber, Coordinates *position)
     id_ = id;
     busNumber_ = busNumber;
     busPosition = position;
+    roadStopOnRoad = false;
     LoadTimetable();
 }
 
@@ -165,8 +166,7 @@ Bus::MoveBus()
 }
 
 int
-Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC,
-                   const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next)
+Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next)
 {
 
     int coordinates;

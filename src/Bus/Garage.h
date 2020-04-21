@@ -11,7 +11,7 @@
 class Garage
 {
 public:
-    std::vector<Bus*> allBuses;    //!< all buses storage
+    std::vector<Bus*> allBus;     //!< array for all bus
 
     /**
     * @brief garage constructor
@@ -59,7 +59,7 @@ public:
 
 private:
 
-
+    bool CheckRoadBlock(StreetMap *streetMap, Bus *bus);
 };
 
 

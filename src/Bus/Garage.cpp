@@ -9,7 +9,7 @@ Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
     bus->iteration = iteration;
     bus->InitBus(scene);
     bus->MoveBus();
-    allBuses.push_back(bus);
+    allBus.push_back(bus);
 }
 
 Bus*
@@ -35,10 +35,28 @@ Garage::GetBusByPhoto(QGraphicsItem *photo)
 
 void
 Garage::MoveAllBuses(StreetMap *streetMap) {
-    for (Bus *bus : allBuses) {
+    for (Bus *bus : allBus) {
+        CheckRoadBlock(streetMap, bus);
         bus = CheckSlowDown(streetMap, bus);
         bus->MoveBus();
     }
+}
+
+bool
+Garage::CheckRoadBlock(StreetMap *streetMap, Bus *bus) {
+    Street *afterNextStreet;
+    int i = 0;
+    for (;i < bus->stopInformation.size() - 2 && bus->stopInformation[i].name != bus->nextBusStop.name; i++) {
+    }
+
+    if (streetMap->layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
+        if (bus->nextBusStop.coordinates->x == bus->stopInformation[i].coordinates->x) {
+            if (streetMap->layout[bus->nextBusStop.coordinates->x][( bus->nextBusStop.coordinates->y + bus->stopInformation[i].coordinates->y ) / 2]->roadBlock) {
+
+            }
+        }
+    }
+
 }
 
 Bus*
@@ -108,6 +126,7 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
              bus->currentBusStop.stopHour = hourNow;
              bus->currentBusStop.stopMin = minuteNow;
         }
+
 
         if (street->previousSlowdown != street->slowdown) {
             /* how many minutes the bus is already on the road */

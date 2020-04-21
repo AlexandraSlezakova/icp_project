@@ -50,10 +50,14 @@ public:
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
+
     /**
      * @brief add buses to scene
      */
     void AddBuses(int iteration = 0);
+
+    void checkRoadBlockBus();
+
 
     QGraphicsScene *scene;
     QLabel *zoomText;           //!< text with information about scale scene
@@ -84,6 +88,13 @@ public slots:
     */
     void ZoomSub();
 
+protected:
+    /**
+    * @brief zooms in and out scene by mouse
+    * @param event Mouse wheel event chager
+    */
+    virtual void wheelEvent(QWheelEvent *event);
+    
 private:
     /**
     * @brief moving map with mouse
@@ -108,20 +119,20 @@ private:
     * @param square information on clicked square
     * @param onOff mood on add or delete roadblock
     */
-    void SquareRoadBlock(Square *square, bool onOff);
-
-    /**
-    * @brief add and delete roadblock on stop
-    * @param stop roadblock stop
-    * @return stopData to update data
-    */
-    StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
+    void SquareRoadBlock(Square *square, bool onOff); 
 
     /**
      * @brief show route of clicked bus
      * @param photo bus photo
      */
     void ShowRoute(QGraphicsItem *photo);
+    
+    /**
+    * @brief add and delete roadblock on stop
+    * @param stop roadblock stop
+    * @return stopData to update data
+    */
+    StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 };
 
 #endif // SCENE_H
