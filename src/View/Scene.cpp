@@ -223,7 +223,7 @@ Scene::squareRoadBlock(Square* square, bool onOff)
 
     //std::cerr << start_int << " " << end_int << "\n";
     /* kontrola jestli se na požadované ulici, která se chce zavřit, je autobus */
-    for(auto *bus : garage->allbus) {
+    for(auto *bus : garage->allBus) {
         if (bus->busPosition->x == x) {
             if (end->y >= bus->busPosition->y && bus->busPosition->y >= start->y) {
                 Msgbox.exec();
@@ -271,7 +271,7 @@ Scene::busStopRoadBlock(StreetMap::stopData stop)
     Msgbox.setText("Na trase je autobus, zastávku nejde uzavřít");
 
     if(!stop.stop->roadStop) {
-        for(auto *bus : garage->allbus) {
+        for(auto *bus : garage->allBus) {
             if (bus->nextBusStop.name == stop.stop->stopName ) {
                 Msgbox.exec();
                 return stop;
@@ -298,7 +298,7 @@ Scene::checkRoadBlockBus()
     int secNow = Timer::GetSecond();
     int i = 0;
 
-    for( auto *bus : garage->allbus) {
+    for( auto *bus : garage->allBus) {
         int nxt, nw, mn;
         for (; i < bus->stopInformation.size() - 2; i++) {
             nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
@@ -315,14 +315,14 @@ Scene::checkRoadBlockBus()
             if ( map->layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock ) {
                 //uzavírka na cestě
                 std::cerr << "Uzavírka zastávky " << bus->stopInformation[i].name << "\n";
-                bus->roadstoponroad = true;
+                bus->roadStopOnRoad = true;
             }
             /* Ulice jde svisle */
             if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
                 if ( map->layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock ) {
                     std::cerr << "Uzavírka mezi " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
                     //uzavírka
-                    bus->roadstoponroad = true;
+                    bus->roadStopOnRoad = true;
                 }
             }
         }

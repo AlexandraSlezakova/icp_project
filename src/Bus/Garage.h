@@ -14,7 +14,7 @@ public:
     std::vector<Bus*> line1;    //!< array for all bus line 1
     std::vector<Bus*> line2;     //!< array for all bus line 2
     std::vector<Bus*> line3;     //!< array for all bus line 3
-    std::vector<Bus*> allbus;     //!< array for all bus
+    std::vector<Bus*> allBus;     //!< array for all bus
 
     /**
     * @brief garage constructor

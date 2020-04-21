@@ -118,8 +118,8 @@ StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 
     /* změna barvy ulice podle provozu */           // Přepsat na ternální operátor aby se to neopakovalo?
     if (street->start->x == street->end->x) {
-        for(int i = street->start->y; i <= street->end->y; i++) {
-            if( updateSlowdown < 1.33) {
+        for (int i = street->start->y; i <= street->end->y; i++) {
+            if (updateSlowdown < 1.33) {
                 if (!layout[street->start->x][i]->roadBlock)
                     layout[street->start->x][i]->SetColor("#C0C0C0");
             }
@@ -134,8 +134,8 @@ StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
         }
     }
     else {
-        for(int i = street->start->x; i <= street->end->x; i++) {
-            if( updateSlowdown < 1.33) {
+        for (int i = street->start->x; i <= street->end->x; i++) {
+            if (updateSlowdown < 1.33) {
                 if (!layout[i][street->start->y]->roadBlock)
                     layout[i][street->start->y]->SetColor("#C0C0C0");
             }

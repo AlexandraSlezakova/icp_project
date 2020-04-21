@@ -19,7 +19,7 @@ public:
     Coordinates *busPosition;                               //!< position of bus
     QGraphicsPixmapItem *bus;                               //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
-    bool roadstoponroad;
+    bool roadStopOnRoad;
 
     /**
      * @brief bus constructor
