@@ -26,7 +26,7 @@ void
 Scene::AddBuses(int iteration)
 {
     static int busId = 0;
-    //garage.AddBus(busId++, 1, scene, iteration);
+    garage.AddBus(busId++, 1, scene, iteration);
     garage.AddBus(busId++, 2, scene, iteration);
 }
 
@@ -287,31 +287,41 @@ Scene::BusStopRoadBlock(StreetMap::stopData stop)
 }
 
 void
+Scene::InitTimetableArea(QWidget *parent, int width, int height)
+{
+    /* text area for bus timetable */
+    textArea = new QPlainTextEdit(parent);
+    textArea->setMinimumSize(width * 0.19, height * 0.6);
+    textArea->move(5, 80);
+}
+
+void
 Scene::ShowRoute(QGraphicsItem *photo)
 {
-    static std::vector<QGraphicsItem*> busPhotoStorage;
-    static Bus *bus;
-    QString colors[4] = {"", "#ff4040", "#75a298", "#daccc4"};
-    std::string routeColor = "#c0c0c0";
+    static Bus *seenBus = nullptr;
+    Bus *bus;
+    QString colors[4] = {"", "#9f92ca", "#f46c6e", "#77bcbd"};
+    QString routeColor = "#c0c0c0";
 
-    /* find photo in storage */
-    auto end = std::end(busPhotoStorage);
-    auto found = std::find(std::begin(busPhotoStorage), end, photo);
     bus = garage.GetBusByPhoto(photo);
+    if (!seenBus || seenBus != bus) {
+        if (seenBus && seenBus != bus) {
+            BusRouteMap::DrawLine(seenBus->stopInformation, routeColor);
+            textArea->clear();
+        }
 
-    if (found == end) {
         if (!bus) {
             std::cerr << "Error: Bus not found\n";
         }
         else {
-            busPhotoStorage.push_back(photo);
-            bus->CreateTimetable(colors[bus->busNumber_]);
+            seenBus = bus;
+            bus->CreateTimetable(colors[bus->busNumber_], textArea);
         }
     } /* second click on same bus changes route to default color */
     else {
-        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(routeColor));
-        bus->ClearTextArea();
-        busPhotoStorage.erase(found);
+        BusRouteMap::DrawLine(bus->stopInformation, routeColor);
+        textArea->clear();
+        seenBus = nullptr;
     }
 }
 

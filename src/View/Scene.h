@@ -58,8 +58,16 @@ public:
 
     void CheckRoadBlockBus();
 
+    /**
+     * @brief initialize text area for timetable
+     * @param parent parent widget
+     * @param width width of textarea
+     * @param height height of textarea
+     */
+    void InitTimetableArea(QWidget *parent, int width, int height);
 
     QGraphicsScene *scene;
+    QPlainTextEdit *textArea;   //!< text area for bus timetable
     QLabel *zoomText;           //!< text with information about scale scene
     double zoom_act = 100;      //!< double expression of zoom
     Garage garage;              //!< all buses
@@ -126,6 +134,13 @@ private:
     * @return stopData to update data
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
+
+    /**
+     * @brief clear text area of bus timetable
+     * from given position
+     * @param lineNumber
+     */
+    void ClearTextArea(int lineNumber);
 };
 
 #endif // SCENE_H

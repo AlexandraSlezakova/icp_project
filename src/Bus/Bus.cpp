@@ -22,7 +22,6 @@ Bus::~Bus()
 
     delete busPosition;
     busPosition = nullptr;
-    
     delete busPhoto;
     busPhoto = nullptr;
 }
@@ -69,9 +68,14 @@ Bus::LoadTimetable()
 }
 
 void
-Bus::CreateTimetable(QString& color)
+Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
 {
     std::string minute;
+    QFont font;
+    font.setPointSize(11);
+    textArea->setFont(font);
+    textArea->appendPlainText("Route " + QString::number(busNumber_) + " (id: " + QString::number(id_) + ")");
+
     for (Coordinates::BusStop_S info : stopInformation) {
         /* show bus timetable in text area */
         std::ostringstream stream;
@@ -87,12 +91,6 @@ Bus::CreateTimetable(QString& color)
 
     /* draw bus route on map */
     BusRouteMap::DrawLine(stopInformation, color);
-}
-
-void
-Bus::ClearTextArea()
-{
-    textArea->clear();
 }
 
 void
@@ -210,15 +208,4 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
     coordinates = isC ? currentBusStop.coordinates->x + moved : currentBusStop.coordinates->y + moved;
 
     return coordinates;
-}
-
-QPlainTextEdit *Bus::textArea;
-
-void
-Bus::InitTimetableArea(QWidget *parent, int width, int height)
-{
-    /* text area for bus timetable */
-    textArea = new QPlainTextEdit(parent);
-    textArea->setMinimumSize(width * 0.19, height * 0.6);
-    textArea->move(5, 80);
 }
