@@ -5,8 +5,7 @@ Garage::Garage() = default;
 void
 Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
 {
-    Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
-    bus->iteration = iteration;
+    Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0), iteration);
     bus->InitBus(scene);
     bus->MoveBus();
     allBuses.push_back(bus);
@@ -84,18 +83,6 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
     int stopTime;
     int pop;
 
-    if (bus->iteration) {
-        if (!minuteNow) {
-            hourNow--;
-            minuteNow = 60;
-        }
-        else if (minuteNow > 0 && minuteNow < 10) {
-            hourNow--;
-            minuteNow += 60;
-        }
-        minuteNow -= (bus->iteration * 10);
-    }
-
     /* find out where the bus should be according to current time */
     int nxt, nw, mn;
     for (; i < bus->stopInformation.size() - 2; i++) {
@@ -111,7 +98,7 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         return bus;
 
     currentSplit = Functions::Split(bus->stopInformation[i].name, "-");
-    nextSplit = Functions::Split(bus->stopInformation[i+1].name, "-");
+    nextSplit = Functions::Split(bus->stopInformation[i + 1].name, "-");
     /* get name of street where bus is
      * example: Pešinova-Škálova and Pešinova-Karlova
      * - bus is at Pešinova street */

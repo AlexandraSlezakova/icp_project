@@ -48,7 +48,7 @@ MainWindow::CreateScene()
     widget->setMinimumSize(width * 0.3, height * 0.9);
 
     /* text area with timetable */
-    Bus::InitTimetableArea(widget, width, height);
+    scene->InitTimetableArea(widget, width, height);
     /* text area with time */
     InitTimeArea(widget);
     /* buttons */
@@ -66,7 +66,7 @@ MainWindow::timerEvent(QTimerEvent *event)
     int minute = Timer::GetMinute();
     int second = Timer::GetSecond();
     static int iteration = 0;
-    /* every five minutes create new buses */
+    /* every 10 minutes create new buses */
     if (minute > 0 && !(minute % 10) && !second) {
         iteration++;
         scene->AddBuses(iteration);
@@ -186,7 +186,8 @@ MainWindow::StopTimer()
         timerButton->setText("Start timer");
         stopFlag = 1;
         connect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
-    } else {
+    }
+    else {
         timerButton->setText("Change time");
         stopFlag = 0;
         timerId = startTimer(1000);

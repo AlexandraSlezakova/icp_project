@@ -30,7 +30,7 @@ public:
      * @param busNumber number of bus
      * @param position position
      */
-    Bus(int id, int busNumber, Coordinates *position);
+    Bus(int id, int busNumber, Coordinates *position, int busIteration = 0);
 
     ~Bus();
 

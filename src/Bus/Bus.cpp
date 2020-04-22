@@ -4,22 +4,18 @@
 #include "../View/Timer.h"
 #include "../View/StreetMap.h"
 
-Bus::Bus(int id, int busNumber, Coordinates *position)
+Bus::Bus(int id, int busNumber, Coordinates *position, int busIteration)
 {
     id_ = id;
     busNumber_ = busNumber;
     busPosition = position;
+    iteration = busIteration;
     roadStopOnRoad = false;
     LoadTimetable();
 }
 
 Bus::~Bus()
 {
-    for (Coordinates::BusStop_S &info : stopInformation) {
-        delete info.coordinates;
-        info.coordinates = nullptr;
-    }
-
     delete busPosition;
     busPosition = nullptr;
     delete busPhoto;
@@ -33,7 +29,7 @@ Bus::LoadTimetable()
     std::ostringstream ss;
     std::string line, minute;
     std::vector<std::string> tokens;
-    int timeFrom;
+    int stopHour, stopMin, stopMinCopy;
     Coordinates *coordinates;
 
     ss << "../files/bus-route-map/" << std::to_string(busNumber_) << ".txt";
@@ -48,17 +44,39 @@ Bus::LoadTimetable()
      * and name of bus stops [3] */
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
-
-        size_t eol = tokens[2].find('\r');
-        if( eol != std::string::npos)
-            tokens[2] = tokens[2].substr(0,tokens[2].size() - 1);
-
-        timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
+        stopHour = std::stoi(tokens[0]) + Timer::GetHour();
+        stopMinCopy = stopMin = std::stoi(tokens[1]);
         coordinates = Stop::GetStop(tokens[2]);
 
-        Coordinates::BusStop_S information = {coordinates, timeFrom, std::stoi(tokens[1]), tokens[2]};
+        if (iteration) {
+            stopMin += (iteration * 10);
+            if (stopMinCopy >= 50 && stopMinCopy <= 59) {
+                stopHour++;
+                stopMin = stopMin == 50 ? 0 : stopMin - 60;
+                IF(stopHour == 24, stopHour = 0)
+            }
+        }
+
+        Coordinates::BusStop_S information = {coordinates, stopHour, stopMin, tokens[2]};
         /* save information */
         stopInformation.push_back(information);
+    }
+
+    int minuteNow = Timer::GetMinute();
+    int hourNow = Timer::GetHour();
+    int size = stopInformation.size();
+    Coordinates::BusStop_S *info = &stopInformation[size - 1];
+    if (minuteNow >= info->stopMin && hourNow == info->stopHour) {
+        for (int i = 0; i < size; i++) {
+            info = &stopInformation[i];
+            info->stopMin += minuteNow;
+
+            if (info->stopMin >= 60) {
+                info->stopHour++;
+                info->stopMin -= 60;
+                IF(info->stopHour == 24, info->stopHour = 0)
+            }
+        }
     }
 
     currentBusStop = stopInformation[0];
@@ -71,21 +89,25 @@ void
 Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
 {
     std::string minute;
+    int hour, min;
     QFont font;
     font.setPointSize(11);
     textArea->setFont(font);
     textArea->appendPlainText("Route " + QString::number(busNumber_) + " (id: " + QString::number(id_) + ")");
 
-    for (Coordinates::BusStop_S info : stopInformation) {
+    for (const Coordinates::BusStop_S& info : stopInformation) {
         /* show bus timetable in text area */
         std::ostringstream stream;
 
-        minute = std::to_string(info.stopMin);
+        hour = info.stopHour;
+        min = info.stopMin;
+
+        minute = std::to_string(min);
         if (minute.size() == 1) {
             minute = "0" + minute;
         }
 
-        stream << std::to_string(info.stopHour) << ":" << minute << " " << info.name;
+        stream << std::to_string(hour) << ":" << minute << " " << info.name;
         textArea->appendPlainText(QString::fromStdString(stream.str()));
     }
 
@@ -111,72 +133,56 @@ Bus::MoveBus()
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
     int rotation;
-    Coordinates::BusStop_S next, current;
 
-    if (iteration) {
-        if (!minuteNow) {
-            hourNow--;
-            minuteNow = 60;
-        }
-        else if (minuteNow > 0 && minuteNow < 10) {
-            hourNow--;
-            minuteNow += 60;
-        }
-        minuteNow -= (iteration * 10);
-    }
-
-    for (int i = 0; i < stopInformation.size() - 1; i++) {
-        current = stopInformation[i];
-        next = stopInformation[i + 1];
+    if (minuteNow == nextBusStop.stopMin) {
         deleteBus = 1;
+        return;
+    }
 
-        if (next.stopHour == hourNow && next.stopMin > minuteNow) {
-            secNow = Timer::GetSecond();
-            x = current.coordinates->x;
-            y = current.coordinates->y;
-            deleteBus = 0;
+    secNow = Timer::GetSecond();
+    x = currentBusStop.coordinates->x;
+    y = currentBusStop.coordinates->y;
+    deleteBus = 0;
 
-            rotation = 0;
-            if (next.coordinates->x > x) {
-                busPhoto->setTransform(QTransform::fromScale(1, 1));
-            }
-            else if (next.coordinates->x < x) {
-                busPhoto->setTransform(QTransform::fromScale(-1, 1));
-            }
-            else {
-                if( next.coordinates->y > y ) {
-                    rotation = 90;
-                    busPhoto->setTransform(QTransform::fromScale(1, 1));
-                }
-                else {
-                    rotation = -90;
-                    busPhoto->setTransform(QTransform::fromScale(1, 1));
-                }
-            }
-
-            busPhoto->setRotation(rotation);
-
-            /* moving along the X axis */
-            if (next.coordinates->y == y) {
-                x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, current, next);
-                yShift = -5;
-
-            } /* moving along the Y axis */
-            else if (next.coordinates->x == x) {
-                y = Bus::GetCoordinate(hourNow, minuteNow, secNow, 0, current, next);
-                xShift = current.coordinates->y < next.coordinates->y ? 25 : -5;
-            }
-
-            busPosition->x = x;
-            busPosition->y = y;
-            busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
-            break;
+    rotation = 0;
+    if (nextBusStop.coordinates->x > x) {
+        busPhoto->setTransform(QTransform::fromScale(1, 1));
+    }
+    else if (nextBusStop.coordinates->x < x) {
+        busPhoto->setTransform(QTransform::fromScale(-1, 1));
+    }
+    else {
+        if (nextBusStop.coordinates->y > y ) {
+            rotation = 90;
+            busPhoto->setTransform(QTransform::fromScale(1, 1));
+        }
+        else {
+            rotation = -90;
+            busPhoto->setTransform(QTransform::fromScale(1, 1));
         }
     }
+
+    busPhoto->setRotation(rotation);
+
+    /* moving along the X axis */
+    if (nextBusStop.coordinates->y == y) {
+        x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, currentBusStop, nextBusStop);
+        yShift = -5;
+
+    } /* moving along the Y axis */
+    else if (nextBusStop.coordinates->x == x) {
+        y = Bus::GetCoordinate(hourNow, minuteNow, secNow, 0, currentBusStop, nextBusStop);
+        xShift = currentBusStop.coordinates->y < nextBusStop.coordinates->y ? 25 : -5;
+    }
+
+    busPosition->x = x;
+    busPosition->y = y;
+    busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
 }
 
 int
-Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,const Coordinates::BusStop_S& next)
+Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinates::BusStop_S& current,
+                   const Coordinates::BusStop_S& next)
 {
 
     int coordinates;
@@ -190,8 +196,8 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
     else
         timerStop = abs( (next.stopMin + 60) - currentBusStop.stopMin) * 60 ;
 
-    /* avg bus movemet  one square for x sec */
-    int avgMove = (int)nearbyint(timerStop / countSquare);
+    /* avg bus movement one square for x sec */
+    int avgMove = std::nearbyint(timerStop / countSquare);
     /*  time when bus past last stop */
     int moved = 0;
 
@@ -203,7 +209,7 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
     else
         moved += ((minNow - currentBusStop.stopMin) * 60) + secNow;
 
-    moved = nearbyint(moved / avgMove);
+    moved = std::nearbyint(moved / avgMove);
 
     coordinates = isC ? currentBusStop.coordinates->x + moved : currentBusStop.coordinates->y + moved;
 

@@ -59,7 +59,6 @@ public:
     */
     Bus* CheckSlowDown(StreetMap *streetMap, Bus *bus);
 
-
 private:
     bool CheckRoadBlock(Bus *bus);
 
