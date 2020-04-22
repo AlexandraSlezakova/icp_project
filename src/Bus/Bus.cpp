@@ -13,6 +13,20 @@ Bus::Bus(int id, int busNumber, Coordinates *position)
     LoadTimetable();
 }
 
+Bus::~Bus()
+{
+    for (Coordinates::BusStop_S &info : stopInformation) {
+        delete info.coordinates;
+        info.coordinates = nullptr;
+    }
+
+    delete busPosition;
+    busPosition = nullptr;
+    
+    delete busPhoto;
+    busPhoto = nullptr;
+}
+
 void
 Bus::LoadTimetable()
 {
@@ -43,11 +57,7 @@ Bus::LoadTimetable()
         timeFrom = std::stoi(tokens[0]) + Timer::GetHour();
         coordinates = Stop::GetStop(tokens[2]);
 
-        Coordinates::BusStop_S information;
-        information.coordinates = coordinates;
-        information.stopHour = timeFrom;
-        information.stopMin = std::stoi(tokens[1]);
-        information.name = tokens[2];
+        Coordinates::BusStop_S information = {coordinates, timeFrom, std::stoi(tokens[1]), tokens[2]};
         /* save information */
         stopInformation.push_back(information);
     }
@@ -62,7 +72,7 @@ void
 Bus::CreateTimetable(QString& color)
 {
     std::string minute;
-    for (const Coordinates::BusStop_S& info : stopInformation) {
+    for (Coordinates::BusStop_S info : stopInformation) {
         /* show bus timetable in text area */
         std::ostringstream stream;
 
@@ -120,11 +130,13 @@ Bus::MoveBus()
     for (int i = 0; i < stopInformation.size() - 1; i++) {
         current = stopInformation[i];
         next = stopInformation[i + 1];
+        deleteBus = 1;
 
         if (next.stopHour == hourNow && next.stopMin > minuteNow) {
             secNow = Timer::GetSecond();
             x = current.coordinates->x;
             y = current.coordinates->y;
+            deleteBus = 0;
 
             rotation = 0;
             if (next.coordinates->x > x) {

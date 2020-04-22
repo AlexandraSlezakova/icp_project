@@ -5,16 +5,11 @@ StreetMap::StreetMap(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
     for (int x = 0; x < X; x++) {
         for (int y = 0; y < Y; y++) {
             Map[x][y].push_back(nullptr);
-            /* creating square */
             auto *square = new Square();
-            /* save its row and col */
             square->row = x;
             square->col = y;
-            /* add position on screen */
             square->setPos(x * SQUARE_SIZE, y * SQUARE_SIZE);
-            /* set color */
             square->SetColor("#CCFFCC");
-            /* save square into layout */
             Square::layout[x][y] = square;
         }
     }

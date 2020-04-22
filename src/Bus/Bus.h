@@ -16,10 +16,11 @@ public:
     int id_;                                                //!< id of bus
     int busNumber_;                                         //!< number of bus
     int iteration;
+    int deleteBus;                                          //!< flag if bus should be deleted
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
     Coordinates *busPosition;                               //!< position of bus
-    QGraphicsPixmapItem *busPhoto{};                             //!< picture of bus
-    Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
+    QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus
+    Coordinates::BusStop_S nextBusStop, currentBusStop;    //!< current and next bus stop
     bool roadStopOnRoad;
 
 
@@ -31,7 +32,7 @@ public:
      */
     Bus(int id, int busNumber, Coordinates *position);
 
-    ~Bus() = default;
+    ~Bus();
 
     /**
      * @brief initialize bus

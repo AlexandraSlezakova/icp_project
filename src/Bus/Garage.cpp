@@ -34,12 +34,24 @@ Garage::GetBusByPhoto(QGraphicsItem *photo)
 }
 
 void
-Garage::MoveAllBuses(StreetMap *streetMap) {
+Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene) {
     for (Bus *bus : allBuses) {
         CheckRoadBlock(bus);
         bus = CheckSlowDown(streetMap, bus);
         bus->MoveBus();
+        IF(bus->deleteBus, DeleteBus(bus, scene))
     }
+}
+
+void
+Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
+{
+    auto found = std::find(std::begin(allBuses), std::end(allBuses), bus);
+    allBuses.erase(found);
+    scene->removeItem(bus->busPhoto);
+    delete bus;
+    /* set to nullptr to avoid crashing on double delete */
+    bus = nullptr;
 }
 
 bool
@@ -193,5 +205,5 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         /* current slowdown */
         street->previousSlowdown = street->slowdown;
     }
-        return bus;
+    return bus;
 }

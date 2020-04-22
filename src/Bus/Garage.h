@@ -3,11 +3,13 @@
  * @brief Garage header file
  * @author Martin Vadura, Alexandra Slezakova
  */
+
 #ifndef ICP_PROJECT_GARAGE_H
 #define ICP_PROJECT_GARAGE_H
 
 #include "Bus.h"
 #include "../View/StreetMap.h"
+
 class Garage
 {
 public:
@@ -31,8 +33,9 @@ public:
     /**
     * @brief move all buses on the scene
     * @param streetMap for CheckSlowDown function
+     * @param scene
     */
-    void MoveAllBuses(StreetMap *streetMap);
+    void MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene);
 
     /**
     * @brief get bus from bus storage
@@ -59,6 +62,13 @@ public:
 
 private:
     bool CheckRoadBlock(Bus *bus);
+
+    /**
+     * @brief delete bus from bus storage and scene
+     * @param bus bus to delete
+     * @param scene
+     */
+    void DeleteBus(Bus *bus, QGraphicsScene *scene);
 };
 
 

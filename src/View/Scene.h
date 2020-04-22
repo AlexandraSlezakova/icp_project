@@ -3,6 +3,7 @@
  * @brief Scene header file
  * @author Martin Vadura, Alexandra Slezakova
  */
+
 #ifndef SCENE_H
 #define SCENE_H
 
