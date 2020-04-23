@@ -138,7 +138,8 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
             bus->nextBusStop = bus->stopInformation[i + 1];
         }
         else {
-             bus->currentBusStop.coordinates = bus->busPosition;
+             bus->currentBusStop.coordinates.x = bus->busPosition->x;
+             bus->currentBusStop.coordinates.y = bus->busPosition->y;
              bus->currentBusStop.stopHour = hourNow;
              bus->currentBusStop.stopMin = minuteNow;
         }
@@ -186,8 +187,8 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
              * new calculated value: 10:02 + traveled distance(1) + delay(2)
              * = new time 10:05 */
             for (; i < bus->stopInformation.size() - 1; i++) {
-                if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
-                    - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
+                if (bus->stopInformation[i].coordinates.x + bus->stopInformation[i].coordinates.y
+                    - bus->stopInformation[i + 1].coordinates.x - bus->stopInformation[i + 1].coordinates.y == 10) {
                     pop = 2;
                 }
                 else {

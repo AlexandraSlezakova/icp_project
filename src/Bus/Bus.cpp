@@ -16,6 +16,7 @@ Bus::Bus(int id, int busNumber, Coordinates *position, int busIteration)
 
 Bus::~Bus()
 {
+    std::vector<Coordinates::busStop>().swap(stopInformation);
     delete busPosition;
     busPosition = nullptr;
     delete busPhoto;
@@ -57,7 +58,8 @@ Bus::LoadTimetable()
             }
         }
 
-        Coordinates::BusStop_S information = {coordinates, stopHour, stopMin, tokens[2], id};
+        Coordinates::Coordinates_S coordinatesS = {coordinates->x, coordinates->y};
+        Coordinates::BusStop_S information = {coordinatesS, stopHour, stopMin, tokens[2], id};
         /* save information */
         stopInformation.push_back(information);
         id++;
@@ -147,19 +149,19 @@ Bus::MoveBus()
     }
 
     secNow = Timer::GetSecond();
-    x = currentBusStop.coordinates->x;
-    y = currentBusStop.coordinates->y;
+    x = currentBusStop.coordinates.x;
+    y = currentBusStop.coordinates.y;
     deleteBus = 0;
 
     rotation = 0;
-    if (nextBusStop.coordinates->x > x) {
+    if (nextBusStop.coordinates.x > x) {
         busPhoto->setTransform(QTransform::fromScale(1, 1));
     }
-    else if (nextBusStop.coordinates->x < x) {
+    else if (nextBusStop.coordinates.x < x) {
         busPhoto->setTransform(QTransform::fromScale(-1, 1));
     }
     else {
-        if (nextBusStop.coordinates->y > y ) {
+        if (nextBusStop.coordinates.y > y ) {
             rotation = 90;
             busPhoto->setTransform(QTransform::fromScale(1, 1));
         }
@@ -172,14 +174,14 @@ Bus::MoveBus()
     busPhoto->setRotation(rotation);
 
     /* moving along the X axis */
-    if (nextBusStop.coordinates->y == y) {
+    if (nextBusStop.coordinates.y == y) {
         x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, currentBusStop, nextBusStop);
         yShift = -5;
 
     } /* moving along the Y axis */
-    else if (nextBusStop.coordinates->x == x) {
+    else if (nextBusStop.coordinates.x == x) {
         y = Bus::GetCoordinate(hourNow, minuteNow, secNow, 0, currentBusStop, nextBusStop);
-        xShift = currentBusStop.coordinates->y < nextBusStop.coordinates->y ? 25 : -5;
+        xShift = currentBusStop.coordinates.y < nextBusStop.coordinates.y ? 25 : -5;
     }
 
     busPosition->x = x;
@@ -194,7 +196,7 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
 
     int coordinates;
     /* get number square between current and next stop */
-    int countSquare = next.coordinates->x + next.coordinates->y - currentBusStop.coordinates->x - currentBusStop.coordinates->y;
+    int countSquare = next.coordinates.x + next.coordinates.y - currentBusStop.coordinates.x - currentBusStop.coordinates.y;
     /* time in sec between current a next stop */
     int timerStop;
 
@@ -218,7 +220,7 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
 
     moved = std::nearbyint(moved / avgMove);
 
-    coordinates = isC ? currentBusStop.coordinates->x + moved : currentBusStop.coordinates->y + moved;
+    coordinates = isC ? currentBusStop.coordinates.x + moved : currentBusStop.coordinates.y + moved;
 
     return coordinates;
 }

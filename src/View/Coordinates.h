@@ -21,11 +21,15 @@ public:
      */
     Coordinates(int x1, int y1);
 
-
     ~Coordinates();
 
+    typedef struct coordinates {
+        int x = 0;
+        int y = 0;
+    } Coordinates_S;
+
     typedef struct busStop {
-        Coordinates *coordinates{};   //!< coordinates of bus stop
+        Coordinates_S coordinates;
         int stopHour = 0;
         int stopMin = 0;
         std::string name;

@@ -371,9 +371,7 @@ Scene::CheckRoadBlockBus()
 {
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    int secNow = Timer::GetSecond();
     int i = 0;
-    Coordinates *busCoordinates;
 
     for (auto *bus : garage.allBuses) {
         int nxt, nw, mn;
@@ -389,15 +387,14 @@ Scene::CheckRoadBlockBus()
         }
 
         for (; i < bus->stopInformation.size() - 2; i++) {
-            busCoordinates = bus->stopInformation[i].coordinates;
-            if (Square::layout[busCoordinates->x][busCoordinates->y]->roadBlock) {
+            if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
                 /* roadStop on road */
                 //std::cerr << "Stop Closed " << bus->stopInformation[i].name << "\n";
                 bus->roadStopOnRoad = true;
             }
             /* street going vertically */
-            if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i + 1].coordinates->x ) {
-                if (Square::layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock) {
+            if (bus->stopInformation[i].coordinates.x == bus->stopInformation[i + 1].coordinates.x ) {
+                if (Square::layout[bus->stopInformation[i].coordinates.x][(bus->stopInformation[i].coordinates.y + bus->stopInformation[i + 1].coordinates.y) / 2 ]->roadBlock) {
                     //std::cerr << "RoadStop between " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
                     /* roadStop */
                     bus->roadStopOnRoad = true;
