@@ -64,6 +64,7 @@ Bus::LoadTimetable()
         stopInformation.push_back(information);
         id++;
     }
+    std::vector<std::string>().swap(tokens);
 
     int minuteNow = Timer::GetMinute();
     int hourNow = Timer::GetHour();

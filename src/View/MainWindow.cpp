@@ -201,6 +201,8 @@ void MainWindow::InitSliders(QWidget *parent) {
         combobox->addItem(QString::fromStdString(street[0]));
     }
 
+    std::vector<std::string>().swap(street);
+
     /* slider for changing street slowdown */
     QSlider *slider = new QSlider(Qt::Horizontal,parent);
     slider->move(160, 857);
@@ -249,6 +251,7 @@ MainWindow::ReadInput()
     if (time.size() == 3) {
         Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]));
     }
+    std::vector<std::string>().swap(time);
 }
 
 void
@@ -285,6 +288,7 @@ MainWindow::TimeShiftForward(int hourNow, int minuteNow)
             }
         }
     }
+    std::vector<int>().swap(seenBus);
 }
 
 void

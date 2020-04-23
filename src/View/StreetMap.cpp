@@ -172,7 +172,7 @@ StreetMap::AddStreets(const std::string& pathToFile)
         insert = StreetMap::AddStreet(new Street(tokens[0], start, end, 1));
         if (!insert) std::cerr << "Warning: Street " << tokens[0] <<  " cannot be added to map" << std::endl;
     }
-
+    std::vector<std::string>().swap(tokens);
     file.close();
 }
 
@@ -225,6 +225,6 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
         }
 
     }
-
+    std::vector<std::string>().swap(tokens);
     file.close();
 }

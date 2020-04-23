@@ -211,5 +211,9 @@ Garage::CheckSlowDown(StreetMap *streetMap, Bus *bus) {
         /* current slowdown */
         street->previousSlowdown = street->slowdown;
     }
+
+    std::vector<std::string>().swap(currentSplit);
+    std::vector<std::string>().swap(nextSplit);
+
     return bus;
 }
