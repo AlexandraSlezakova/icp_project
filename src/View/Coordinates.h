@@ -29,6 +29,7 @@ public:
         int stopHour = 0;
         int stopMin = 0;
         std::string name;
+        int id = 0;
     } BusStop_S;
 };
 

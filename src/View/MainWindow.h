@@ -98,6 +98,10 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 private:
+    void TimeShiftForward(int hourNow, int minuteNow);
+
+    void TimeShiftBackwards(int hourNow, int minuteNow);
+
     QComboBox *combobox;            //!< combobox on pick street to slowdown
     std::string streetUpdate;       //!< street name
     QPushButton *roadBlockButton;   //!< button to add roadblock

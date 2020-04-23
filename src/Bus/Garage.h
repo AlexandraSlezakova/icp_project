@@ -13,7 +13,7 @@
 class Garage
 {
 public:
-    std::vector<Bus*> allBuses;     //!< array for all bus
+    std::vector<Bus*> allBuses;             //!< bus storage
 
     /**
     * @brief garage constructor
@@ -28,7 +28,7 @@ public:
      * @param busNumber number of bus
      * @param scene
      */
-    void AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration = 0);
+    void AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration = 0);
 
     /**
     * @brief move all buses on the scene
@@ -39,10 +39,10 @@ public:
 
     /**
     * @brief get bus from bus storage
-    * @param busId id of bus
+    * @param id id of bus
     * @return bus found bus | nullptr
     */
-    Bus* GetBus(int busId);
+    Bus* GetBus(int id);
 
     /**
      * @brief get bus by photo
@@ -59,15 +59,14 @@ public:
     */
     Bus* CheckSlowDown(StreetMap *streetMap, Bus *bus);
 
-private:
-    bool CheckRoadBlock(Bus *bus);
-
     /**
      * @brief delete bus from bus storage and scene
      * @param bus bus to delete
      * @param scene
      */
     void DeleteBus(Bus *bus, QGraphicsScene *scene);
+private:
+    bool CheckRoadBlock(Bus *bus);
 };
 
 

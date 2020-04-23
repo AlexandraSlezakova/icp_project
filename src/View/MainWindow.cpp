@@ -65,11 +65,9 @@ MainWindow::timerEvent(QTimerEvent *event)
 
     int minute = Timer::GetMinute();
     int second = Timer::GetSecond();
-    static int iteration = 0;
-    /* every 10 minutes create new buses */
-    if (minute > 0 && !(minute % 10) && !second) {
-        iteration++;
-        scene->AddBuses(iteration);
+    /* check every minute if new bus should be created */
+    if (!(minute % 10) && !second) {
+        scene->AddBuses();
     }
     scene->MoveBuses();
 }
@@ -181,7 +179,13 @@ void MainWindow::InitSliders(QWidget *parent) {
 void
 MainWindow::StopTimer()
 {
+    static int previousHour;
+    static int previousMinute;
+
     if (!stopFlag) {
+        previousHour = Timer::GetHour();
+        previousMinute = Timer::GetMinute();
+
         killTimer(timerId);
         timerButton->setText("Start timer");
         stopFlag = 1;
@@ -192,6 +196,15 @@ MainWindow::StopTimer()
         stopFlag = 0;
         timerId = startTimer(1000);
         disconnect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
+
+        int hourNow = Timer::GetHour();
+        int minuteNow = Timer::GetMinute();
+        int previousTime = previousHour * 60 + previousMinute;
+        int currentTime = hourNow * 60 + minuteNow;
+
+        currentTime < previousTime
+            ? TimeShiftBackwards(hourNow, minuteNow)
+            : TimeShiftForward(hourNow, minuteNow);
     }
 }
 
@@ -203,6 +216,66 @@ MainWindow::ReadInput()
     std::vector<std::string> time = Functions::Split(data.toStdString(), ":");
     if (time.size() == 3) {
         Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]));
+    }
+}
+
+void
+MainWindow::TimeShiftForward(int hourNow, int minuteNow)
+{
+    int minute;
+    int allBusesSize = scene->garage.allBuses.size();
+    int iteration;
+    int busTime, currentTime;
+    std::vector<int> seenBus;
+
+    Coordinates::BusStop_S stopInformation;
+    Bus *bus;
+    for (int i = allBusesSize - 1; i >= 0; i--) {
+        bus = scene->garage.allBuses[i];
+
+        auto found = std::find(std::begin(seenBus), std::end(seenBus), bus->busNumber_);
+        IF(found != std::end(seenBus), continue;)
+
+        seenBus.push_back(bus->busNumber_);
+        stopInformation = bus->stopInformation[0];
+        iteration = bus->iteration + 1;
+
+        busTime = stopInformation.stopHour * 60 + stopInformation.stopMin;
+        currentTime = hourNow * 60 + minuteNow;
+
+        if (currentTime > busTime) {
+            minute = currentTime - busTime;
+            minute /= 10;
+
+            for (int j = 0; j < minute; j++) {
+                scene->garage.AddBus(scene->busId++, bus->busNumber_, scene->graphicsScene, iteration);
+                iteration++;
+            }
+        }
+    }
+}
+
+void
+MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
+{
+    Coordinates::BusStop_S stopInformation;
+    int busStorageSize = scene->garage.allBuses.size();
+
+    for (int i = 0; i < busStorageSize; i++) {
+        Bus *bus = scene->garage.allBuses[i];
+        stopInformation = bus->stopInformation[0];
+        
+        if (stopInformation.stopMin > minuteNow || stopInformation.stopHour > hourNow) {
+            scene->garage.DeleteBus(bus, scene->graphicsScene);
+            busStorageSize--;
+            i--;
+        }
+    }
+
+    /* no buses exist, create new ones */
+    if (scene->garage.allBuses.empty()) {
+        scene->garage.AddBus(0, 1, scene->graphicsScene);
+        scene->garage.AddBus(1, 2, scene->graphicsScene);
     }
 }
 
@@ -263,4 +336,3 @@ MainWindow::TimerSub()
     percentage = 100 - percentage;
     timerLabel->setText("Timer interval = " + QString::number(percentage) + "%");
 }
-

@@ -3,18 +3,18 @@
 Garage::Garage() = default;
 
 void
-Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
+Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
 {
-    Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0), iteration);
+    Bus *bus = new Bus(id, busNumber, new Coordinates(0,0), iteration);
     bus->InitBus(scene);
     bus->MoveBus();
     allBuses.push_back(bus);
 }
 
 Bus*
-Garage::GetBus(int busId) {
-    for (auto &bus : allBuses) {
-        if (busId == bus->id_)
+Garage::GetBus(int id) {
+    for (Bus *bus : allBuses) {
+        if (id == bus->id_)
             return bus;
     }
 
@@ -24,7 +24,7 @@ Garage::GetBus(int busId) {
 Bus*
 Garage::GetBusByPhoto(QGraphicsItem *photo)
 {
-    for (auto &bus : allBuses) {
+    for (Bus *bus : allBuses) {
         if (photo == bus->busPhoto)
             return bus;
     }
@@ -38,7 +38,10 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene) {
         CheckRoadBlock(bus);
         bus = CheckSlowDown(streetMap, bus);
         bus->MoveBus();
-        IF(bus->deleteBus, DeleteBus(bus, scene))
+
+        if (bus->deleteBus) {
+            DeleteBus(bus, scene);
+        }
     }
 }
 

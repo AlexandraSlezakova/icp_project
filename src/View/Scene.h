@@ -54,7 +54,7 @@ public:
     /**
      * @brief add buses to scene
      */
-    void AddBuses(int iteration = 0);
+    void AddBuses();
 
     void CheckRoadBlockBus();
 
@@ -66,7 +66,7 @@ public:
      */
     void InitTimetableArea(QWidget *parent, int width, int height);
 
-    QGraphicsScene *scene;
+    QGraphicsScene *graphicsScene;
     QPlainTextEdit *textArea;   //!< text area for bus timetable
     QLabel *zoomText;           //!< text with information about scale scene
     double zoom_act = 100;      //!< double expression of zoom
@@ -77,6 +77,7 @@ public:
     int  m_originalX = 0;       //!< x mouse position to move map
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
+    int busId = 0;
 
 protected:
     /**
@@ -136,11 +137,10 @@ private:
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
     /**
-     * @brief clear text area of bus timetable
-     * from given position
-     * @param lineNumber
+     * @brief add the bus one by one to scene at the beginning of the program execution
+     * according to current time
      */
-    void ClearTextArea(int lineNumber);
+    void AddBusOneByOne();
 };
 
 #endif // SCENE_H

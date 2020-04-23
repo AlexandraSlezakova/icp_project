@@ -2,7 +2,7 @@
 
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
-    scene = new QGraphicsScene();
+    graphicsScene = new QGraphicsScene();
     SetUpView();
     CreateMap();
 }
@@ -15,7 +15,7 @@ Scene::CreateMap()
     map = new StreetMap();
     /* initialize streets and bus stops */
     map->AddStreets(Functions::GetAbsolutePath("../files/ulice.txt"));
-    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), scene);
+    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), graphicsScene);
     /* add squares to scene */
     AddSquares();
     /* add buses */
@@ -23,11 +23,45 @@ Scene::CreateMap()
 }
 
 void
-Scene::AddBuses(int iteration)
+Scene::AddBuses() {
+    int iteration = 0;
+
+    if (busId >= 2) {
+        iteration = garage.allBuses[garage.allBuses.size() - 1]->iteration + 1;
+    }
+
+    garage.AddBus(busId++, 1, graphicsScene, iteration);
+    garage.AddBus(busId++, 2, graphicsScene, iteration);
+
+    if (busId == 2) {
+        /* add the number of buses to the scene according to current time */
+        AddBusOneByOne();
+        return;
+    }
+}
+
+void
+Scene::AddBusOneByOne()
 {
-    static int busId = 0;
-    garage.AddBus(busId++, 1, scene, iteration);
-    garage.AddBus(busId++, 2, scene, iteration);
+    static int route = 2;
+    static int busNumber = 1;
+    static int originalBusId = busId;
+
+    Bus *found = garage.GetBus(originalBusId - route);
+    int minuteNow = Timer::GetMinute();
+    int stopMin = found->stopInformation[0].stopMin;
+
+    if (minuteNow >= stopMin + 10) {
+        minuteNow /= 10;
+        for (int i = 0; i < minuteNow; i++) {
+            garage.AddBus(busId, busNumber, graphicsScene, i + 1);
+            busId++;
+        }
+    }
+
+    route--;
+    busNumber++;
+    IF(route, AddBusOneByOne())
 }
 
 void
@@ -35,7 +69,7 @@ Scene::AddSquares()
 {
     for (auto &x : Square::layout) {
         for (auto &y : x) {
-            scene->addItem(y);
+            graphicsScene->addItem(y);
         }
     }
 }
@@ -46,7 +80,7 @@ Scene::SetUpView()
     setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setScene(scene);
+    setScene(graphicsScene);
 }
 
 void
@@ -153,7 +187,7 @@ Scene::ZoomSub()
 void
 Scene::MoveBuses()
 {
-    garage.MoveAllBuses(map, scene);
+    garage.MoveAllBuses(map, graphicsScene);
 }
 
 void
@@ -281,7 +315,7 @@ Scene::BusStopRoadBlock(StreetMap::stopData stop)
         Square::layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = false;
     }
 
-    stop.photo = stop.stop->AddStopToScene(scene, path);
+    stop.photo = stop.stop->AddStopToScene(graphicsScene, path);
 
     return stop;
 }
