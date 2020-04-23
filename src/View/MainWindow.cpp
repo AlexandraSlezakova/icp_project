@@ -306,8 +306,8 @@ MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
 
     /* no buses exist, create new ones */
     if (scene->garage.allBuses.empty()) {
-        scene->garage.AddBus(0, 1, scene->graphicsScene);
-        scene->garage.AddBus(1, 2, scene->graphicsScene);
+        scene->busId = 0;
+        scene->AddBuses();
     }
 }
 

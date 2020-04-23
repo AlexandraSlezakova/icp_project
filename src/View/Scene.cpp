@@ -26,14 +26,15 @@ void
 Scene::AddBuses() {
     int iteration = 0;
 
-    if (busId >= 2) {
+    if (busId >= 3) {
         iteration = garage.allBuses[garage.allBuses.size() - 1]->iteration + 1;
     }
 
     garage.AddBus(busId++, 1, graphicsScene, iteration);
     garage.AddBus(busId++, 2, graphicsScene, iteration);
+    garage.AddBus(busId++, 3, graphicsScene, iteration);
 
-    if (busId == 2) {
+    if (busId == 3) {
         /* add the number of buses to the scene according to current time */
         AddBusOneByOne();
         return;
@@ -43,12 +44,12 @@ Scene::AddBuses() {
 void
 Scene::AddBusOneByOne()
 {
-    static int route = 2;
+    static int route = 3;
     static int busNumber = 1;
     static int originalBusId = busId;
 
-    if (!route && busNumber > 2) {
-        route = 2;
+    if (!route && busNumber > 3) {
+        route = 3;
         busNumber = 1;
     }
 
