@@ -29,7 +29,7 @@ Bus::LoadTimetable()
     std::ostringstream ss;
     std::string line, minute;
     std::vector<std::string> tokens;
-    int stopHour, stopMin, stopMinCopy;
+    int stopHour, stopMin, id = 0;
     Coordinates *coordinates;
 
     ss << "../files/bus-route-map/" << std::to_string(busNumber_) << ".txt";
@@ -45,28 +45,34 @@ Bus::LoadTimetable()
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
         stopHour = std::stoi(tokens[0]) + Timer::GetHour();
-        stopMinCopy = stopMin = std::stoi(tokens[1]);
+        stopMin = std::stoi(tokens[1]);
         coordinates = Stop::GetStop(tokens[2]);
 
         if (iteration) {
             stopMin += (iteration * 10);
-            if (stopMinCopy >= 50 && stopMinCopy <= 59) {
+            if (stopMin >= 60) {
                 stopHour++;
-                stopMin = stopMin == 50 ? 0 : stopMin - 60;
+                stopMin -= 60;
                 IF(stopHour == 24, stopHour = 0)
             }
         }
 
-        Coordinates::BusStop_S information = {coordinates, stopHour, stopMin, tokens[2]};
+        Coordinates::BusStop_S information = {coordinates, stopHour, stopMin, tokens[2], id};
         /* save information */
         stopInformation.push_back(information);
+        id++;
     }
 
     int minuteNow = Timer::GetMinute();
     int hourNow = Timer::GetHour();
     int size = stopInformation.size();
     Coordinates::BusStop_S *info = &stopInformation[size - 1];
+
     if (minuteNow >= info->stopMin && hourNow == info->stopHour) {
+        while (minuteNow % 10) {
+            minuteNow--;
+        }
+
         for (int i = 0; i < size; i++) {
             info = &stopInformation[i];
             info->stopMin += minuteNow;
@@ -133,8 +139,9 @@ Bus::MoveBus()
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
     int rotation;
+    int stopInfoSize = (int)stopInformation.size() - 1;
 
-    if (minuteNow == nextBusStop.stopMin) {
+    if (minuteNow >= nextBusStop.stopMin && nextBusStop.id == stopInfoSize) {
         deleteBus = 1;
         return;
     }
