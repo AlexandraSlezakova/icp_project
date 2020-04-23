@@ -47,6 +47,11 @@ Scene::AddBusOneByOne()
     static int busNumber = 1;
     static int originalBusId = busId;
 
+    if (!route && busNumber > 2) {
+        route = 2;
+        busNumber = 1;
+    }
+
     Bus *found = garage.GetBus(originalBusId - route);
     int minuteNow = Timer::GetMinute();
     int stopMin = found->stopInformation[0].stopMin;
@@ -142,7 +147,8 @@ Scene::mousePressEvent(QMouseEvent *event)
 }
 
 void
-Scene::mouseReleaseEvent(QMouseEvent *event){
+Scene::mouseReleaseEvent(QMouseEvent *event)
+{
     if (event->button() == Qt::RightButton) {
         m_moving = false;
         setCursor(Qt::ArrowCursor);
@@ -326,7 +332,7 @@ Scene::InitTimetableArea(QWidget *parent, int width, int height)
     /* text area for bus timetable */
     textArea = new QPlainTextEdit(parent);
     textArea->setMinimumSize(width * 0.19, height * 0.6);
-    textArea->move(5, 80);
+    textArea->move(5, 115);
 }
 
 void

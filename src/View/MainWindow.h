@@ -102,11 +102,16 @@ private:
 
     void TimeShiftBackwards(int hourNow, int minuteNow);
 
+    void NightTime();
+
+    void Run();
+
     QComboBox *combobox;            //!< combobox on pick street to slowdown
     std::string streetUpdate;       //!< street name
     QPushButton *roadBlockButton;   //!< button to add roadblock
     QPushButton *timerButton;       //!< button to start or stop timer
     QPlainTextEdit *timeArea;       //!< textarea with time
+    QLabel *nightTimeLabel;         //!< label with warning - buses don't move between midnight and 6AM
     QLabel *timerLabel;
     Ui::MainWindow *ui;
     Scene *scene;
@@ -116,5 +121,6 @@ private:
     int width = 0;                  //!< width of screen
     int height = 0;                 //!< height of screen
     int stopFlag = 0;               //!< timer is active or inactive
+    int nightFlag = 0;
 };
 #endif // MAINWINDOW_H

@@ -65,6 +65,8 @@ public:
      * @param scene
      */
     void DeleteBus(Bus *bus, QGraphicsScene *scene);
+
+    void DeleteBuses(QGraphicsScene *scene);
 private:
     bool CheckRoadBlock(Bus *bus);
 };

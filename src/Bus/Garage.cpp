@@ -56,6 +56,21 @@ Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
     bus = nullptr;
 }
 
+void
+Garage::DeleteBuses(QGraphicsScene *scene)
+{
+    Coordinates::BusStop_S stopInformation;
+    int busStorageSize = allBuses.size();
+
+    for (int i = 0; i < busStorageSize; i++) {
+        Bus *bus = allBuses[i];
+        stopInformation = bus->stopInformation[0];
+        DeleteBus(bus, scene);
+        busStorageSize--;
+        i--;
+    }
+}
+
 bool
 Garage::CheckRoadBlock(Bus *bus) {
 //    Street *afterNextStreet;
