@@ -48,7 +48,7 @@ MainWindow::CreateScene()
     widget->setMinimumSize(width * 0.3, height * 0.9);
 
     /* text area with timetable */
-    Bus::InitTimetableArea(widget, width, height);
+    scene->InitTimetableArea(widget, width, height);
     /* text area with time */
     InitTimeArea(widget);
     /* buttons */
@@ -65,13 +65,41 @@ MainWindow::timerEvent(QTimerEvent *event)
 
     int minute = Timer::GetMinute();
     int second = Timer::GetSecond();
-    static int iteration = 0;
-    /* every five minutes create new buses */
-    if (minute > 0 && !(minute % 10) && !second) {
-        iteration++;
-        scene->AddBuses(iteration);
+
+    int hour = Timer::GetHour();
+    if (hour >= 0 && hour < 6) {
+        NightTime();
+        nightFlag = 1;
     }
-    scene->MoveBuses();
+    else if (nightFlag) {
+        nightFlag = 0;
+        Run();
+    }
+    else {
+        /* create new buses every 10 minutes */
+        if (!(minute % 10) && !second) {
+            scene->AddBuses();
+        }
+        scene->MoveBuses();
+    }
+}
+
+void
+MainWindow::Run()
+{
+    nightTimeLabel->setText("");
+    scene->busId = 0;
+    scene->AddBuses();
+}
+
+void
+MainWindow::NightTime()
+{
+    nightTimeLabel->move(5, TIME_AREA_HEIGHT + 10);
+    nightTimeLabel->setFixedSize(300, 35);
+    nightTimeLabel->setStyleSheet("color: red; font-weight: bold;");
+    nightTimeLabel->setText("Warning: buses don't move \nbetween midnight and 6AM");
+    scene->garage.DeleteBuses(scene->graphicsScene);
 }
 
 void
@@ -92,6 +120,8 @@ MainWindow::InitTimeArea(QWidget *parent)
     timerButton->setFixedSize(90, 30);
     timerButton->setText("Change time");
     connect(timerButton, SIGNAL (released()), this , SLOT(StopTimer()));
+
+    nightTimeLabel = new QLabel(parent);
 
     /* reset button */
     QPushButton *resetButton = new QPushButton(parent);
@@ -127,25 +157,25 @@ MainWindow::InitButtons(QWidget *parent)
 
     /* zoom buttons */
     QPushButton *zoomButtonAdd = new QPushButton(parent);
-    zoomButtonAdd->move(TIME_AREA_WIDTH, 770);
+    zoomButtonAdd->move(TIME_AREA_WIDTH, 803);
     zoomButtonAdd->setFixedSize(30, 30);
     zoomButtonAdd->setText("+");
     connect(zoomButtonAdd, SIGNAL (released()), scene, SLOT(ZoomAdd()));
 
     QPushButton *zoomButtonSub = new QPushButton(parent);
-    zoomButtonSub->move(TIME_AREA_WIDTH + 30, 770);
+    zoomButtonSub->move(TIME_AREA_WIDTH + 30, 803);
     zoomButtonSub->setFixedSize(30, 30);
     zoomButtonSub->setText("-");
     connect(zoomButtonSub, SIGNAL (released()), scene, SLOT(ZoomSub()));
 
     /* print numb. expression of zoom */
     scene->zoomText = new QLabel(parent);
-    scene->zoomText->move(5, 770);
+    scene->zoomText->move(5, 803);
     scene->zoomText->setFixedSize(150,30);
     scene->zoomText->setText("Actual zoom = " + QString::number(scene->zoom_act,'f',2));
 
     roadBlockButton = new QPushButton(parent);
-    roadBlockButton->move(5, 725);
+    roadBlockButton->move(5, 755);
     roadBlockButton->setFixedSize(200, 30);
     roadBlockButton->setText("RoadBlockMode OFF");
     roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
@@ -160,7 +190,7 @@ void MainWindow::InitSliders(QWidget *parent) {
 
     /* streetpicker */
     combobox = new QComboBox(parent);
-    combobox->move(5,820);
+    combobox->move(5,850);
     combobox->setFixedSize(150, 40);
 
     file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
@@ -171,9 +201,11 @@ void MainWindow::InitSliders(QWidget *parent) {
         combobox->addItem(QString::fromStdString(street[0]));
     }
 
+    std::vector<std::string>().swap(street);
+
     /* slider for changing street slowdown */
     QSlider *slider = new QSlider(Qt::Horizontal,parent);
-    slider->move(160, 827);
+    slider->move(160, 857);
     slider->setFixedSize(80, 40);
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(ChangedSlowDownValue(int)));
 }
@@ -181,16 +213,32 @@ void MainWindow::InitSliders(QWidget *parent) {
 void
 MainWindow::StopTimer()
 {
+    static int previousHour;
+    static int previousMinute;
+
     if (!stopFlag) {
+        previousHour = Timer::GetHour();
+        previousMinute = Timer::GetMinute();
+
         killTimer(timerId);
         timerButton->setText("Start timer");
         stopFlag = 1;
         connect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
-    } else {
+    }
+    else {
         timerButton->setText("Change time");
         stopFlag = 0;
         timerId = startTimer(1000);
         disconnect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
+
+        int hourNow = Timer::GetHour();
+        int minuteNow = Timer::GetMinute();
+        int previousTime = previousHour * 60 + previousMinute;
+        int currentTime = hourNow * 60 + minuteNow;
+
+        currentTime < previousTime
+            ? TimeShiftBackwards(hourNow, minuteNow)
+            : TimeShiftForward(hourNow, minuteNow);
     }
 }
 
@@ -202,6 +250,68 @@ MainWindow::ReadInput()
     std::vector<std::string> time = Functions::Split(data.toStdString(), ":");
     if (time.size() == 3) {
         Timer::ChangeTime(std::stoi(time[0]), std::stoi(time[1]), std::stoi(time[2]));
+    }
+    std::vector<std::string>().swap(time);
+}
+
+void
+MainWindow::TimeShiftForward(int hourNow, int minuteNow)
+{
+    int minute;
+    int allBusesSize = scene->garage.allBuses.size();
+    int iteration;
+    int busTime, currentTime;
+    std::vector<int> seenBus;
+
+    Coordinates::BusStop_S stopInformation;
+    Bus *bus;
+    for (int i = allBusesSize - 1; i >= 0; i--) {
+        bus = scene->garage.allBuses[i];
+
+        auto found = std::find(std::begin(seenBus), std::end(seenBus), bus->busNumber_);
+        IF(found != std::end(seenBus), continue;)
+
+        seenBus.push_back(bus->busNumber_);
+        stopInformation = bus->stopInformation[0];
+        iteration = bus->iteration + 1;
+
+        busTime = stopInformation.stopHour * 60 + stopInformation.stopMin;
+        currentTime = hourNow * 60 + minuteNow;
+
+        if (currentTime > busTime) {
+            minute = currentTime - busTime;
+            minute /= 10;
+
+            for (int j = 0; j < minute; j++) {
+                scene->garage.AddBus(scene->busId++, bus->busNumber_, scene->graphicsScene, iteration);
+                iteration++;
+            }
+        }
+    }
+    std::vector<int>().swap(seenBus);
+}
+
+void
+MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
+{
+    Coordinates::BusStop_S stopInformation;
+    int busStorageSize = scene->garage.allBuses.size();
+
+    for (int i = 0; i < busStorageSize; i++) {
+        Bus *bus = scene->garage.allBuses[i];
+        stopInformation = bus->stopInformation[0];
+
+        if (stopInformation.stopMin > minuteNow || stopInformation.stopHour > hourNow) {
+            scene->garage.DeleteBus(bus, scene->graphicsScene);
+            busStorageSize--;
+            i--;
+        }
+    }
+
+    /* no buses exist, create new ones */
+    if (scene->garage.allBuses.empty()) {
+        scene->busId = 0;
+        scene->AddBuses();
     }
 }
 
@@ -264,4 +374,3 @@ MainWindow::TimerSub()
     percentage = 100 - percentage;
     timerLabel->setText("Timer interval = " + QString::number(percentage) + "%");
 }
-

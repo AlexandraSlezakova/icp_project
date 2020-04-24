@@ -3,6 +3,7 @@
  * @brief Scene header file
  * @author Martin Vadura, Alexandra Slezakova
  */
+
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -53,10 +54,20 @@ public:
     /**
      * @brief add buses to scene
      */
-    void AddBuses(int iteration = 0);
+    void AddBuses();
 
+    void CheckRoadBlockBus();
 
-    QGraphicsScene *scene;
+    /**
+     * @brief initialize text area for timetable
+     * @param parent parent widget
+     * @param width width of textarea
+     * @param height height of textarea
+     */
+    void InitTimetableArea(QWidget *parent, int width, int height);
+
+    QGraphicsScene *graphicsScene;
+    QPlainTextEdit *textArea;   //!< text area for bus timetable
     QLabel *zoomText;           //!< text with information about scale scene
     double zoom_act = 100;      //!< double expression of zoom
     Garage garage;              //!< all buses
@@ -67,7 +78,7 @@ public:
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
     Bus *markedBus = nullptr;
-
+    int busId = 0;
 
 
 protected:
@@ -127,9 +138,12 @@ private:
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
-    Bus *NewBusRoad(Bus *Bus);
-
     void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end, int* startInt, int* endInt, bool* xy);
+    /**
+     * @brief add the bus one by one to scene at the beginning of the program execution
+     * according to current time
+     */
+    void AddBusOneByOne();
 };
 
 #endif // SCENE_H

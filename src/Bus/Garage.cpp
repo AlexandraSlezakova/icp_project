@@ -3,19 +3,19 @@
 Garage::Garage() = default;
 
 void
-Garage::AddBus(int busId, int busNumber, QGraphicsScene *scene, int iteration)
+Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
 {
-    Bus *bus = new Bus(busId, busNumber, new Coordinates(0,0));
-    bus->iteration = iteration;
+    Bus *bus = new Bus(id, busNumber, new Coordinates(0,0), iteration);
     bus->InitBus(scene,"../images/bus.png",0,0);
     bus->MoveBus();
     allBuses.push_back(bus);
 }
 
 Bus*
-Garage::GetBus(int busId) {
-    for (auto &bus : allBuses) {
-        if (busId == bus->id_)
+Garage::GetBus(int id) 
+{
+    for (Bus *bus : allBuses) {
+        if (id == bus->id_)
             return bus;
     }
 
@@ -25,7 +25,7 @@ Garage::GetBus(int busId) {
 Bus*
 Garage::GetBusByPhoto(QGraphicsItem *photo)
 {
-    for (auto &bus : allBuses) {
+    for (Bus *bus : allBuses) {
         if (photo == bus->busPhoto)
             return bus;
     }
@@ -34,34 +34,36 @@ Garage::GetBusByPhoto(QGraphicsItem *photo)
 }
 
 void
-Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene) {
+Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
+{
     for (Bus *bus : allBuses) {
-        if  (!bus->stopMoving) {
+        if (!bus->stopMoving) {
             bus = CheckRoad(streetMap, bus);
             bus->MoveBus();
+            
+            
+            if (bus->deleteBus) {
+                DeleteBus(bus, scene);
+            }
         }
         if (bus->roadStopOnRoad) {
             QString path;
             int secNow = Timer::GetSecond();
+            std::string imagePath;
 
             scene->removeItem(bus->busPhoto);
-
-            if (secNow % 2 == 0)
-            {
-                path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus.png"));
-            }
-            else {
-                path = QString::fromStdString(Functions::GetAbsolutePath("../images/busWarning.png"));
-            }
+            imagePath = !(secNow % 2) ? "../images/bus.png" : "../images/busWarning.png";
+            path = QString::fromStdString(Functions::GetAbsolutePath(imagePath));
+           
             bus->InitBus(scene,path,bus->busPosition->x,bus->busPosition->y);
-
             bus->BusRotation(bus->currentBusStop.coordinates->x, bus->currentBusStop.coordinates->y, bus->nextBusStop);
-        }
     }
 }
 
+
 bool
-Garage::CheckRoadBlockShortDistace(Bus *bus) {
+Garage::CheckRoadBlockShortDistace(Bus *bus) 
+{
     /* checking the bus for roadblocks */
     if (bus->roadStopOnRoad) {
 
@@ -84,10 +86,10 @@ Garage::CheckRoadBlockShortDistace(Bus *bus) {
             else {
                 /* check vertically or horizontally street if its closed */
                 if (bus->currentBusStop.coordinates->x == bus->nextBusStop.coordinates->x) {
-                    return Square::layout[bus->currentBusStop.coordinates->x][(bus->currentBusStop.coordinates->y + bus->nextBusStop.coordinates->y) /2]->roadBlock;
+                    return Square::layout[bus->currentBusStop.coordinates->x][(bus->currentBusStop.coordinates->y + bus->nextBusStop.coordinates->y) / 2]->roadBlock;
                 }
                 else {
-                    return Square::layout[(bus->currentBusStop.coordinates->x + bus->nextBusStop.coordinates->x) /2][bus->currentBusStop.coordinates->y]->roadBlock;
+                    return Square::layout[(bus->currentBusStop.coordinates->x + bus->nextBusStop.coordinates->x) / 2][bus->currentBusStop.coordinates->y]->roadBlock;
                 }
             }
         }
@@ -95,8 +97,35 @@ Garage::CheckRoadBlockShortDistace(Bus *bus) {
     return false;
 }
 
+void
+Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
+{
+    auto found = std::find(std::begin(allBuses), std::end(allBuses), bus);
+    allBuses.erase(found);
+    scene->removeItem(bus->busPhoto);
+    delete bus;
+    /* set to nullptr to avoid crashing on double delete */
+    bus = nullptr;
+}
+
+void
+Garage::DeleteBuses(QGraphicsScene *scene)
+{
+    Coordinates::BusStop_S stopInformation;
+    int busStorageSize = allBuses.size();
+
+    for (int i = 0; i < busStorageSize; i++) {
+        Bus *bus = allBuses[i];
+        stopInformation = bus->stopInformation[0];
+        DeleteBus(bus, scene);
+        busStorageSize--;
+        i--;
+    }
+}
+
 bool
-Garage::CheckRoadBlockLongDistace(Bus *bus) {
+Garage::CheckRoadBlockLongDistace(Bus *bus)
+{
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
     int i = 0;
@@ -145,8 +174,8 @@ Garage::CheckRoadBlockLongDistace(Bus *bus) {
 }
 
 Bus*
-Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
-
+Garage::CheckRoad(StreetMap *streetMap, Bus *bus) 
+{
     std::vector<std::string> currentSplit;
     std::vector<std::string> nextSplit;
     std::string streetName;
@@ -157,18 +186,6 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
     int i = 0;
     int stopTime;
     int pop;
-
-    if (bus->iteration) {
-        if (!minuteNow) {
-            hourNow--;
-            minuteNow = 60;
-        }
-        else if (minuteNow > 0 && minuteNow < 10) {
-            hourNow--;
-            minuteNow += 60;
-        }
-        minuteNow -= (bus->iteration * 10);
-    }
 
     /* find out where the bus should be according to current time */
     int nxt, nw, mn;
@@ -185,7 +202,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
         return bus;
 
     currentSplit = Functions::Split(bus->stopInformation[i].name, "-");
-    nextSplit = Functions::Split(bus->stopInformation[i+1].name, "-");
+    nextSplit = Functions::Split(bus->stopInformation[i + 1].name, "-");
     /* get name of street where bus is
      * example: Pešinova-Škálova and Pešinova-Karlova
      * - bus is at Pešinova street */
@@ -216,7 +233,8 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
             }
         }
         else {
-             bus->currentBusStop.coordinates = bus->busPosition;
+             bus->currentBusStop.coordinates.x = bus->busPosition->x;
+             bus->currentBusStop.coordinates.y = bus->busPosition->y;
              bus->currentBusStop.stopHour = hourNow;
              bus->currentBusStop.stopMin = minuteNow;
         }
@@ -264,8 +282,8 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
              * new calculated value: 10:02 + traveled distance(1) + delay(2)
              * = new time 10:05 */
             for (; i < bus->stopInformation.size() - 1; i++) {
-                if (bus->stopInformation[i].coordinates->x + bus->stopInformation[i].coordinates->y
-                    - bus->stopInformation[i + 1].coordinates->x - bus->stopInformation[i + 1].coordinates->y == 10) {
+                if (bus->stopInformation[i].coordinates.x + bus->stopInformation[i].coordinates.y
+                    - bus->stopInformation[i + 1].coordinates.x - bus->stopInformation[i + 1].coordinates.y == 10) {
                     pop = 2;
                 }
                 else {
@@ -288,5 +306,9 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus) {
         /* current slowdown */
         street->previousSlowdown = street->slowdown;
     }
-        return bus;
+
+    std::vector<std::string>().swap(currentSplit);
+    std::vector<std::string>().swap(nextSplit);
+
+    return bus;
 }
