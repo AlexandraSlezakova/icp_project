@@ -20,7 +20,12 @@ public:
     Coordinates *busPosition;                               //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                             //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
+
+    std::vector<Coordinates::BusStop_S> newstopInformation; //!< new bus stop coordinates and time
     bool roadStopOnRoad;
+    bool stopMoving = false;
+    int stopHour;
+    int stopMin;
 
 
     /**
@@ -38,7 +43,7 @@ public:
      * put image of little bus on scene, set scale and initial position
      * @param scene
      */
-    void InitBus(QGraphicsScene *scene);
+    void InitBus(QGraphicsScene *scene,std::string pathPic,int x, int y);
 
     /**
      * @brief get coordinates of bus
@@ -78,6 +83,9 @@ public:
      */
     void ClearTextArea();
 
+
+    void BusRotation(int x, int y, const Coordinates::BusStop_S &next) const;
+
 private:
     static QPlainTextEdit *textArea;   //!< text area for bus timetable
 
@@ -85,6 +93,7 @@ private:
      * @brief load timetable of bus from file and save all information
      */
     void LoadTimetable();
+
 
 };
 

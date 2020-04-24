@@ -232,7 +232,9 @@ MainWindow::RoadBlockSwitcher()
         roadBlockButton->setText("RoadBlockMode OFF");
         roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
         scene->roadBlockMode = false;
-        scene->CheckRoadBlockBus();
+        for (auto *bus : scene->garage.allBuses) {
+            scene->garage.CheckRoadBlockLongDistace(bus);
+        }
     }
 }
 

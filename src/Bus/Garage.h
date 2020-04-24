@@ -30,9 +30,9 @@ public:
 
     /**
     * @brief move all buses on the scene
-    * @param streetMap for CheckSlowDown function
+    * @param streetMap for CheckRoad function
     */
-    void MoveAllBuses(StreetMap *streetMap);
+    void MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scen);
 
     /**
     * @brief get bus from bus storage
@@ -49,16 +49,19 @@ public:
     Bus *GetBusByPhoto(QGraphicsItem *photo);
 
     /**
-    * @brief check street slow down for bus
+    * @brief check street slow down for bus and roadstop
     * @param streetMap find street in map with slowdown
-    * @param bus a bus for which a slowdown applies
+    * @param bus a bus for which a slowdown applies or stop due to stoproad
     * @return bus with updated data
     */
-    Bus* CheckSlowDown(StreetMap *streetMap, Bus *bus);
+    Bus* CheckRoad(StreetMap *streetMap, Bus *bus);
 
+
+
+    bool CheckRoadBlockLongDistace(Bus *bus);
 
 private:
-    bool CheckRoadBlock(Bus *bus);
+    bool CheckRoadBlockShortDistace(Bus *bus);
 };
 
 

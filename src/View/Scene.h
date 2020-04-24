@@ -55,8 +55,6 @@ public:
      */
     void AddBuses(int iteration = 0);
 
-    void CheckRoadBlockBus();
-
 
     QGraphicsScene *scene;
     QLabel *zoomText;           //!< text with information about scale scene
@@ -68,6 +66,9 @@ public:
     int  m_originalX = 0;       //!< x mouse position to move map
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
+    Bus *markedBus = nullptr;
+
+
 
 protected:
     /**
@@ -125,6 +126,10 @@ private:
     * @return stopData to update data
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
+
+    Bus *NewBusRoad(Bus *Bus);
+
+    void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end, int* startInt, int* endInt, bool* xy);
 };
 
 #endif // SCENE_H
