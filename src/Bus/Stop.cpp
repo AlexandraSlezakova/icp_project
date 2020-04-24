@@ -12,7 +12,7 @@ Stop::Stop(std::string name, Coordinates *coordinate)
 Stop::~Stop() =default;
 
 Coordinates*
-Stop::GetStop(const std::string& name)
+Stop::GetStopByName(const std::string& name)
 {
     for (const auto& stop : stopList) {
         if (stop.first == name) {
@@ -21,6 +21,18 @@ Stop::GetStop(const std::string& name)
     }
 
     return nullptr;
+}
+
+std::string
+Stop::GetStopByCoordinates(int x, int y)
+{
+    for (const auto& stop : stopList) {
+        if (stop.second->x == x && stop.second->y == y) {
+            return stop.first;
+        }
+    }
+
+    return "";
 }
 
 std::map<std::string, Coordinates*> Stop::stopList{};

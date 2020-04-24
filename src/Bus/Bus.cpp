@@ -45,9 +45,10 @@ Bus::LoadTimetable()
      * and name of bus stops [3] */
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
+      
         stopHour = std::stoi(tokens[0]) + Timer::GetHour();
         stopMin = std::stoi(tokens[1]);
-        coordinates = Stop::GetStop(tokens[2]);
+        coordinates = Stop::GetStopByName(tokens[2]);
 
         if (iteration) {
             stopMin += (iteration * 10);
@@ -125,9 +126,9 @@ Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
 }
 
 void
-Bus::InitBus(QGraphicsScene *scene)
+Bus::InitBus(QGraphicsScene *scene, std::string pathPic)
 {
-    QString path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus.png"));
+    QString path = QString::fromStdString(Functions::GetAbsolutePath(pathPic.c_str()));
     busPhoto = new QGraphicsPixmapItem(QPixmap(path));
     busPhoto->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
     busPhoto->setScale(0.06);
@@ -141,8 +142,10 @@ Bus::MoveBus()
     int secNow, x, y, xShift = 0, yShift = 0;
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
+    Coordinates::BusStop_S next, current;
     int rotation;
     int stopInfoSize = (int)stopInformation.size() - 1;
+
 
     if (minuteNow >= nextBusStop.stopMin && nextBusStop.id == stopInfoSize) {
         deleteBus = 1;
@@ -154,23 +157,7 @@ Bus::MoveBus()
     y = currentBusStop.coordinates.y;
     deleteBus = 0;
 
-    rotation = 0;
-    if (nextBusStop.coordinates.x > x) {
-        busPhoto->setTransform(QTransform::fromScale(1, 1));
-    }
-    else if (nextBusStop.coordinates.x < x) {
-        busPhoto->setTransform(QTransform::fromScale(-1, 1));
-    }
-    else {
-        if (nextBusStop.coordinates.y > y ) {
-            rotation = 90;
-            busPhoto->setTransform(QTransform::fromScale(1, 1));
-        }
-        else {
-            rotation = -90;
-            busPhoto->setTransform(QTransform::fromScale(1, 1));
-        }
-    }
+    BusRotation(x, y, next);
 
     busPhoto->setRotation(rotation);
 
@@ -188,6 +175,28 @@ Bus::MoveBus()
     busPosition->x = x;
     busPosition->y = y;
     busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
+}
+
+void Bus::BusRotation(int x, int y, const Coordinates::BusStop_S &next) const {
+    int rotation = 0;
+    if (next.coordinates->x > x) {
+        busPhoto->setTransform(QTransform::fromScale(1, 1));
+    }
+    else if (next.coordinates->x < x) {
+        busPhoto->setTransform(QTransform::fromScale(-1, 1));
+    }
+    else {
+        if( next.coordinates->y > y ) {
+            rotation = 90;
+            busPhoto->setTransform(QTransform::fromScale(1, 1));
+        }
+        else {
+            rotation = -90;
+            busPhoto->setTransform(QTransform::fromScale(1, 1));
+        }
+    }
+
+    busPhoto->setRotation(rotation);
 }
 
 int

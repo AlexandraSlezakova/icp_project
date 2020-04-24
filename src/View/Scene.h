@@ -77,7 +77,9 @@ public:
     int  m_originalX = 0;       //!< x mouse position to move map
     int  m_originalY = 0;       //!< y mouse position to move map
     bool m_moving = false;      //!< moving map with mouse
+    Bus *markedBus = nullptr;
     int busId = 0;
+
 
 protected:
     /**
@@ -136,6 +138,7 @@ private:
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
+    void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end, int* startInt, int* endInt, bool* xy);
     /**
      * @brief add the bus one by one to scene at the beginning of the program execution
      * according to current time

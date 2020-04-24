@@ -31,7 +31,9 @@ public:
      * @param name name of stop
      * @return coordinates of stop or nullptr
      */
-    static Coordinates *GetStop(const std::string& name);
+    static Coordinates *GetStopByName(const std::string& name);
+
+    static std::string GetStopByCoordinates(int x, int y);
 
     /**
      * @brief adds image of bus stop on square
@@ -51,6 +53,8 @@ public:
 
 private:
     QBrush brush;
+
+
 };
 
 #endif // STOP_H
