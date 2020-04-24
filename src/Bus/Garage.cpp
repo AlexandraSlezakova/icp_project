@@ -5,7 +5,7 @@ Garage::Garage() = default;
 void
 Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
 {
-    Bus *bus = new Bus(id, busNumber, new Coordinates(0,0), iteration);
+    Bus *bus = new Bus(id, busNumber, iteration);
     bus->InitBus(scene,"../images/bus.png",0,0);
     bus->MoveBus();
     allBuses.push_back(bus);
@@ -47,19 +47,17 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
             }
         }
         if (bus->roadStopOnRoad) {
-            QString path;
             int secNow = Timer::GetSecond();
-            std::string imagePath;
+            const char *imagePath;
 
             scene->removeItem(bus->busPhoto);
             imagePath = !(secNow % 2) ? "../images/bus.png" : "../images/busWarning.png";
-            path = QString::fromStdString(Functions::GetAbsolutePath(imagePath));
-           
-            bus->InitBus(scene,path,bus->busPosition->x,bus->busPosition->y);
-            bus->BusRotation(bus->currentBusStop.coordinates->x, bus->currentBusStop.coordinates->y, bus->nextBusStop);
+
+            bus->InitBus(scene, imagePath, bus->busPosition.x, bus->busPosition.y);
+            bus->BusRotation(bus->currentBusStop.coordinates.x, bus->currentBusStop.coordinates.y, bus->nextBusStop);
+        }
     }
 }
-
 
 bool
 Garage::CheckRoadBlockShortDistace(Bus *bus) 
@@ -67,29 +65,29 @@ Garage::CheckRoadBlockShortDistace(Bus *bus)
     /* checking the bus for roadblocks */
     if (bus->roadStopOnRoad) {
 
-        /* check next bustop if its closed and route behehit it
+        /* check next bustop if it is closed and route behind it
          * example:
          *                     stop             stop
          *  S   R   B   R   R   S   R   R   R   S
          *         bus         |check section|
          * */
 
-        /* if the next stop is closed !!! it should never get to if, it should always jump to else!!! */
-        if (Square::layout[bus->currentBusStop.coordinates->x][bus->currentBusStop.coordinates->y]->roadBlock) {
+        /* if the next stop is closed, it should never get to if statement, it should always jump to else */
+        if (Square::layout[bus->currentBusStop.coordinates.x][bus->currentBusStop.coordinates.y]->roadBlock) {
             return false;
         }
         else {
             /* checking second stop if the stop is closed */
-            if (Square::layout[bus->nextBusStop.coordinates->x][bus->nextBusStop.coordinates->y]->roadBlock) {
+            if (Square::layout[bus->nextBusStop.coordinates.x][bus->nextBusStop.coordinates.y]->roadBlock) {
                 return false;
             }
             else {
-                /* check vertically or horizontally street if its closed */
-                if (bus->currentBusStop.coordinates->x == bus->nextBusStop.coordinates->x) {
-                    return Square::layout[bus->currentBusStop.coordinates->x][(bus->currentBusStop.coordinates->y + bus->nextBusStop.coordinates->y) / 2]->roadBlock;
+                /* check vertically or horizontally street if it is closed */
+                if (bus->currentBusStop.coordinates.x == bus->nextBusStop.coordinates.x) {
+                    return Square::layout[bus->currentBusStop.coordinates.x][(bus->currentBusStop.coordinates.y + bus->nextBusStop.coordinates.y) / 2]->roadBlock;
                 }
                 else {
-                    return Square::layout[(bus->currentBusStop.coordinates->x + bus->nextBusStop.coordinates->x) / 2][bus->currentBusStop.coordinates->y]->roadBlock;
+                    return Square::layout[(bus->currentBusStop.coordinates.x + bus->nextBusStop.coordinates.x) / 2][bus->currentBusStop.coordinates.y]->roadBlock;
                 }
             }
         }
@@ -112,7 +110,7 @@ void
 Garage::DeleteBuses(QGraphicsScene *scene)
 {
     Coordinates::BusStop_S stopInformation;
-    int busStorageSize = allBuses.size();
+    int busStorageSize = (int)allBuses.size();
 
     for (int i = 0; i < busStorageSize; i++) {
         Bus *bus = allBuses[i];
@@ -130,7 +128,9 @@ Garage::CheckRoadBlockLongDistace(Bus *bus)
     int minuteNow = Timer::GetMinute();
     int i = 0;
     int nxt, nw, mn;
-    for (; i < bus->stopInformation.size() - 2; i++) {
+
+    int stopInformationSize = (int)bus->stopInformation.size();
+    for (; i < stopInformationSize - 2; i++) {
         nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
         nw  = hourNow * 60 + minuteNow;
         mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
@@ -140,21 +140,21 @@ Garage::CheckRoadBlockLongDistace(Bus *bus)
             break;
         }
     }
-    /* check next bustop if its closed and route behehit it to end of bus route
+    /* check next bustop if it is closed and route behind it to the end of bus route
      * example (1. iteration):
      *                     stop             stop
      *  S   R   B   R   R   S   R   R   R   S
      *         bus         |check section|
      * */
-    for (; i < bus->stopInformation.size() - 1; i++) {
-        if (Square::layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock) {
+    for (; i < stopInformationSize - 1; i++) {
+        if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
             /* roadStop on stop */
             bus->roadStopOnRoad = true;
             return false;
         }
         /* street going vertically */
-        if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
-            if (Square::layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock) {
+        if (bus->stopInformation[i].coordinates.x == bus->stopInformation[i + 1].coordinates.x ) {
+            if (Square::layout[bus->stopInformation[i].coordinates.x][(bus->stopInformation[i].coordinates.y + bus->stopInformation[i + 1].coordinates.y) / 2 ]->roadBlock) {
                 /* roadStop */
                 bus->roadStopOnRoad = true;
                 return false;
@@ -162,7 +162,7 @@ Garage::CheckRoadBlockLongDistace(Bus *bus)
         }
             /* street going vertically */
         else {
-            if (Square::layout[(bus->stopInformation[i].coordinates->x + bus->stopInformation[i + 1].coordinates->x) / 2 ][bus->stopInformation[i].coordinates->y]->roadBlock) {
+            if (Square::layout[(bus->stopInformation[i].coordinates.x + bus->stopInformation[i + 1].coordinates.x) / 2 ][bus->stopInformation[i].coordinates.y]->roadBlock) {
                 /* roadStop */
                 bus->roadStopOnRoad = true;
                 return false;
@@ -189,7 +189,8 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
 
     /* find out where the bus should be according to current time */
     int nxt, nw, mn;
-    for (; i < bus->stopInformation.size() - 2; i++) {
+    int stopInformationSize = (int)bus->stopInformation.size();
+    for (; i < stopInformationSize - 2; i++) {
         nxt = bus->stopInformation[i+1].stopHour * 60 + bus->stopInformation[i+1].stopMin;
         nw  = hourNow * 60 + minuteNow;
         mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
@@ -233,8 +234,8 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
             }
         }
         else {
-             bus->currentBusStop.coordinates.x = bus->busPosition->x;
-             bus->currentBusStop.coordinates.y = bus->busPosition->y;
+             bus->currentBusStop.coordinates.x = bus->busPosition.x;
+             bus->currentBusStop.coordinates.y = bus->busPosition.y;
              bus->currentBusStop.stopHour = hourNow;
              bus->currentBusStop.stopMin = minuteNow;
         }
@@ -281,7 +282,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
              * so 2 minutes left
              * new calculated value: 10:02 + traveled distance(1) + delay(2)
              * = new time 10:05 */
-            for (; i < bus->stopInformation.size() - 1; i++) {
+            for (; i < stopInformationSize - 1; i++) {
                 if (bus->stopInformation[i].coordinates.x + bus->stopInformation[i].coordinates.y
                     - bus->stopInformation[i + 1].coordinates.x - bus->stopInformation[i + 1].coordinates.y == 10) {
                     pop = 2;

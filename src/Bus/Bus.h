@@ -6,7 +6,7 @@
 #ifndef ICP_PROJECT_BUS_H
 #define ICP_PROJECT_BUS_H
 
-#include "BusRouteMap.h"
+#include "../View/StreetMap.h"
 #include <sstream>
 #include <QPlainTextEdit>
 
@@ -18,7 +18,7 @@ public:
     int iteration;                                          //!< iteration of bus on the map, default is 0
     int deleteBus;                                          //!< flag if bus should be deleted
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
-    Coordinates *busPosition;                               //!< position of bus
+    Coordinates::Coordinates_S busPosition;                 //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
 
@@ -35,7 +35,7 @@ public:
      * @param busNumber number of bus
      * @param position position
      */
-    Bus(int id, int busNumber, Coordinates *position, int busIteration = 0);
+    Bus(int id, int busNumber, int busIteration = 0);
 
     ~Bus();
 
@@ -44,7 +44,7 @@ public:
      * put image of little bus on scene, set scale and initial position
      * @param scene
      */
-    void InitBus(QGraphicsScene *scene,std::string pathPic,int x, int y);
+    void InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y);
 
     /**
      * @brief get coordinates of bus

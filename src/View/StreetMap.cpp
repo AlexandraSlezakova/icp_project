@@ -31,8 +31,8 @@ StreetMap::AddStreet(Street *s)
     int counter = 0;
     static std::string crossedStreet;
 
-    for (int x = s->start->x; x <= s->end->x; x++) {
-        for (int y = s->start->y; y <= s->end->y; y++) {
+    for (int x = s->start.x; x <= s->end.x; x++) {
+        for (int y = s->start.y; y <= s->end.y; y++) {
             /* only two streets can cross at a point */
             std::vector<Street *> &positionOnMap = Map[x][y];
             IF(positionOnMap.front() != nullptr && counter >= 0, counter++)
@@ -42,8 +42,8 @@ StreetMap::AddStreet(Street *s)
             /* restart for loop */
             if (counter > 1) {
                 if (crossedStreet == positionOnMap.front()->name) {
-                    x = s->start->y == s->end->y ? s->start->x - 1 : s->start->x;
-                    y = s->start->x == s->end->x ? s->start->y - 1 : s->start->y;
+                    x = s->start.y == s->end.y ? s->start.x - 1 : s->start.x;
+                    y = s->start.x == s->end.x ? s->start.y - 1 : s->start.y;
                     counter = -1;
                 } else {
                     counter = 0;
@@ -112,9 +112,9 @@ StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 
     Square *square;
     /* change street color according to traffic */
-    if (street->start->x == street->end->x) {
-        for (int i = street->start->y; i <= street->end->y; i++) {
-            square = Square::layout[street->start->x][i];
+    if (street->start.x == street->end.x) {
+        for (int i = street->start.y; i <= street->end.y; i++) {
+            square = Square::layout[street->start.x][i];
             if (updateSlowdown < 1.33) {
                 if (!square->roadBlock)
                     square->SetColor("#C0C0C0");
@@ -130,8 +130,8 @@ StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
         }
     }
     else {
-        for (int i = street->start->x; i <= street->end->x; i++) {
-            square = Square::layout[i][street->start->y];
+        for (int i = street->start.x; i <= street->end.x; i++) {
+            square = Square::layout[i][street->start.y];
             if (updateSlowdown < 1.33) {
                 if (!square->roadBlock)
                     square->SetColor("#C0C0C0");
@@ -152,8 +152,8 @@ void
 StreetMap::AddStreets(const std::string& pathToFile)
 {
     QString color;
-    Coordinates *start;
-    Coordinates *end;
+    Coordinates::Coordinates_S start;
+    Coordinates::Coordinates_S end;
     std::ifstream file;
     std::string line;
     std::vector<std::string> tokens;
@@ -166,8 +166,10 @@ StreetMap::AddStreets(const std::string& pathToFile)
         tokens = Functions::Split(line, " ");
         IF(tokens.empty(), break)
         /* coordinates of street */
-        start = new Coordinates(std::stoi(tokens[1]), std::stoi(tokens[2]));
-        end = new Coordinates(std::stoi(tokens[3]), std::stoi(tokens[4]));
+        start.x = std::stoi(tokens[1]);
+        start.y = std::stoi(tokens[2]);
+        end.x = std::stoi(tokens[3]);
+        end.y = std::stoi(tokens[4]);
         /* add street to map */
         insert = StreetMap::AddStreet(new Street(tokens[0], start, end, 1));
         if (!insert) std::cerr << "Warning: Street " << tokens[0] <<  " cannot be added to map" << std::endl;
@@ -210,11 +212,12 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
             square->SetColor("#FFFFFF");
             square->hasStop = true;
 
-            Stop *stop = new Stop(tokens[0],new Coordinates(x, y));
-            /* add stop to list for each street */
-            street->SetStop(stop);
-
-            stopInfo.stop = stop;
+            Coordinates::Coordinates_S coordinates;
+            coordinates.x = x;
+            coordinates.y = y;
+            Stop *stop = new Stop(tokens[0], coordinates);
+            /* add stop to list */
+            stopList.emplace(stop, coordinates);
 
             /* add stop to scene */
             stopInfo.photo = stop->AddStopToScene(scene, path);
@@ -227,4 +230,34 @@ StreetMap::AddStops(const std::string& pathToFile, QGraphicsScene *scene)
     }
     std::vector<std::string>().swap(tokens);
     file.close();
+}
+
+std::map<Stop*, Coordinates::Coordinates_S> StreetMap::stopList;
+
+Coordinates::Coordinates_S
+StreetMap::GetStopByName(const std::string& name)
+{
+    for (const auto& stop : stopList) {
+        if (stop.first->stopName == name) {
+            return stop.second;
+        }
+    }
+
+    Coordinates::Coordinates_S coordinates;
+    coordinates.x = -1;
+    coordinates.y = -1;
+
+    return coordinates;
+}
+
+std::string
+StreetMap::GetStopByCoordinates(int x, int y)
+{
+    for (const auto& stop : stopList) {
+        if (stop.second.x == x && stop.second.y == y) {
+            return stop.first->stopName;
+        }
+    }
+
+    return "";
 }

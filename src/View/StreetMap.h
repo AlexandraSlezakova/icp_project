@@ -11,8 +11,7 @@
 class StreetMap : public QGraphicsRectItem
 {
 public:
-    struct stopData
-    {
+    struct stopData {
         Stop *stop;
         QGraphicsPixmapItem *photo;
     };
@@ -57,8 +56,18 @@ public:
      */
     void UpdateStreet(const std::string& name, float updateSlowdown);
 
+    /**
+     * @brief get coordinates of stop by name
+     * @param name name of stop
+     * @return coordinates of stop or nullptr
+     */
+    static Coordinates::Coordinates_S GetStopByName(const std::string& name);
+
+    static std::string GetStopByCoordinates(int x, int y);
+
     std::vector<Street*> Map[X][Y]{};   //!< map of streets
     std::vector<stopData> stopped;
+    static std::map<Stop*, Coordinates::Coordinates_S> stopList;    //!< list of stops
 };
 
 #endif // STREETMAP_H

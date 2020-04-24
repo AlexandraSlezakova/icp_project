@@ -1,6 +1,6 @@
 #include "Street.h"
 
-Street::Street(std::string s, Coordinates *start, Coordinates *end, float slowdown)
+Street::Street(std::string s, Coordinates::Coordinates_S start, Coordinates::Coordinates_S end, float slowdown)
 {
     this->name = std::move(s);
     this->start = start;
@@ -9,9 +9,3 @@ Street::Street(std::string s, Coordinates *start, Coordinates *end, float slowdo
 }
 
 Street::~Street() =default;
-
-void
-Street::SetStop(Stop *stop)
-{
-    busStopsList.push_back(stop);
-}

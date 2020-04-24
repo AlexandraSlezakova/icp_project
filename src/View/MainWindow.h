@@ -93,9 +93,8 @@ public slots:
 protected:
     /**
      * @brief display current time
-     * @param event
      */
-    void timerEvent(QTimerEvent *event) override;
+    void timerEvent(QTimerEvent *) override;
 
 private:
     void TimeShiftForward(int hourNow, int minuteNow);

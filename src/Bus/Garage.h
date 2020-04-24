@@ -8,7 +8,6 @@
 #define ICP_PROJECT_GARAGE_H
 
 #include "Bus.h"
-#include "../View/StreetMap.h"
 
 class Garage
 {

@@ -58,7 +58,7 @@ MainWindow::CreateScene()
 }
 
 void
-MainWindow::timerEvent(QTimerEvent *event)
+MainWindow::timerEvent(QTimerEvent*)
 {
     timeArea->clear();
     timeArea->appendPlainText(Timer::GetTime());
@@ -193,7 +193,7 @@ void MainWindow::InitSliders(QWidget *parent) {
     combobox->move(5,850);
     combobox->setFixedSize(150, 40);
 
-    file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
+    file.open(Functions::GetAbsolutePath("../examples/ulice.txt"));
 
     /* add choice to streetpicker */
     while (std::getline(file, line)) {

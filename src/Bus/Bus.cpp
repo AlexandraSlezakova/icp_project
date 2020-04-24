@@ -4,11 +4,12 @@
 #include "../View/Timer.h"
 #include "../View/StreetMap.h"
 
-Bus::Bus(int id, int busNumber, Coordinates *position, int busIteration)
+Bus::Bus(int id, int busNumber, int busIteration)
 {
     id_ = id;
     busNumber_ = busNumber;
-    busPosition = position;
+    busPosition.x = 0;
+    busPosition.y = 0;
     iteration = busIteration;
     roadStopOnRoad = false;
     LoadTimetable();
@@ -17,8 +18,6 @@ Bus::Bus(int id, int busNumber, Coordinates *position, int busIteration)
 Bus::~Bus()
 {
     std::vector<Coordinates::busStop>().swap(stopInformation);
-    delete busPosition;
-    busPosition = nullptr;
     delete busPhoto;
     busPhoto = nullptr;
 }
@@ -30,10 +29,10 @@ Bus::LoadTimetable()
     std::ostringstream ss;
     std::string line, minute;
     std::vector<std::string> tokens;
-    int stopHour, stopMin, id = 0;
-    Coordinates *coordinates;
+    int stopHours, stopMinutes, id = 0;
+    Coordinates::Coordinates_S coordinates;
 
-    ss << "../files/bus-route-map/" << std::to_string(busNumber_) << ".txt";
+    ss << "../examples/bus-route-map/" << std::to_string(busNumber_) << ".txt";
     std::string path = Functions::GetAbsolutePath(ss.str().c_str());
     ss.clear();
 
@@ -45,22 +44,27 @@ Bus::LoadTimetable()
      * and name of bus stops [3] */
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
-      
-        stopHour = std::stoi(tokens[0]) + Timer::GetHour();
-        stopMin = std::stoi(tokens[1]);
-        coordinates = Stop::GetStopByName(tokens[2]);
+
+        stopHours = std::stoi(tokens[0]) + Timer::GetHour();
+        stopMinutes = std::stoi(tokens[1]);
+        coordinates = StreetMap::GetStopByName(tokens[2]);
 
         if (iteration) {
-            stopMin += (iteration * 10);
-            if (stopMin >= 60) {
-                stopHour++;
-                stopMin -= 60;
-                IF(stopHour == 24, stopHour = 0)
+            stopMinutes += (iteration * 10);
+            if (stopMinutes >= 60) {
+                stopHours++;
+                stopMinutes -= 60;
+                IF(stopHours == 24, stopHours = 0)
             }
         }
 
-        Coordinates::Coordinates_S coordinatesS = {coordinates->x, coordinates->y};
-        Coordinates::BusStop_S information = {coordinatesS, stopHour, stopMin, tokens[2], id};
+        Coordinates::BusStop_S information;
+        information.coordinates = coordinates;
+        information.stopHour = stopHours;
+        information.stopMin = stopMinutes;
+        information.name = tokens[2];
+        information.id = id;
+
         /* save information */
         stopInformation.push_back(information);
         id++;
@@ -126,13 +130,13 @@ Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
 }
 
 void
-Bus::InitBus(QGraphicsScene *scene, std::string pathPic)
+Bus::InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y)
 {
-    QString path = QString::fromStdString(Functions::GetAbsolutePath(pathPic.c_str()));
+    QString path = QString::fromStdString(Functions::GetAbsolutePath(imagePath));
     busPhoto = new QGraphicsPixmapItem(QPixmap(path));
     busPhoto->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
     busPhoto->setScale(0.06);
-    busPhoto->setPos(0, 0 - 5);
+    busPhoto->setPos(x, y - 5);
     scene->addItem(busPhoto);
 }
 
@@ -142,10 +146,7 @@ Bus::MoveBus()
     int secNow, x, y, xShift = 0, yShift = 0;
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    Coordinates::BusStop_S next, current;
-    int rotation;
     int stopInfoSize = (int)stopInformation.size() - 1;
-
 
     if (minuteNow >= nextBusStop.stopMin && nextBusStop.id == stopInfoSize) {
         deleteBus = 1;
@@ -157,13 +158,11 @@ Bus::MoveBus()
     y = currentBusStop.coordinates.y;
     deleteBus = 0;
 
-    BusRotation(x, y, next);
-
-    busPhoto->setRotation(rotation);
+    BusRotation(x, y, nextBusStop);
 
     /* moving along the X axis */
     if (nextBusStop.coordinates.y == y) {
-        x = Bus::GetCoordinate(hourNow,minuteNow,secNow, 1, currentBusStop, nextBusStop);
+        x = Bus::GetCoordinate(hourNow, minuteNow, secNow, 1, currentBusStop, nextBusStop);
         yShift = -5;
 
     } /* moving along the Y axis */
@@ -172,21 +171,21 @@ Bus::MoveBus()
         xShift = currentBusStop.coordinates.y < nextBusStop.coordinates.y ? 25 : -5;
     }
 
-    busPosition->x = x;
-    busPosition->y = y;
+    busPosition.x = x;
+    busPosition.y = y;
     busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
 }
 
 void Bus::BusRotation(int x, int y, const Coordinates::BusStop_S &next) const {
     int rotation = 0;
-    if (next.coordinates->x > x) {
+    if (next.coordinates.x > x) {
         busPhoto->setTransform(QTransform::fromScale(1, 1));
     }
-    else if (next.coordinates->x < x) {
+    else if (next.coordinates.x < x) {
         busPhoto->setTransform(QTransform::fromScale(-1, 1));
     }
     else {
-        if( next.coordinates->y > y ) {
+        if (next.coordinates.y > y ) {
             rotation = 90;
             busPhoto->setTransform(QTransform::fromScale(1, 1));
         }
