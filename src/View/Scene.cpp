@@ -2,7 +2,7 @@
 
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
-    scene = new QGraphicsScene();
+    graphicsScene = new QGraphicsScene();
     SetUpView();
     CreateMap();
 }
@@ -15,7 +15,7 @@ Scene::CreateMap()
     map = new StreetMap();
     /* initialize streets and bus stops */
     map->AddStreets(Functions::GetAbsolutePath("../files/ulice.txt"));
-    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), scene);
+    map->AddStops(Functions::GetAbsolutePath("../files/zastavky.txt"), graphicsScene);
     /* add squares to scene */
     AddSquares();
     /* add buses */
@@ -23,11 +23,51 @@ Scene::CreateMap()
 }
 
 void
-Scene::AddBuses(int iteration)
+Scene::AddBuses() {
+    int iteration = 0;
+
+    if (busId >= 3) {
+        iteration = garage.allBuses[garage.allBuses.size() - 1]->iteration + 1;
+    }
+
+    garage.AddBus(busId++, 1, graphicsScene, iteration);
+    garage.AddBus(busId++, 2, graphicsScene, iteration);
+    garage.AddBus(busId++, 3, graphicsScene, iteration);
+
+    if (busId == 3) {
+        /* add the number of buses to the scene according to current time */
+        AddBusOneByOne();
+        return;
+    }
+}
+
+void
+Scene::AddBusOneByOne()
 {
-    static int busId = 0;
-    garage.AddBus(busId++, 1, scene, iteration);
-    garage.AddBus(busId++, 2, scene, iteration);
+    static int route = 3;
+    static int busNumber = 1;
+    static int originalBusId = busId;
+
+    if (!route && busNumber > 3) {
+        route = 3;
+        busNumber = 1;
+    }
+
+    Bus *found = garage.GetBus(originalBusId - route);
+    int minuteNow = Timer::GetMinute();
+    int stopMin = found->stopInformation[0].stopMin;
+
+    if (minuteNow >= stopMin + 10) {
+        minuteNow /= 10;
+        for (int i = 0; i < minuteNow; i++) {
+            garage.AddBus(busId, busNumber, graphicsScene, i + 1);
+            busId++;
+        }
+    }
+
+    route--;
+    busNumber++;
+    IF(route, AddBusOneByOne())
 }
 
 void
@@ -35,7 +75,7 @@ Scene::AddSquares()
 {
     for (auto &x : Square::layout) {
         for (auto &y : x) {
-            scene->addItem(y);
+            graphicsScene->addItem(y);
         }
     }
 }
@@ -46,7 +86,7 @@ Scene::SetUpView()
     setFixedSize(X * SQUARE_SIZE, Y * SQUARE_SIZE);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setScene(scene);
+    setScene(graphicsScene);
 }
 
 void
@@ -108,7 +148,8 @@ Scene::mousePressEvent(QMouseEvent *event)
 }
 
 void
-Scene::mouseReleaseEvent(QMouseEvent *event){
+Scene::mouseReleaseEvent(QMouseEvent *event)
+{
     if (event->button() == Qt::RightButton) {
         m_moving = false;
         setCursor(Qt::ArrowCursor);
@@ -153,7 +194,7 @@ Scene::ZoomSub()
 void
 Scene::MoveBuses()
 {
-    garage.MoveAllBuses(map);
+    garage.MoveAllBuses(map, graphicsScene);
 }
 
 void
@@ -170,7 +211,7 @@ Scene::SquareRoadBlock(Square* square, bool onOff)
 
     int x = square->row;
     int y = square->col;
-    int start_int,end_int;
+    int startInt,endInt;
     Coordinates *start,*end;
     QMessageBox Msgbox;
     bool xy;
@@ -183,34 +224,34 @@ Scene::SquareRoadBlock(Square* square, bool onOff)
         return;
 
     if (x + 1 >= 0 and x + 1 < 138)
-        start_int = x + 1;
+        startInt = x + 1;
     else
-        start_int = x - 1;
+        startInt = x - 1;
 
     /* distance between stops x axis */
-    if (Square::layout[start_int][y]->road) {
-        start_int = x;
-        end_int = x;
+    if (Square::layout[startInt][y]->road) {
+        startInt = x;
+        endInt = x;
         xy = true;
-        for (; !Square::layout[end_int + 1][y]->hasStop; end_int++) {
+        for (; !Square::layout[endInt + 1][y]->hasStop; endInt++) {
         }
-        for (; !Square::layout[start_int - 1][y]->hasStop; start_int--) {
+        for (; !Square::layout[startInt - 1][y]->hasStop; startInt--) {
         }
 
-        start = new Coordinates(start_int, y);
-        end = new Coordinates(end_int, y);
+        start = new Coordinates(startInt, y);
+        end = new Coordinates(endInt, y);
     }
     /* y axis */
     else {
-        start_int = y;
-        end_int = y;
+        startInt = y;
+        endInt = y;
         xy = false;
-        for (; !Square::layout[x][end_int + 1]->hasStop; end_int++) {
+        for (; !Square::layout[x][endInt + 1]->hasStop; endInt++) {
         }
-        for (; !Square::layout[x][start_int - 1]->hasStop; start_int--) {
+        for (; !Square::layout[x][startInt - 1]->hasStop; startInt--) {
         }
-        start = new Coordinates(x, start_int);
-        end = new Coordinates(x, end_int);
+        start = new Coordinates(x, startInt);
+        end = new Coordinates(x, endInt);
 
     }
 
@@ -230,26 +271,30 @@ Scene::SquareRoadBlock(Square* square, bool onOff)
         }
     }
 
+    Square *squareX, *squareY;
     /* Add RoadStop */
-    for (; start_int <= end_int; start_int++) {
+    for (; startInt <= endInt; startInt++) {
+        squareX = Square::layout[x][startInt];
+        squareY = Square::layout[startInt][y];
+
         if (onOff) {
             if (xy) {
-                Square::layout[start_int][y]->roadBlock = true;
-                Square::layout[start_int][y]->SetColor("#FF0000");
+                squareY->roadBlock = true;
+                squareY->SetColor("#FF0000");
             }
             else {
-                Square::layout[x][start_int]->roadBlock = true;
-                Square::layout[x][start_int]->SetColor("#FF0000");
+                squareX->roadBlock = true;
+                squareX->SetColor("#FF0000");
             }
         }
         else {
             if (xy) {
-                Square::layout[start_int][y]->roadBlock = false;
-                Square::layout[start_int][y]->SetColor("#C0C0C0");
+                squareY->roadBlock = false;
+                squareY->SetColor("#C0C0C0");
             }
             else {
-                Square::layout[x][start_int]->roadBlock = false;
-                Square::layout[x][start_int]->SetColor("#C0C0C0");
+                squareX->roadBlock = false;
+                squareX->SetColor("#C0C0C0");
             }
         }
     }
@@ -277,37 +322,47 @@ Scene::BusStopRoadBlock(StreetMap::stopData stop)
         Square::layout[stop.stop->coordinates->x][stop.stop->coordinates->y]->roadBlock = false;
     }
 
-    stop.photo = stop.stop->AddStopToScene(scene, path);
+    stop.photo = stop.stop->AddStopToScene(graphicsScene, path);
 
     return stop;
 }
 
 void
+Scene::InitTimetableArea(QWidget *parent, int width, int height)
+{
+    /* text area for bus timetable */
+    textArea = new QPlainTextEdit(parent);
+    textArea->setMinimumSize(width * 0.19, height * 0.6);
+    textArea->move(5, 115);
+}
+
+void
 Scene::ShowRoute(QGraphicsItem *photo)
 {
-    static std::vector<QGraphicsItem*> busPhotoStorage;
-    static Bus *bus;
-    QString colors[4] = {"", "#ff4040", "#75a298", "#daccc4"};
-    std::string routeColor = "#c0c0c0";
+    static Bus *seenBus = nullptr;
+    Bus *bus;
+    QString colors[4] = {"", "#9f92ca", "#f46c6e", "#77bcbd"};
+    QString routeColor = "#c0c0c0";
 
-    /* find photo in storage */
-    auto end = std::end(busPhotoStorage);
-    auto found = std::find(std::begin(busPhotoStorage), end, photo);
     bus = garage.GetBusByPhoto(photo);
+    if (!seenBus || seenBus != bus) {
+        if (seenBus && seenBus != bus) {
+            BusRouteMap::DrawLine(seenBus->stopInformation, routeColor);
+            textArea->clear();
+        }
 
-    if (found == end) {
         if (!bus) {
             std::cerr << "Error: Bus not found\n";
         }
         else {
-            busPhotoStorage.push_back(photo);
-            bus->CreateTimetable(colors[bus->busNumber_]);
+            seenBus = bus;
+            bus->CreateTimetable(colors[bus->busNumber_], textArea);
         }
     } /* second click on same bus changes route to default color */
     else {
-        BusRouteMap::DrawLine(bus->stopInformation, QString::fromStdString(routeColor));
-        bus->ClearTextArea();
-        busPhotoStorage.erase(found);
+        BusRouteMap::DrawLine(bus->stopInformation, routeColor);
+        textArea->clear();
+        seenBus = nullptr;
     }
 }
 
@@ -316,7 +371,6 @@ Scene::CheckRoadBlockBus()
 {
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    int secNow = Timer::GetSecond();
     int i = 0;
 
     for (auto *bus : garage.allBuses) {
@@ -333,14 +387,14 @@ Scene::CheckRoadBlockBus()
         }
 
         for (; i < bus->stopInformation.size() - 2; i++) {
-            if (Square::layout[bus->stopInformation[i].coordinates->x][bus->stopInformation[i].coordinates->y]->roadBlock) {
+            if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
                 /* roadStop on road */
                 //std::cerr << "Stop Closed " << bus->stopInformation[i].name << "\n";
                 bus->roadStopOnRoad = true;
             }
             /* street going vertically */
-            if (bus->stopInformation[i].coordinates->x == bus->stopInformation[i+1].coordinates->x ) {
-                if (Square::layout[bus->stopInformation[i].coordinates->x][(bus->stopInformation[i].coordinates->y + bus->stopInformation[i + 1].coordinates->y) / 2 ]->roadBlock) {
+            if (bus->stopInformation[i].coordinates.x == bus->stopInformation[i + 1].coordinates.x ) {
+                if (Square::layout[bus->stopInformation[i].coordinates.x][(bus->stopInformation[i].coordinates.y + bus->stopInformation[i + 1].coordinates.y) / 2 ]->roadBlock) {
                     //std::cerr << "RoadStop between " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
                     /* roadStop */
                     bus->roadStopOnRoad = true;
