@@ -22,6 +22,8 @@ public:
      */
     explicit Square(QGraphicsRectItem *parent = nullptr);
 
+    ~Square();
+
     /**
      * @brief set color of square
      * @param name color in hex format

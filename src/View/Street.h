@@ -22,7 +22,7 @@ public:
      * @param start coordinates of start of street
      * @param end coordinates of end of street
      */
-    Street(std::string s, Coordinates::Coordinates_S start, Coordinates::Coordinates_S end,float slowdown);
+    Street(std::string s, Coordinates::Coordinates_S start, Coordinates::Coordinates_S end, float slowdown);
 
     ~Street();
 

@@ -24,6 +24,8 @@ public:
      */
     explicit Scene(QWidget *parent = nullptr);
 
+    ~Scene();
+
     /**
      * @brief create map with streets, bus stops and buses
      */

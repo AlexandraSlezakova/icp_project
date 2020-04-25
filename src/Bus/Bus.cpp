@@ -215,7 +215,7 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
         timerStop = abs( (next.stopMin + 60) - currentBusStop.stopMin) * 60 ;
 
     /* avg bus movement one square for x sec */
-    int avgMove = std::nearbyint(timerStop / countSquare);
+    int avgMove = !countSquare ? 11 : std::nearbyint(timerStop / countSquare);
     /*  time when bus past last stop */
     int moved = 0;
 

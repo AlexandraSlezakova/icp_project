@@ -102,8 +102,6 @@ Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
     allBuses.erase(found);
     scene->removeItem(bus->busPhoto);
     delete bus;
-    /* set to nullptr to avoid crashing on double delete */
-    bus = nullptr;
 }
 
 void
@@ -181,7 +179,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
     std::string streetName;
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
-    Street *street;
+    std::shared_ptr<Street> street;
     int timeAdd;
     int i = 0;
     int stopTime;

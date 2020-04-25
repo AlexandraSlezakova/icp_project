@@ -2,9 +2,22 @@
 
 Scene::Scene(QWidget *parent) : QGraphicsView(parent)
 {
-    graphicsScene = new QGraphicsScene();
+    graphicsScene = new QGraphicsScene(parent);
     SetUpView();
     CreateMap();
+}
+
+Scene::~Scene()
+{
+    /* delete all buses and map */
+    garage.DeleteBuses(graphicsScene);
+    for (auto list : StreetMap::stopList) {
+        delete list.stop;
+        delete list.photo;
+    }
+    std::vector<StreetMap::stopData>().swap(StreetMap::stopList);
+    delete map;
+    delete markedBus;
 }
 
 void
@@ -193,8 +206,8 @@ Scene::mousePressEvent(QMouseEvent *event)
 
                 }
                 else if (photo) {
-                    for (auto &i : map->stopped) {
-                        if (i.photo == photo) {
+                    for (auto &list : StreetMap::stopList) {
+                        if (list.photo == photo) {
 
                         }
                     }
@@ -209,7 +222,7 @@ Scene::mousePressEvent(QMouseEvent *event)
                 SquareRoadBlock(square, !square->roadBlock);
             }
             else if (photo) {
-                for (auto &i : map->stopped) {
+                for (auto &i : StreetMap::stopList) {
                     if (i.photo == photo) {
                         i = BusStopRoadBlock(i);
                     }

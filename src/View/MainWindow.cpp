@@ -12,6 +12,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 MainWindow::~MainWindow()
 {
+    for (auto &x : Square::layout) {
+        for (auto &y : x) {
+            delete y;
+        }
+    }
+
     delete ui;
 }
 
@@ -38,12 +44,12 @@ MainWindow::CreateScene()
 {
     QScrollArea *scrollArea = new QScrollArea(this);
     scrollArea->setMinimumSize(width * 0.7, height * 0.9);
+
     /* create scene */
     scene = new Scene(scrollArea);
     scrollArea->setWidget(scene);
 
     QWidget *widget = new QWidget(this);
-    /* move widget */
     widget->move(width * 0.7, 0);
     widget->setMinimumSize(width * 0.3, height * 0.9);
 
@@ -182,7 +188,9 @@ MainWindow::InitButtons(QWidget *parent)
     connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
 }
 
-void MainWindow::InitSliders(QWidget *parent) {
+void
+MainWindow::InitSliders(QWidget *parent)
+{
 
     std::ifstream file;
     std::string line;
