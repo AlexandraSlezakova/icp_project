@@ -50,31 +50,31 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = View/MainWindow.cpp \
-		View/Square.cpp \
-		View/Scene.cpp \
-		main.cpp \
-		View/Coordinates.cpp \
-		Functions.cpp \
+SOURCES       = Bus/Bus.cpp \
+		Bus/BusRouteMap.cpp \
+		Bus/Garage.cpp \
 		Bus/Stop.cpp \
+		View/MainWindow.cpp \
+		View/Scene.cpp \
+		View/Square.cpp \
 		View/Street.cpp \
 		View/StreetMap.cpp \
-		Bus/Bus.cpp \
-		Bus/BusRouteMap.cpp \
-		View/Timer.cpp moc_MainWindow.cpp \
+		View/Timer.cpp \
+		main.cpp \
+		Functions.cpp moc_MainWindow.cpp \
 		moc_Scene.cpp
-OBJECTS       = MainWindow.o \
-		Square.o \
-		Scene.o \
-		main.o \
-		Coordinates.o \
-		Functions.o \
+OBJECTS       = Bus.o \
+		BusRouteMap.o \
+		Garage.o \
 		Stop.o \
+		MainWindow.o \
+		Scene.o \
+		Square.o \
 		Street.o \
 		StreetMap.o \
-		Bus.o \
-		BusRouteMap.o \
 		Timer.o \
+		main.o \
+		Functions.o \
 		moc_MainWindow.o \
 		moc_Scene.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -154,29 +154,30 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		src.pro View/MainWindow.h \
-		View/Square.h \
-		View/Scene.h \
-		main.h \
-		View/Coordinates.h \
-		Functions.h \
+		src.pro Bus/Bus.h \
+		Bus/BusRouteMap.h \
+		Bus/Garage.h \
 		Bus/Stop.h \
+		View/Coordinates.h \
+		View/MainWindow.h \
+		View/Scene.h \
+		View/Square.h \
 		View/Street.h \
 		View/StreetMap.h \
-		Bus/Bus.h \
-		Bus/BusRouteMap.h \
-		View/Timer.h View/MainWindow.cpp \
-		View/Square.cpp \
-		View/Scene.cpp \
-		main.cpp \
-		View/Coordinates.cpp \
-		Functions.cpp \
+		View/Timer.h \
+		main.h \
+		Functions.h Bus/Bus.cpp \
+		Bus/BusRouteMap.cpp \
+		Bus/Garage.cpp \
 		Bus/Stop.cpp \
+		View/MainWindow.cpp \
+		View/Scene.cpp \
+		View/Square.cpp \
 		View/Street.cpp \
 		View/StreetMap.cpp \
-		Bus/Bus.cpp \
-		Bus/BusRouteMap.cpp \
-		View/Timer.cpp
+		View/Timer.cpp \
+		main.cpp \
+		Functions.cpp
 QMAKE_TARGET  = icp
 DESTDIR       = 
 TARGET        = icp
@@ -366,8 +367,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents View/MainWindow.h View/Square.h View/Scene.h main.h View/Coordinates.h Functions.h Bus/Stop.h View/Street.h View/StreetMap.h Bus/Bus.h Bus/BusRouteMap.h View/Timer.h $(DISTDIR)/
-	$(COPY_FILE) --parents View/MainWindow.cpp View/Square.cpp View/Scene.cpp main.cpp View/Coordinates.cpp Functions.cpp Bus/Stop.cpp View/Street.cpp View/StreetMap.cpp Bus/Bus.cpp Bus/BusRouteMap.cpp View/Timer.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Bus/Bus.h Bus/BusRouteMap.h Bus/Garage.h Bus/Stop.h View/Coordinates.h View/MainWindow.h View/Scene.h View/Square.h View/Street.h View/StreetMap.h View/Timer.h main.h Functions.h $(DISTDIR)/
+	$(COPY_FILE) --parents Bus/Bus.cpp Bus/BusRouteMap.cpp Bus/Garage.cpp Bus/Stop.cpp View/MainWindow.cpp View/Scene.cpp View/Square.cpp View/Street.cpp View/StreetMap.cpp View/Timer.cpp main.cpp Functions.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -453,82 +454,6 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-MainWindow.o: View/MainWindow.cpp View/MainWindow.h \
-		View/Scene.h \
-		View/StreetMap.h \
-		Bus/BusRouteMap.h \
-		View/Street.h \
-		Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h \
-		View/Square.h \
-		Bus/Garage.h \
-		Bus/Bus.h \
-		../build-src-Desktop-Debug/ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o View/MainWindow.cpp
-
-Square.o: View/Square.cpp View/Square.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Square.o View/Square.cpp
-
-Scene.o: View/Scene.cpp View/Scene.h \
-		View/StreetMap.h \
-		Bus/BusRouteMap.h \
-		View/Street.h \
-		Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h \
-		View/Square.h \
-		Bus/Garage.h \
-		Bus/Bus.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Scene.o View/Scene.cpp
-
-main.o: main.cpp main.h \
-		View/MainWindow.h \
-		View/Scene.h \
-		View/StreetMap.h \
-		Bus/BusRouteMap.h \
-		View/Street.h \
-		Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h \
-		View/Square.h \
-		Bus/Garage.h \
-		Bus/Bus.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
-
-Coordinates.o: View/Coordinates.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Coordinates.o View/Coordinates.cpp
-
-Functions.o: Functions.cpp Functions.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Functions.o Functions.cpp
-
-Stop.o: Bus/Stop.cpp Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Stop.o Bus/Stop.cpp
-
-Street.o: View/Street.cpp View/Street.h \
-		Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h \
-		View/Square.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Street.o View/Street.cpp
-
-StreetMap.o: View/StreetMap.cpp View/StreetMap.h \
-		Bus/BusRouteMap.h \
-		View/Street.h \
-		Bus/Stop.h \
-		View/Coordinates.h \
-		Functions.h \
-		View/Timer.h \
-		View/Square.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o StreetMap.o View/StreetMap.cpp
-
 Bus.o: Bus/Bus.cpp Bus/Bus.h \
 		View/StreetMap.h \
 		Bus/BusRouteMap.h \
@@ -549,9 +474,94 @@ BusRouteMap.o: Bus/BusRouteMap.cpp Bus/BusRouteMap.h \
 		View/Square.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BusRouteMap.o Bus/BusRouteMap.cpp
 
+Garage.o: Bus/Garage.cpp Bus/Garage.h \
+		Bus/Bus.h \
+		View/StreetMap.h \
+		Bus/BusRouteMap.h \
+		View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Garage.o Bus/Garage.cpp
+
+Stop.o: Bus/Stop.cpp Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Stop.o Bus/Stop.cpp
+
+MainWindow.o: View/MainWindow.cpp View/MainWindow.h \
+		View/Scene.h \
+		View/StreetMap.h \
+		Bus/BusRouteMap.h \
+		View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h \
+		Bus/Garage.h \
+		Bus/Bus.h \
+		../build-src-Desktop-Debug/ui_mainwindow.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o View/MainWindow.cpp
+
+Scene.o: View/Scene.cpp View/Scene.h \
+		View/StreetMap.h \
+		Bus/BusRouteMap.h \
+		View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h \
+		Bus/Garage.h \
+		Bus/Bus.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Scene.o View/Scene.cpp
+
+Square.o: View/Square.cpp View/Square.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Square.o View/Square.cpp
+
+Street.o: View/Street.cpp View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Street.o View/Street.cpp
+
+StreetMap.o: View/StreetMap.cpp View/StreetMap.h \
+		Bus/BusRouteMap.h \
+		View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o StreetMap.o View/StreetMap.cpp
+
 Timer.o: View/Timer.cpp View/Timer.h \
 		Functions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Timer.o View/Timer.cpp
+
+main.o: main.cpp main.h \
+		View/MainWindow.h \
+		View/Scene.h \
+		View/StreetMap.h \
+		Bus/BusRouteMap.h \
+		View/Street.h \
+		Bus/Stop.h \
+		View/Coordinates.h \
+		Functions.h \
+		View/Timer.h \
+		View/Square.h \
+		Bus/Garage.h \
+		Bus/Bus.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+
+Functions.o: Functions.cpp Functions.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Functions.o Functions.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MainWindow.o moc_MainWindow.cpp

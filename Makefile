@@ -7,7 +7,6 @@ FILES = Makefile \
 	src/main.h \
 	src/mainwindow.ui \
 	src/src.pro \
-	src/src.pro.user \
 	src/ui_mainwindow.h
 	
 DELETE = src/Bus.o \
@@ -47,7 +46,7 @@ pack:
 clean:
 	rm -rf doc/latex/*
 	rm -rf doc/html/*
-	rm -r doc/latex
-	rm -r doc/html
+	rm -rf doc/latex
+	rm -rf doc/html
 	rm -rf $(DELETE)
-	rm -r xvadur04-xsleza20.zip
+	rm -rf xvadur04-xsleza20.zip
