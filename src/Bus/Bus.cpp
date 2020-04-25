@@ -14,8 +14,11 @@ Bus::Bus(int id, int busNumber, int busIteration)
 Bus::~Bus()
 {
     std::vector<Coordinates::busStop>().swap(stopInformation);
-    delete busPhoto;
-    busPhoto = nullptr;
+
+    if (busPhoto) {
+        delete busPhoto;
+        busPhoto = nullptr;
+    }
 }
 
 void
@@ -50,7 +53,6 @@ Bus::LoadTimetable()
             if (stopMinutes >= 60) {
                 stopHours++;
                 stopMinutes -= 60;
-                IF(stopHours == 24, stopHours = 0)
             }
         }
 
@@ -84,13 +86,19 @@ Bus::LoadTimetable()
             if (info->stopMin >= 60) {
                 info->stopHour++;
                 info->stopMin -= 60;
-                IF(info->stopHour == 24, info->stopHour = 0)
             }
         }
     }
 
     currentBusStop = stopInformation[0];
     nextBusStop = stopInformation[1];
+
+    /* buses with arrival time at first bus stops greater than midnight are deleted */
+    int midnight = 23 * 60 + 60;
+    stopHours = stopInformation[size - 1].stopHour;
+    IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
+    int lastBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
+    IF(lastBusStop > midnight, deleteBus = 1)
 
     file.close();
 }

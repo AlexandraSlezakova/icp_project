@@ -74,8 +74,10 @@ MainWindow::timerEvent(QTimerEvent*)
 
     int hour = Timer::GetHour();
     if (hour >= 0 && hour < 6) {
-        NightTime();
-        nightFlag = 1;
+        if (!nightFlag) {
+            NightTime();
+            nightFlag = 1;
+        }
     }
     else if (nightFlag) {
         nightFlag = 0;
@@ -104,8 +106,7 @@ MainWindow::NightTime()
     nightTimeLabel->move(5, TIME_AREA_HEIGHT + 10);
     nightTimeLabel->setFixedSize(300, 35);
     nightTimeLabel->setStyleSheet("color: red; font-weight: bold;");
-    nightTimeLabel->setText("Warning: buses don't move \nbetween midnight and 6AM");
-    scene->garage.DeleteBuses(scene->graphicsScene);
+    nightTimeLabel->setText("Warning: new buses are not created \nbetween midnight and 6AM");
 }
 
 void
@@ -265,6 +266,8 @@ MainWindow::ReadInput()
 void
 MainWindow::TimeShiftForward(int hourNow, int minuteNow)
 {
+    IF(hourNow >= 0 && hourNow < 6, return)
+
     int minute;
     int allBusesSize = scene->garage.allBuses.size();
     int iteration;
@@ -327,7 +330,9 @@ void
 MainWindow::ResetTimer()
 {
     Timer::ResetTime();
+    killTimer(timerId);
     timerInterval = 1000;
+    timerId = startTimer(timerInterval);
     timerLabel->setText("Timer interval = " + QString::number(100) + "%");
 }
 

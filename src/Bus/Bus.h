@@ -19,7 +19,7 @@ public:
     int id_;                                                //!< id of bus
     int busNumber_;                                         //!< number of bus
     int iteration;                                          //!< iteration of bus on the map, default is 0
-    int deleteBus;                                          //!< flag if bus should be deleted
+    int deleteBus = 0;                                      //!< flag if bus should be deleted
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
     Coordinates::Coordinates_S busPosition;                 //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus

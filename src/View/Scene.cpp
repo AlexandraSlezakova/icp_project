@@ -67,14 +67,16 @@ Scene::AddBusOneByOne()
     }
 
     Bus *found = garage.GetBus(originalBusId - route);
-    int minuteNow = Timer::GetMinute();
-    int stopMin = found->stopInformation[0].stopMin;
+    if (found) {
+        int minuteNow = Timer::GetMinute();
+        int stopMin = found->stopInformation[0].stopMin;
 
-    if (minuteNow >= stopMin + 10) {
-        minuteNow /= 10;
-        for (int i = 0; i < minuteNow; i++) {
-            garage.AddBus(busId, busNumber, graphicsScene, i + 1);
-            busId++;
+        if (minuteNow >= stopMin + 10) {
+            minuteNow /= 10;
+            for (int i = 0; i < minuteNow; i++) {
+                garage.AddBus(busId, busNumber, graphicsScene, i + 1);
+                busId++;
+            }
         }
     }
 

@@ -6,6 +6,11 @@ void
 Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
 {
     Bus *bus = new Bus(id, busNumber, iteration);
+    if (bus->deleteBus) {
+        delete bus;
+        return;
+    }
+
     bus->InitBus(scene,"../images/bus.png",0,0);
     bus->MoveBus();
     allBuses.push_back(bus);
