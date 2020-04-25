@@ -1,8 +1,4 @@
-#include <iomanip>
 #include "Bus.h"
-#include "BusRouteMap.h"
-#include "../View/Timer.h"
-#include "../View/StreetMap.h"
 
 Bus::Bus(int id, int busNumber, int busIteration)
 {

@@ -25,14 +25,14 @@ public:
      * @brief add bus to garage
      * @param id id of bus
      * @param busNumber number of bus
-     * @param scene
+     * @param scene graphics scene
      */
     void AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration = 0);
 
     /**
      * @brief move all buses on the scene
      * @param streetMap for CheckRoad function
-     * @param scene
+     * @param scene graphics scene
      */
     void MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene);
 
@@ -51,9 +51,9 @@ public:
     Bus *GetBusByPhoto(QGraphicsItem *photo);
 
     /**
-    * @brief check street slow down for bus and roadstop
+    * @brief check street slow down for bus and road stop
     * @param streetMap find street in map with slowdown
-    * @param bus a bus for which a slowdown applies or stop due to stoproad
+    * @param bus a bus for which a slowdown applies
     * @return bus with updated data
     */
     Bus* CheckRoad(StreetMap *streetMap, Bus *bus);
@@ -61,15 +61,19 @@ public:
     /**
      * @brief delete bus from bus storage and scene
      * @param bus bus to delete
-     * @param scene
+     * @param scene graphics scene
      */
     void DeleteBus(Bus *bus, QGraphicsScene *scene);
 
-    bool CheckRoadBlockLongDistace(Bus *bus);
+    bool CheckRoadBlockLongDistance(Bus *bus);
 
+    /**
+     * @brief delete all buses from graphics scene
+     * @param scene graphics scene
+     */
     void DeleteBuses(QGraphicsScene *scene);
 private:
-    bool CheckRoadBlockShortDistace(Bus *bus);
+    bool CheckRoadBlockShortDistance(Bus *bus);
 };
 
 

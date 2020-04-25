@@ -6,9 +6,12 @@
 #ifndef ICP_PROJECT_BUS_H
 #define ICP_PROJECT_BUS_H
 
-#include "../View/StreetMap.h"
 #include <sstream>
 #include <QPlainTextEdit>
+#include "../View/StreetMap.h"
+#include "BusRouteMap.h"
+#include "../View/Timer.h"
+#include <iomanip>
 
 class Bus
 {
@@ -25,9 +28,8 @@ public:
     std::vector<Coordinates::BusStop_S> newstopInformation; //!< new bus stop coordinates and time
     bool roadStopOnRoad;
     bool stopMoving = false;
-    int stopHour;
-    int stopMin;
-
+    int stopHour;                                           //!< hour when the bus is at a stop
+    int stopMin;                                            //!< minute when the bus is at a stop
 
     /**
      * @brief bus constructor
@@ -42,7 +44,7 @@ public:
     /**
      * @brief initialize bus
      * put image of little bus on scene, set scale and initial position
-     * @param scene
+     * @param scene graphics scene
      */
     void InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y);
 
@@ -72,7 +74,12 @@ public:
      */
     void CreateTimetable(QString& color, QPlainTextEdit *textArea);
 
-
+    /**
+     * @brief change rotation of bus image
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param next next bus stop
+     */
     void BusRotation(int x, int y, const Coordinates::BusStop_S &next) const;
 
 private:
@@ -80,7 +87,6 @@ private:
      * @brief load timetable of bus from file and save all information
      */
     void LoadTimetable();
-
 
 };
 

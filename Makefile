@@ -41,7 +41,7 @@ doxygen:
 	doxygen doc/Doxyfile
 
 pack:
-	zip xvadur04-xsleza20 Makefile README.txt -r src/Bus/* -r src/View/* $(FILES) -r examples/* -r images/*
+	zip xsleza20-xvadur04 Makefile README.txt -r src/Bus/* -r src/View/* $(FILES) -r examples/* -r images/*
 	
 clean:
 	rm -rf doc/latex/*

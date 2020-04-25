@@ -54,7 +54,7 @@ public:
     static void ResetTime();
 
 private:
-    static tm *ltm;
+    static tm *ltm;         //!< current time
 
 };
 

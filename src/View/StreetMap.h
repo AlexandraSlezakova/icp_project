@@ -13,9 +13,9 @@ class StreetMap : public QGraphicsRectItem
 {
 public:
     struct stopData {
-        Stop *stop;
-        QGraphicsPixmapItem *photo;
-        Coordinates::Coordinates_S coordinates;
+        Stop *stop;                                 //!< bus stop
+        QGraphicsPixmapItem *photo;                 //!< photo of bus stop
+        Coordinates::Coordinates_S coordinates;     //!< coordinates of bus stop
     };
     
     /**
@@ -39,9 +39,10 @@ public:
      void AddStreets(const std::string& pathToFile);
 
     /**
-    * @brief adds bus stops on street
-    * @param pathToFile
-    */
+     * @brief adds bus stops on street
+     * @param pathToFile path to file
+     * @param scene graphics scene
+     */
     void AddStops(const std::string& pathToFile, QGraphicsScene *scene);
 
     /**
@@ -65,10 +66,16 @@ public:
      */
     static Coordinates::Coordinates_S GetStopByName(const std::string& name);
 
+    /**
+     * @brief get bus stop by its coordinates
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return bus stop name
+     */
     static std::string GetStopByCoordinates(int x, int y);
 
     std::vector<std::shared_ptr<Street>> Map[X][Y]{};         //!< map of streets
-    static std::vector<stopData> stopList;    //!< list of stops
+    static std::vector<stopData> stopList;                    //!< list of stops
 };
 
 #endif // STREETMAP_H

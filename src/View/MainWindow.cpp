@@ -351,7 +351,7 @@ MainWindow::RoadBlockSwitcher()
         roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
         scene->roadBlockMode = false;
         for (auto *bus : scene->garage.allBuses) {
-            scene->garage.CheckRoadBlockLongDistace(bus);
+            scene->garage.CheckRoadBlockLongDistance(bus);
         }
     }
 }

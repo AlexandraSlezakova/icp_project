@@ -49,7 +49,7 @@ public:
     /**
      * @brief update slowdown on street
      * @param updateSlowdown changed float streetSlowdown
-     * @param name streetname of which slowdown should be changed
+     * @param name street name of which slowdown should be changed
      */
     void StreetUpdate(float updateSlowdown, const std::string& name);
 
@@ -68,19 +68,19 @@ public:
      */
     void InitTimetableArea(QWidget *parent, int width, int height);
 
-    QGraphicsScene *graphicsScene;
-    QPlainTextEdit *textArea;   //!< text area for bus timetable
-    QLabel *zoomText;           //!< text with information about scale scene
-    double zoom_act = 100;      //!< double expression of zoom
-    Garage garage;              //!< all buses
-    StreetMap *map;             //!< map
-    bool roadBlockMode = false; //!< Mode to add and sub roadblock
+    QGraphicsScene *graphicsScene;  //!< graphics scene
+    QPlainTextEdit *textArea;       //!< text area for bus timetable
+    QLabel *zoomText;               //!< text with information about scale scene
+    double zoom_act = 100;          //!< double expression of zoom
+    Garage garage;                  //!< all buses
+    StreetMap *map;                 //!< map
+    bool roadBlockMode = false;     //!< Mode to add and sub roadblock
 
-    int  m_originalX = 0;       //!< x mouse position to move map
-    int  m_originalY = 0;       //!< y mouse position to move map
-    bool m_moving = false;      //!< moving map with mouse
+    int  m_originalX = 0;           //!< x mouse position to move map
+    int  m_originalY = 0;           //!< y mouse position to move map
+    bool m_moving = false;          //!< moving map with mouse
     Bus *markedBus = nullptr;
-    int busId = 0;
+    int busId = 0;                  //!< bus id
 
 
 protected:
@@ -140,7 +140,9 @@ private:
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
-    void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end, int* startInt, int* endInt, bool* xy);
+    void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end,
+                                       int* startInt, int* endInt, bool* xy);
+
     /**
      * @brief add the bus one by one to scene at the beginning of the program execution
      * according to current time

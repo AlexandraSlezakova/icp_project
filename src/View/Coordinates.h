@@ -12,28 +12,21 @@
 class Coordinates
 {
 public:
-//    int x{}, y{};   //!< x and y coordinate
-//
-//    /**
-//     * @brief initial setup of coordinates
-//     * @param x1 x coordinate
-//     * @param y1 y coordinate
-//     */
     Coordinates() = default;
 
     ~Coordinates() = default;
 
     typedef struct coordinates {
-        int x = 0;
-        int y = 0;
+        int x = 0;                      //!< x coordinate
+        int y = 0;                      //!< y coordinate
     } Coordinates_S;
 
     typedef struct busStop {
-        Coordinates_S coordinates;
-        int stopHour = 0;
-        int stopMin = 0;
-        std::string name;
-        int id = 0;
+        Coordinates_S coordinates;      //!< coordinates
+        int stopHour = 0;               //!< hour when the bus is at a stop
+        int stopMin = 0;                //!< minute when the bus is at a stop
+        std::string name;               //!< name of bus stop
+        int id = 0;                     //!< id of bus stop
     } BusStop_S;
 };
 

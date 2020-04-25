@@ -44,8 +44,8 @@ public:
     static Square *layout[X][Y];       //!< layout with squares
 
 private:
-    QColor color_;              //!< color of square
-    QBrush brush;
+    QColor color_;                      //!< color of square
+    QBrush brush;                       //!< brush
 };
 
 #endif // SQUARE_H

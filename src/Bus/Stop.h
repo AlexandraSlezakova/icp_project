@@ -29,7 +29,7 @@ public:
     /**
      * @brief adds image of bus stop on square
      * where bus stops of each street are
-     * @param scene scene where to put image
+     * @param scene graphics scene
      * @param pathToFile path to image
      * @return to save stop photo
      */
@@ -37,11 +37,7 @@ public:
 
     Coordinates::Coordinates_S coordinates;  //!< coordinates of bus stop
     std::string stopName;                    //!< bus stop name
-    bool roadStop;                           //!< save information about roadstop on Stops
-private:
-    QBrush brush;
-
-
+    bool roadStop;                           //!< save information about road stop on Stops
 };
 
 #endif // STOP_H

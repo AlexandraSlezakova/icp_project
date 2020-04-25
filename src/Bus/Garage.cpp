@@ -60,7 +60,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
 }
 
 bool
-Garage::CheckRoadBlockShortDistace(Bus *bus) 
+Garage::CheckRoadBlockShortDistance(Bus *bus)
 {
     /* checking the bus for roadblocks */
     if (bus->roadStopOnRoad) {
@@ -120,7 +120,7 @@ Garage::DeleteBuses(QGraphicsScene *scene)
 }
 
 bool
-Garage::CheckRoadBlockLongDistace(Bus *bus)
+Garage::CheckRoadBlockLongDistance(Bus *bus)
 {
     int hourNow = Timer::GetHour();
     int minuteNow = Timer::GetMinute();
@@ -224,7 +224,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
 
             /* if in short distance is something closed and the bus would get into a dead end
              * save actual time and stop moving with bus*/
-            if (CheckRoadBlockShortDistace(bus)) {
+            if (CheckRoadBlockShortDistance(bus)) {
                 bus->stopMoving = true;
                 bus->stopHour = hourNow;
                 bus->stopMin = minuteNow;
