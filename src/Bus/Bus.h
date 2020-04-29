@@ -6,9 +6,12 @@
 #ifndef ICP_PROJECT_BUS_H
 #define ICP_PROJECT_BUS_H
 
-#include "BusRouteMap.h"
 #include <sstream>
 #include <QPlainTextEdit>
+#include "../View/StreetMap.h"
+#include "BusRouteMap.h"
+#include "../View/Timer.h"
+#include <iomanip>
 
 class Bus
 {
@@ -16,18 +19,17 @@ public:
     int id_;                                                //!< id of bus
     int busNumber_;                                         //!< number of bus
     int iteration;                                          //!< iteration of bus on the map, default is 0
-    int deleteBus;                                          //!< flag if bus should be deleted
+    int deleteBus = 0;                                      //!< flag if bus should be deleted
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
-    Coordinates *busPosition;                               //!< position of bus
+    Coordinates::Coordinates_S busPosition;                 //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
 
     std::vector<Coordinates::BusStop_S> newstopInformation; //!< new bus stop coordinates and time
     bool roadStopOnRoad;
     bool stopMoving = false;
-    int stopHour;
-    int stopMin;
-
+    int stopHour;                                           //!< hour when the bus is at a stop
+    int stopMin;                                            //!< minute when the bus is at a stop
 
     /**
      * @brief bus constructor
@@ -35,16 +37,16 @@ public:
      * @param busNumber number of bus
      * @param position position
      */
-    Bus(int id, int busNumber, Coordinates *position, int busIteration = 0);
+    Bus(int id, int busNumber, int busIteration = 0);
 
     ~Bus();
 
     /**
      * @brief initialize bus
      * put image of little bus on scene, set scale and initial position
-     * @param scene
+     * @param scene graphics scene
      */
-    void InitBus(QGraphicsScene *scene,std::string pathPic,int x, int y);
+    void InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y);
 
     /**
      * @brief get coordinates of bus
@@ -72,7 +74,12 @@ public:
      */
     void CreateTimetable(QString& color, QPlainTextEdit *textArea);
 
-
+    /**
+     * @brief change rotation of bus image
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param next next bus stop
+     */
     void BusRotation(int x, int y, const Coordinates::BusStop_S &next) const;
 
 private:
@@ -80,7 +87,6 @@ private:
      * @brief load timetable of bus from file and save all information
      */
     void LoadTimetable();
-
 
 };
 

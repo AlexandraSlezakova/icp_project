@@ -86,24 +86,43 @@ public slots:
 
     /**
      * @breif increase timer interval
-     * the time does slower
+     * the time goes slower
      */
     void TimerSub();
 
 protected:
     /**
      * @brief display current time
-     * @param event
      */
-    void timerEvent(QTimerEvent *event) override;
+    void timerEvent(QTimerEvent *) override;
 
 private:
+    /**
+     * @brief time is shifted forward
+     * number of buses is added to graphics scene according to new time
+     * @param hourNow current hour
+     * @param minuteNow current minute
+     */
     void TimeShiftForward(int hourNow, int minuteNow);
 
+    /**
+     * @brief time is shifted backwards
+     * bus is deleted when first bus stop has a greater arrival time than the current time
+     * @param hourNow current hour
+     * @param minuteNow current minute
+     */
     void TimeShiftBackwards(int hourNow, int minuteNow);
 
+    /**
+     * @brief buses don't move between midnight and 6AM
+     * all buses are deleted from graphics scene
+     */
     void NightTime();
 
+    /**
+     * @brief time was shifted to night time and later time greater than 6AM
+     * buses are added to graphics scene
+     */
     void Run();
 
     QComboBox *combobox;            //!< combobox on pick street to slowdown
@@ -112,15 +131,15 @@ private:
     QPushButton *timerButton;       //!< button to start or stop timer
     QPlainTextEdit *timeArea;       //!< textarea with time
     QLabel *nightTimeLabel;         //!< label with warning - buses don't move between midnight and 6AM
-    QLabel *timerLabel;
+    QLabel *timerLabel;             //!< label with timer interval
     Ui::MainWindow *ui;
-    Scene *scene;
+    Scene *scene;                   //!< scene object
 
-    int timerId = 0;
-    int timerInterval = 0;
+    int timerId = 0;                //!< timer id
+    int timerInterval = 0;          //!< timer interval
     int width = 0;                  //!< width of screen
     int height = 0;                 //!< height of screen
     int stopFlag = 0;               //!< timer is active or inactive
-    int nightFlag = 0;
+    int nightFlag = 0;              //!< night flag (midnight - 6AM)
 };
 #endif // MAINWINDOW_H

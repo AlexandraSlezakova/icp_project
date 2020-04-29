@@ -10,6 +10,8 @@ Square::Square(QGraphicsRectItem *parent) : QGraphicsRectItem(parent)
     setZValue(-2);
 }
 
+Square::~Square() =default;
+
 void
 Square::SetColor(const QString &name)
 {

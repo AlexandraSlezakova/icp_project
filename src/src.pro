@@ -16,32 +16,33 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    View/MainWindow.cpp \
-    View/Square.cpp \
-    View/Scene.cpp \
-    main.cpp \
-    View/Coordinates.cpp \
-    Functions.cpp \
-    Bus/Stop.cpp \
-    View/Street.cpp \
-    View/StreetMap.cpp \
     Bus/Bus.cpp \
     Bus/BusRouteMap.cpp \
+    Bus/Garage.cpp \
+    Bus/Stop.cpp \
+    View/MainWindow.cpp \
+    View/Scene.cpp \
+    View/Square.cpp \
+    View/Street.cpp \
+    View/StreetMap.cpp \
     View/Timer.cpp \
+    main.cpp \
+    Functions.cpp \
 
 HEADERS += \
-    View/MainWindow.h \
-    View/Square.h \
-    View/Scene.h \
-    main.h \
-    View/Coordinates.h \
-    Functions.h \
-    Bus/Stop.h \
-    View/Street.h \
-    View/StreetMap.h \
     Bus/Bus.h \
     Bus/BusRouteMap.h \
+    Bus/Garage.h \
+    Bus/Stop.h \
+    View/Coordinates.h \
+    View/MainWindow.h \
+    View/Scene.h \
+    View/Square.h \
+    View/Street.h \
+    View/StreetMap.h \
     View/Timer.h \
+    main.h \
+    Functions.h \
 
 FORMS += \
     mainwindow.ui

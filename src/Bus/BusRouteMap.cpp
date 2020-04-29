@@ -6,7 +6,7 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
     Coordinates::Coordinates_S currentCoordinate, nextCoordinate;
     int from , to;
 
-    for (int i = 0; i < stopInformation.size() - 1; i++) {
+    for (int i = 0; i < (int)stopInformation.size() - 1; i++) {
         currentCoordinate = stopInformation[i].coordinates;
         nextCoordinate = stopInformation[i + 1].coordinates;
 

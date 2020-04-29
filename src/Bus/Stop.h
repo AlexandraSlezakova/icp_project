@@ -22,39 +22,22 @@ public:
      * @param stopName bus stop name
      * @param coordinates coordinates of bus stop
      */
-     Stop(std::string name, Coordinates *coordinate);
+     Stop(std::string name, Coordinates::Coordinates_S coordinate);
 
     ~Stop();
 
     /**
-     * @brief get coordinates of stop by name
-     * @param name name of stop
-     * @return coordinates of stop or nullptr
-     */
-    static Coordinates *GetStopByName(const std::string& name);
-
-    static std::string GetStopByCoordinates(int x, int y);
-
-    /**
      * @brief adds image of bus stop on square
      * where bus stops of each street are
-     * @param scene scene where to put image
+     * @param scene graphics scene
      * @param pathToFile path to image
      * @return to save stop photo
      */
     QGraphicsPixmapItem* AddStopToScene(QGraphicsScene *scene, const QString& pathToFile);
 
-    Coordinates *coordinates;  //!< coordinates of bus stop
-    std::string stopName;      //!< bus stop name
-    bool roadStop;             //!< save information about roadstop on Stops
-
-    static std::map<std::string, Coordinates*> stopList;    //!< list of stops
-
-
-private:
-    QBrush brush;
-
-
+    Coordinates::Coordinates_S coordinates;  //!< coordinates of bus stop
+    std::string stopName;                    //!< bus stop name
+    bool roadStop;                           //!< save information about road stop on Stops
 };
 
 #endif // STOP_H

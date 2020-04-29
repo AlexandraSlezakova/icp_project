@@ -12,6 +12,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 MainWindow::~MainWindow()
 {
+    for (auto &x : Square::layout) {
+        for (auto &y : x) {
+            delete y;
+        }
+    }
+
     delete ui;
 }
 
@@ -38,12 +44,12 @@ MainWindow::CreateScene()
 {
     QScrollArea *scrollArea = new QScrollArea(this);
     scrollArea->setMinimumSize(width * 0.7, height * 0.9);
+
     /* create scene */
     scene = new Scene(scrollArea);
     scrollArea->setWidget(scene);
 
     QWidget *widget = new QWidget(this);
-    /* move widget */
     widget->move(width * 0.7, 0);
     widget->setMinimumSize(width * 0.3, height * 0.9);
 
@@ -58,7 +64,7 @@ MainWindow::CreateScene()
 }
 
 void
-MainWindow::timerEvent(QTimerEvent *event)
+MainWindow::timerEvent(QTimerEvent*)
 {
     timeArea->clear();
     timeArea->appendPlainText(Timer::GetTime());
@@ -68,8 +74,10 @@ MainWindow::timerEvent(QTimerEvent *event)
 
     int hour = Timer::GetHour();
     if (hour >= 0 && hour < 6) {
-        NightTime();
-        nightFlag = 1;
+        if (!nightFlag) {
+            NightTime();
+            nightFlag = 1;
+        }
     }
     else if (nightFlag) {
         nightFlag = 0;
@@ -98,8 +106,7 @@ MainWindow::NightTime()
     nightTimeLabel->move(5, TIME_AREA_HEIGHT + 10);
     nightTimeLabel->setFixedSize(300, 35);
     nightTimeLabel->setStyleSheet("color: red; font-weight: bold;");
-    nightTimeLabel->setText("Warning: buses don't move \nbetween midnight and 6AM");
-    scene->garage.DeleteBuses(scene->graphicsScene);
+    nightTimeLabel->setText("Warning: new buses are not created \nbetween midnight and 6AM");
 }
 
 void
@@ -182,7 +189,9 @@ MainWindow::InitButtons(QWidget *parent)
     connect(roadBlockButton, SIGNAL (released()), this, SLOT(RoadBlockSwitcher()));
 }
 
-void MainWindow::InitSliders(QWidget *parent) {
+void
+MainWindow::InitSliders(QWidget *parent)
+{
 
     std::ifstream file;
     std::string line;
@@ -193,7 +202,7 @@ void MainWindow::InitSliders(QWidget *parent) {
     combobox->move(5,850);
     combobox->setFixedSize(150, 40);
 
-    file.open(Functions::GetAbsolutePath("../files/ulice.txt"));
+    file.open(Functions::GetAbsolutePath("../examples/ulice.txt"));
 
     /* add choice to streetpicker */
     while (std::getline(file, line)) {
@@ -257,6 +266,8 @@ MainWindow::ReadInput()
 void
 MainWindow::TimeShiftForward(int hourNow, int minuteNow)
 {
+    IF(hourNow >= 0 && hourNow < 6, return)
+
     int minute;
     int allBusesSize = scene->garage.allBuses.size();
     int iteration;
@@ -319,7 +330,9 @@ void
 MainWindow::ResetTimer()
 {
     Timer::ResetTime();
+    killTimer(timerId);
     timerInterval = 1000;
+    timerId = startTimer(timerInterval);
     timerLabel->setText("Timer interval = " + QString::number(100) + "%");
 }
 
@@ -343,7 +356,7 @@ MainWindow::RoadBlockSwitcher()
         roadBlockButton->setStyleSheet("background-color: red; color: white; font-weight: bold;");
         scene->roadBlockMode = false;
         for (auto *bus : scene->garage.allBuses) {
-            scene->garage.CheckRoadBlockLongDistace(bus);
+            scene->garage.CheckRoadBlockLongDistance(bus);
         }
     }
 }
