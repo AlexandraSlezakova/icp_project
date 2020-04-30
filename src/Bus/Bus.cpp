@@ -119,11 +119,11 @@ Bus::LoadTimetable()
     nextBusStop = stopInformation[1];
 
     /* buses with arrival time at first bus stops greater than midnight are deleted */
-//    int midnight = 23 * 60 + 60;
-//    stopHours = stopInformation[size - 1].stopHour;
-//    IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
-//    int firstBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
-//    IF(firstBusStop >= midnight, deleteBus = 1)
+    int midnight = 23 * 60 + 60;
+    stopHours = stopInformation[size - 1].stopHour;
+    IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
+    int firstBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
+    IF(firstBusStop >= midnight, deleteBus = 1)
 
     /* save route length in minutes */
     if (iteration == 0) {
