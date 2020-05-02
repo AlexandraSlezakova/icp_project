@@ -45,8 +45,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
         if (!bus->stopMoving) {
             bus = CheckRoad(streetMap, bus);
             bus->MoveBus();
-            
-            
+
             if (bus->deleteBus) {
                 DeleteBus(bus, scene);
             }
@@ -58,8 +57,21 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
             scene->removeItem(bus->busPhoto);
             imagePath = !(secNow % 2) ? "../images/bus.png" : "../images/busWarning.png";
 
-            bus->InitBus(scene, imagePath, bus->busPosition.x, bus->busPosition.y);
-            bus->BusRotation(bus->currentBusStop.coordinates.x, bus->currentBusStop.coordinates.y, bus->nextBusStop);
+            bus->InitBus(scene, imagePath, bus->busPosition.x * 20, bus->busPosition.y * 20);
+            bus->BusRotation(bus->busPosition.x, bus->busPosition.y, bus->nextBusStop);
+
+            int yShift = 0;
+            int xShift = 0;
+            /* moving along the X axis */
+            if (bus->nextBusStop.coordinates.y == bus->busPosition.y) {
+                yShift = -5;
+
+            } /* moving along the Y axis */
+            else if (bus->nextBusStop.coordinates.x == bus->busPosition.x) {
+                xShift = bus->currentBusStop.coordinates.y < bus->nextBusStop.coordinates.y ? 25 : -5;
+            }
+
+            bus->busPhoto->setPos(bus->busPosition.x * SQUARE_SIZE + xShift, bus->busPosition.y * SQUARE_SIZE + yShift);
         }
     }
 }
@@ -127,28 +139,17 @@ Garage::DeleteBuses(QGraphicsScene *scene)
 bool
 Garage::CheckRoadBlockLongDistance(Bus *bus)
 {
-    int hourNow = Timer::GetHour();
-    int minuteNow = Timer::GetMinute();
-    int i = 0;
-    int nxt, nw, mn;
-
+    int i = bus->pastStops;
     int stopInformationSize = (int)bus->stopInformation.size();
-    for (; i < stopInformationSize - 2; i++) {
-        nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
-        nw  = hourNow * 60 + minuteNow;
-        mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
 
-        if (nxt > nw and nw >= mn) {
-            i++;
-            break;
-        }
-    }
     /* check next bustop if it is closed and route behind it to the end of bus route
      * example (1. iteration):
      *                     stop             stop
      *  S   R   B   R   R   S   R   R   R   S
      *         bus         |check section|
      * */
+
+
     for (; i < stopInformationSize - 1; i++) {
         if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
             /* roadStop on stop */
@@ -205,6 +206,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
     if (bus->stopInformation[i].name.empty())
         return bus;
 
+
     currentSplit = Functions::Split(bus->stopInformation[i].name, "-");
     nextSplit = Functions::Split(bus->stopInformation[i + 1].name, "-");
     /* get name of street where bus is
@@ -226,6 +228,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
         {
             bus->currentBusStop = bus->stopInformation[i];
             bus->nextBusStop = bus->stopInformation[i + 1];
+            bus->pastStops++;
 
             /* if in short distance is something closed and the bus would get into a dead end
              * save actual time and stop moving with bus*/

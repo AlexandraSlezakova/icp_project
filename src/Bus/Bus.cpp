@@ -8,7 +8,9 @@ Bus::Bus(int id, int busNumber, int busIteration)
     busPosition.y = 0;
     iteration = busIteration;
     roadStopOnRoad = false;
+    pastStops = 0;
     LoadTimetable();
+
 }
 
 Bus::~Bus()
@@ -99,6 +101,23 @@ Bus::LoadTimetable()
     IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
     int lastBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
     IF(lastBusStop > midnight, deleteBus = 1)
+
+
+    /* find out where the bus should be according to current time */
+    minuteNow = Timer::GetMinute();
+    hourNow = Timer::GetHour();
+
+    int nxt, nw, mn, i = 0;
+    int stopInformationSize = (int)stopInformation.size();
+    for (; i < stopInformationSize - 2; i++) {
+        nxt = stopInformation[i+1].stopHour * 60 + stopInformation[i+1].stopMin;
+        nw  = hourNow * 60 + minuteNow;
+        mn = stopInformation[i].stopHour * 60 + stopInformation[i].stopMin;
+
+        if (nxt > nw and nw >= mn)
+            break;
+    }
+    pastStops = i;
 
     file.close();
 }

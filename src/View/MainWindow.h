@@ -141,5 +141,6 @@ private:
     int height = 0;                 //!< height of screen
     int stopFlag = 0;               //!< timer is active or inactive
     int nightFlag = 0;              //!< night flag (midnight - 6AM)
+
 };
 #endif // MAINWINDOW_H

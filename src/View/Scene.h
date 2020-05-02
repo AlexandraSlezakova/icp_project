@@ -17,6 +17,7 @@
 class Scene : public QGraphicsView
 {
     Q_OBJECT
+
 public:
     /**
      * @brief scene constructor
@@ -59,6 +60,8 @@ public:
     void AddBuses();
 
     void CheckRoadBlockBus();
+
+    void MapClean();
 
     /**
      * @brief initialize text area for timetable
@@ -140,7 +143,7 @@ private:
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
-    void GetStreetPositionBetweenStops(Square *square, Coordinates* *start, Coordinates* *end,
+    void GetStreetPositionBetweenStops(Square *square, Coordinates::Coordinates_S *start, Coordinates::Coordinates_S *end,
                                        int* startInt, int* endInt, bool* xy);
 
     /**
@@ -148,6 +151,12 @@ private:
      * according to current time
      */
     void AddBusOneByOne();
+
+    void PlottingRouteBetweenStops(const Coordinates::BusStop_S &first, const Coordinates::BusStop_S &second,QString colour) const;
+
+    void BusPick(Bus *b);
+
+    void RoadStopBusService(Square *square, QGraphicsPixmapItem *photo);
 };
 
 #endif // SCENE_H

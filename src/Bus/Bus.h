@@ -30,6 +30,7 @@ public:
     bool stopMoving = false;
     int stopHour;                                           //!< hour when the bus is at a stop
     int stopMin;                                            //!< minute when the bus is at a stop
+    int pastStops;                                          //!< counter on stops
 
     /**
      * @brief bus constructor
