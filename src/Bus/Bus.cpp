@@ -1,12 +1,13 @@
 #include "Bus.h"
 
-Bus::Bus(int id, int busNumber, int busIteration)
+Bus::Bus(int id, int busNumber, int busIteration, int routeLen)
 {
     id_ = id;
     busNumber_ = busNumber;
     busPosition.x = 0;
     busPosition.y = 0;
     iteration = busIteration;
+    routeLength = routeLen;
     roadStopOnRoad = false;
     LoadTimetable();
 }
@@ -28,7 +29,7 @@ Bus::LoadTimetable()
     std::ostringstream ss;
     std::string line, minute;
     std::vector<std::string> tokens;
-    int stopHours, stopMinutes, id = 0;
+    int stopHours, stopMinutes, minutes, id = 0;
     Coordinates::Coordinates_S coordinates;
 
     ss << "../examples/bus-route-map/" << std::to_string(busNumber_) << ".txt";
@@ -48,12 +49,18 @@ Bus::LoadTimetable()
         stopMinutes = std::stoi(tokens[1]);
         coordinates = StreetMap::GetStopByName(tokens[2]);
 
-        if (iteration) {
-            stopMinutes += (iteration * 10);
+        if (iteration > 0) {
+            stopMinutes += (iteration * 15);
             if (stopMinutes >= 60) {
                 stopHours++;
                 stopMinutes -= 60;
             }
+        }
+        else if (iteration < 0) {
+            /* new time with negative iteration */
+            minutes = (stopHours * 60 + stopMinutes) + (iteration * 15);
+            stopHours = minutes / 60;
+            stopMinutes = minutes - (stopHours * 60);
         }
 
         Coordinates::BusStop_S information;
@@ -75,17 +82,35 @@ Bus::LoadTimetable()
     Coordinates::BusStop_S *info = &stopInformation[size - 1];
 
     if (minuteNow >= info->stopMin && hourNow == info->stopHour) {
-        while (minuteNow % 10) {
-            minuteNow--;
+        if (iteration < 0) {
+            deleteBus = 1;
         }
+        else {
+            while (minuteNow % 15) {
+                minuteNow++;
+            }
 
-        for (int i = 0; i < size; i++) {
-            info = &stopInformation[i];
-            info->stopMin += minuteNow;
+            for (int i = 0; i < size; i++) {
+                info = &stopInformation[i];
+                info->stopMin += minuteNow;
 
-            if (info->stopMin >= 60) {
-                info->stopHour++;
-                info->stopMin -= 60;
+                /* bus with arrival time at the first bus stop hourNow:00 already exists
+                 * if time of current bus has same arrival time, delete bus */
+                if (i == 0 && info->stopMin == 0 && info->stopHour == hourNow) {
+                    deleteBus = 1;
+                    break;
+                }
+
+                if (info->stopMin >= 60) {
+                    info->stopHour++;
+                    info->stopMin -= 60;
+                }
+
+                if ((info->stopMin > minuteNow || info->stopHour > hourNow) && i == 0 && !iteration) {
+                    i = iteration = -1;
+                    minuteNow -= 15;
+                    IF(info->stopHour > hourNow, info->stopHour--)
+                }
             }
         }
     }
@@ -97,8 +122,23 @@ Bus::LoadTimetable()
     int midnight = 23 * 60 + 60;
     stopHours = stopInformation[size - 1].stopHour;
     IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
-    int lastBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
-    IF(lastBusStop > midnight, deleteBus = 1)
+    int firstBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
+    IF(firstBusStop >= midnight, deleteBus = 1)
+
+    /* save route length in minutes */
+    if (iteration == 0) {
+        Coordinates::BusStop_S lastBusStop = stopInformation[size - 1];
+        routeLength = (lastBusStop.stopHour * 60 + lastBusStop.stopMin)
+                      - (currentBusStop.stopHour * 60 + currentBusStop.stopMin);
+    }
+
+    /* last check if bus arrival time at its first bus stop
+     * is less or equal to current time */
+    if (!deleteBus) {
+        if (currentBusStop.stopMin > minuteNow || currentBusStop.stopHour > hourNow) {
+            deleteBus = 1;
+        }
+    }
 
     file.close();
 }
