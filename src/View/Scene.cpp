@@ -420,10 +420,13 @@ Scene::BusStopRoadBlock(StreetMap::stopData stop)
         }
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop_roadblock.jpg"));
         Square::layout[stop.stop->coordinates.x][stop.stop->coordinates.y]->roadBlock = true;
+        stop.stop->roadStop = true;
+
     }
     else {
         path = QString::fromStdString(Functions::GetAbsolutePath("../images/bus_stop.jpeg"));
         Square::layout[stop.stop->coordinates.x][stop.stop->coordinates.y]->roadBlock = false;
+        stop.stop->roadStop = false;
     }
 
     stop.photo = stop.stop->AddStopToScene(graphicsScene, path);
@@ -499,14 +502,12 @@ Scene::CheckRoadBlockBus()
         for (; i < stopInformationSize - 1; i++) {
             if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
                 /* roadStop on road */
-                //std::cerr << "Stop Closed " << bus->stopInformation[i].name << "\n";
-                bus->roadStopOnRoad = true;
+               bus->roadStopOnRoad = true;
             }
             /* street going vertically */
             if (bus->stopInformation[i].coordinates.x == bus->stopInformation[i + 1].coordinates.x ) {
                 if (Square::layout[bus->stopInformation[i].coordinates.x][(bus->stopInformation[i].coordinates.y + bus->stopInformation[i + 1].coordinates.y) / 2 ]->roadBlock) {
                     //std::cerr << "RoadStop between " << bus->stopInformation[i].name << " a " << bus->stopInformation[i+1].name << "\n";
-                    /* roadStop */
                     bus->roadStopOnRoad = true;
                 }
             }
@@ -625,33 +626,8 @@ Scene::RoadStopBusService (Square *square, QGraphicsPixmapItem *photo) {
                     reply = QMessageBox::question(this, "RoadStop", "continue on the bus line?",QMessageBox::Yes|QMessageBox::No);
                     if (reply == QMessageBox::Yes) {
                         c++;
-                        for (; c < markedBus->newstopInformation.size(); ++c) {
-                            Coordinates::BusStop_S sIStop = markedBus->stopInformation[markedBus->stopInformation.size()-1];
-                            Coordinates::BusStop_S nIStop = markedBus->newstopInformation[c];
-                            if ( abs(sIStop.coordinates.x + sIStop.coordinates.y - nIStop.coordinates.x - nIStop.coordinates.y) == 10) {
-                                if (sIStop.stopMin + 2 > 60) {
-                                    nIStop.stopHour = sIStop.stopHour + 1;
-                                    nIStop.stopMin = sIStop.stopMin + 2 - 60;
-                                }
-                                else {
-                                    nIStop.stopMin = sIStop.stopMin + 2;
-                                    nIStop.stopHour = sIStop.stopHour;
-                                }
-                            }
-                            else {
-                                if (sIStop.stopMin + 3 > 60) {
-                                    nIStop.stopHour = sIStop.stopHour + 1;
-                                    nIStop.stopMin = sIStop.stopMin + 3 - 60;
-                                }
-                                else {
-                                    nIStop.stopMin = sIStop.stopMin + 3;
-                                    nIStop.stopHour = sIStop.stopHour;
-                                }
-                            }
-                            markedBus->stopInformation.push_back(nIStop);
-                            PlottingRouteBetweenStops(markedBus->stopInformation[markedBus->stopInformation.size()-2],
-                                                      markedBus->stopInformation[markedBus->stopInformation.size()-1], "#ff00aa");
-                        }
+
+                        ContinueBusRoute(information);
                     }
                 }
             }
@@ -709,16 +685,108 @@ Scene::RoadStopBusService (Square *square, QGraphicsPixmapItem *photo) {
     else if (photo) {
         for (auto &list : StreetMap::stopList) {
             if (list.photo == photo) {
+                Coordinates::BusStop_S first = markedBus->stopInformation[markedBus->stopInformation.size()-1];
+                Msgbox.setText("This path cannot be selected, there is a roadblock on the road!");
+                Coordinates::BusStop_S information;
 
+                int squareCount = abs(first.coordinates.x + first.coordinates.y - list.coordinates.x - list.coordinates.y);
+
+                if (squareCount == 10) {
+                    if (Square::layout[(first.coordinates.x + list.coordinates.x)/2][(first.coordinates.y + list.coordinates.y)/2]->roadBlock) {
+                        Msgbox.exec();
+                        return;
+                    }
+                    information.coordinates = list.coordinates;
+                    information.name = list.stop->stopName;
+
+                    if (first.stopMin + 2 > 60) {
+                        information.stopHour = first.stopHour + 1;
+                        information.stopMin = first.stopMin + 2 - 60;
+                    }
+                    else {
+                        information.stopHour = first.stopHour;
+                        information.stopMin = first.stopMin + 2;
+                    }
+                }
+                else if (squareCount == 19) {
+
+                    if (Square::layout[(first.coordinates.x + list.coordinates.x)/2][(first.coordinates.y + list.coordinates.y)/2]->roadBlock) {
+                        Msgbox.exec();
+                        return;
+                    }
+
+                    information.coordinates = list.coordinates;
+                    information.name = list.stop->stopName;
+
+                    if (first.stopMin + 3 > 60) {
+                        information.stopHour = first.stopHour + 1;
+                        information.stopMin = first.stopMin + 3 - 60;
+                    }
+                    else {
+                        information.stopHour = first.stopHour;
+                        information.stopMin = first.stopMin + 3;
+                    }
+                }
+                else {
+                    Msgbox.setText("The stop is not located near the last bus stop!");
+                    Msgbox.exec();
+                    return;
+                }
+
+                markedBus->stopInformation.push_back(information);
+
+                PlottingRouteBetweenStops(first,information,"#ff00aa");
+
+                ContinueBusRoute(information);
             }
         }
         if (markedBus->busPhoto == photo) {
             MapClean();
             markedBus = nullptr;
+            return;
         }
         for (auto &b : garage.allBuses) {
             if (b->busPhoto == photo) {
                 BusPick(b);
+            }
+        }
+    }
+}
+
+void Scene::ContinueBusRoute(Coordinates::BusStop_S &information) {
+    for (int c = 0; c < markedBus->newstopInformation.size(); c++) {
+        if (information.name == markedBus->newstopInformation[c].name) {
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, "RoadStop", "continue on the bus line?",QMessageBox::Yes|QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+                c++;
+                for (; c < markedBus->newstopInformation.size(); ++c) {
+                    Coordinates::BusStop_S sIStop = markedBus->stopInformation[markedBus->stopInformation.size() - 1];
+                    Coordinates::BusStop_S nIStop = markedBus->newstopInformation[c];
+                    if ( abs(sIStop.coordinates.x + sIStop.coordinates.y - nIStop.coordinates.x - nIStop.coordinates.y) == 10) {
+                        if (sIStop.stopMin + 2 > 60) {
+                            nIStop.stopHour = sIStop.stopHour + 1;
+                            nIStop.stopMin = sIStop.stopMin + 2 - 60;
+                        }
+                        else {
+                            nIStop.stopMin = sIStop.stopMin + 2;
+                            nIStop.stopHour = sIStop.stopHour;
+                        }
+                    }
+                    else {
+                        if (sIStop.stopMin + 3 > 60) {
+                            nIStop.stopHour = sIStop.stopHour + 1;
+                            nIStop.stopMin = sIStop.stopMin + 3 - 60;
+                        }
+                        else {
+                            nIStop.stopMin = sIStop.stopMin + 3;
+                            nIStop.stopHour = sIStop.stopHour;
+                        }
+                    }
+                    markedBus->stopInformation.push_back(nIStop);
+                    PlottingRouteBetweenStops(markedBus->stopInformation[markedBus->stopInformation.size() - 2],
+                                              markedBus->stopInformation[markedBus->stopInformation.size() - 1], "#ff00aa");
+                }
             }
         }
     }

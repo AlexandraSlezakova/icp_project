@@ -157,6 +157,8 @@ private:
     void BusPick(Bus *b);
 
     void RoadStopBusService(Square *square, QGraphicsPixmapItem *photo);
+
+    void ContinueBusRoute(Coordinates::BusStop_S &information);
 };
 
 #endif // SCENE_H

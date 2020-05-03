@@ -50,6 +50,28 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 DeleteBus(bus, scene);
             }
         }
+        else {
+            if (!CheckRoadBlockShortDistance(bus)) {
+                int hourNow = Timer::GetHour();
+                int minuteNow = Timer::GetMinute();
+
+                int minAdd = (hourNow * 60 + minuteNow) - bus->stopInformation[bus->pastStops].stopHour * 60 - bus->stopInformation[bus->pastStops-1].stopMin + 1;
+
+
+                for (int k = bus->pastStops; k < bus->stopInformation.size(); k++) {
+                    if (bus->stopInformation[k].stopMin + minAdd > 60) {
+                        bus->stopInformation[k].stopHour = hourNow + 1;
+                        bus->stopInformation[k].stopMin = bus->stopInformation[k].stopMin + minAdd - 60;
+                    }
+                    else {
+                        bus->stopInformation[k].stopHour = bus->stopInformation[k - 1].stopHour;
+                        bus->stopInformation[k].stopMin = bus->stopInformation[k].stopMin + minAdd;
+                    }
+                }
+                bus->stopMoving = false;
+                bus->roadStopOnRoad = CheckRoadBlockLongDistance(bus);
+            }
+        }
         if (bus->roadStopOnRoad) {
             int secNow = Timer::GetSecond();
             const char *imagePath;
@@ -96,7 +118,7 @@ Garage::CheckRoadBlockShortDistance(Bus *bus)
         else {
             /* checking second stop if the stop is closed */
             if (Square::layout[bus->nextBusStop.coordinates.x][bus->nextBusStop.coordinates.y]->roadBlock) {
-                return false;
+                return true;
             }
             else {
                 /* check vertically or horizontally street if it is closed */

@@ -362,6 +362,7 @@ MainWindow::RoadBlockSwitcher()
             scene->garage.CheckRoadBlockLongDistance(bus);
         }
         scene->MapClean();
+        scene->markedBus = nullptr;
     }
 }
 
