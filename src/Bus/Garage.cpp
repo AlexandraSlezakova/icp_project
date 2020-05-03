@@ -10,10 +10,16 @@ Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
         delete bus;
         return;
     }
+    IF(!iteration, routeTime.emplace(busNumber, bus->routeLength))
 
     bus->InitBus(scene,"../images/bus.png",0,0);
     bus->MoveBus();
-    allBuses.push_back(bus);
+
+    if (iteration < 0) {
+        allBuses.insert(allBuses.begin(), bus);
+    } else {
+        allBuses.push_back(bus);
+    }
 }
 
 Bus*
@@ -41,12 +47,19 @@ Garage::GetBusByPhoto(QGraphicsItem *photo)
 void
 Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
 {
+    deletedBus = 0;
     for (Bus *bus : allBuses) {
         if (!bus->stopMoving) {
             bus = CheckRoad(streetMap, bus);
             bus->MoveBus();
 
             if (bus->deleteBus) {
+                /* clear text area, if timetable displayed there belongs to the deleted bus */
+                if (bus->textArea) {
+                    bus->textArea->clear();
+                    BusRouteMap::DrawLine(bus->stopInformation, "#c0c0c0");
+                }
+                deletedBus = 1;
                 DeleteBus(bus, scene);
             }
         }

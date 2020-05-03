@@ -12,6 +12,7 @@
 #include "BusRouteMap.h"
 #include "../View/Timer.h"
 #include <iomanip>
+#include <cmath>
 
 class Bus
 {
@@ -24,21 +25,25 @@ public:
     Coordinates::Coordinates_S busPosition;                 //!< position of bus
     QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
+    QPlainTextEdit *textArea = nullptr;
 
-    std::vector<Coordinates::BusStop_S> newstopInformation; //!< new bus stop coordinates and time
+    std::vector<Coordinates::BusStop_S> newStopInformation; //!< new bus stop coordinates and time
     bool roadStopOnRoad;
     bool stopMoving = false;
+
     int stopHour;                                           //!< hour when the bus is at a stop
     int stopMin;                                            //!< minute when the bus is at a stop
     int pastStops;                                          //!< counter on stops
+
 
     /**
      * @brief bus constructor
      * @param id id of bus
      * @param busNumber number of bus
      * @param position position
+     * @param routeLen route length
      */
-    Bus(int id, int busNumber, int busIteration = 0);
+    Bus(int id, int busNumber, int busIteration = 0, int routeLen = 0);
 
     ~Bus();
 
@@ -83,11 +88,14 @@ public:
      */
     void BusRotation(int x, int y, const Coordinates::BusStop_S &next) const;
 
+    int routeLength{};
 private:
     /**
      * @brief load timetable of bus from file and save all information
      */
     void LoadTimetable();
+
+    //!< bus travel time in minutes
 
 };
 

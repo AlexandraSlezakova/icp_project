@@ -84,11 +84,15 @@ MainWindow::timerEvent(QTimerEvent*)
         Run();
     }
     else {
-        /* create new buses every 10 minutes */
-        if (!(minute % 10) && !second) {
-            scene->AddBuses();
+        /* create new buses every 15 minutes */
+        if (!(minute % 15) && !second) {
+            scene->AddBuses(minute);
         }
         scene->MoveBuses();
+    }
+
+    if (scene->garage.deletedBus) {
+        scene->seenBus = nullptr;
     }
 }
 
@@ -291,7 +295,7 @@ MainWindow::TimeShiftForward(int hourNow, int minuteNow)
 
         if (currentTime > busTime) {
             minute = currentTime - busTime;
-            minute /= 10;
+            minute /= 15;
 
             for (int j = 0; j < minute; j++) {
                 scene->garage.AddBus(scene->busId++, bus->busNumber_, scene->graphicsScene, iteration);

@@ -36,10 +36,10 @@ Scene::CreateMap()
 }
 
 void
-Scene::AddBuses() {
+Scene::AddBuses(int currentMinute) {
     int iteration = 0;
 
-    if (busId >= 3) {
+    if (busId >= 3 && currentMinute > 0) {
         iteration = garage.allBuses[garage.allBuses.size() - 1]->iteration + 1;
     }
 
@@ -66,14 +66,44 @@ Scene::AddBusOneByOne()
         busNumber = 1;
     }
 
-    Bus *found = garage.GetBus(originalBusId - route);
-    if (found) {
+    Bus *foundBus = garage.GetBus(originalBusId - route);
+    if (foundBus) {
         int minuteNow = Timer::GetMinute();
-        int stopMin = found->stopInformation[0].stopMin;
+        int hourNow = Timer::GetHour();
+        int stopMin = foundBus->stopInformation[0].stopMin;
+        /* add buses with negative iteration */
+        auto foundRoute = garage.routeTime.find(busNumber);
+        /* arrival time at the first bus stop of each bus is hourNow:00 */
+        int busInitialTime = hourNow * 60;
+        int currentTime = busInitialTime + minuteNow;
+        /* number of buses already on the road */
+        int busesOnRoad = 0, newTime;
+        int busIteration = foundBus->iteration;
 
-        if (minuteNow >= stopMin + 10) {
-            minuteNow /= 10;
+        do {
+            busesOnRoad++;
+            newTime = busInitialTime - (busesOnRoad * 15) + foundRoute->second;
+        } while (newTime > currentTime);
+        busesOnRoad--;
+
+        for (int i = 0; i < busesOnRoad; i++) {
+            /* do not create bus with same iteration */
+            if (busIteration < 0 && busIteration == -busesOnRoad + i) {
+                continue;
+            }
+
+            garage.AddBus(busId, busNumber, graphicsScene, -busesOnRoad + i);
+            busId++;
+        }
+
+        if (minuteNow >= stopMin + 15) {
+            minuteNow /= 15;
             for (int i = 0; i < minuteNow; i++) {
+                /* do not create bus with same iteration */
+                if (busIteration > 0 && busIteration == i + 1) {
+                    continue;
+                }
+
                 garage.AddBus(busId, busNumber, graphicsScene, i + 1);
                 busId++;
             }
@@ -461,7 +491,6 @@ Scene::InitTimetableArea(QWidget *parent, int width, int height)
 void
 Scene::ShowRoute(QGraphicsItem *photo)
 {
-    static Bus *seenBus = nullptr;
     Bus *bus;
     QString colors[4] = {"", "#9f92ca", "#f46c6e", "#77bcbd"};
     QString routeColor = "#c0c0c0";
@@ -471,6 +500,7 @@ Scene::ShowRoute(QGraphicsItem *photo)
         if (seenBus && seenBus != bus) {
             BusRouteMap::DrawLine(seenBus->stopInformation, routeColor);
             textArea->clear();
+            seenBus->textArea = nullptr;
         }
 
         if (!bus) {
@@ -479,10 +509,12 @@ Scene::ShowRoute(QGraphicsItem *photo)
         else {
             seenBus = bus;
             bus->CreateTimetable(colors[bus->busNumber_], textArea);
+            bus->textArea = textArea;
         }
     } /* second click on same bus changes route to default color */
     else {
         BusRouteMap::DrawLine(bus->stopInformation, routeColor);
+        bus->textArea = nullptr;
         textArea->clear();
         seenBus = nullptr;
     }

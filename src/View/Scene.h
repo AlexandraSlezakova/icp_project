@@ -56,8 +56,9 @@ public:
 
     /**
      * @brief add buses to scene
+     * @param currentMinute current minute
      */
-    void AddBuses();
+    void AddBuses(int currentMinute = 0);
 
     void CheckRoadBlockBus();
 
@@ -77,6 +78,7 @@ public:
     double zoom_act = 100;          //!< double expression of zoom
     Garage garage;                  //!< all buses
     StreetMap *map;                 //!< map
+    Bus *seenBus = nullptr;         //!< already seen bus in ShowRoute method
     bool roadBlockMode = false;     //!< Mode to add and sub roadblock
 
     int  m_originalX = 0;           //!< x mouse position to move map

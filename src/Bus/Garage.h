@@ -13,7 +13,8 @@ class Garage
 {
 public:
     std::vector<Bus*> allBuses;             //!< bus storage
-
+    std::map<int, int> routeTime;           //!< route length in minutes
+    int deletedBus;
     /**
     * @brief garage constructor
     */
