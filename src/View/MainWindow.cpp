@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 //#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // Cesta Alex  TODO v qt_creator len ui_mainwindow.h
-#include "../../build-src-Desktop-Ladu011bnu00ed/ui_mainwindow.h" // Cesta Martin
+#include "../ui_mainwindow.h" // Cesta Martin
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -86,7 +86,7 @@ MainWindow::timerEvent(QTimerEvent*)
     else {
         /* create new buses every 15 minutes */
         if (!(minute % 15) && !second) {
-            scene->AddBuses(minute);
+            scene->AddBusOneByOne();
         }
         scene->MoveBuses();
     }
@@ -117,7 +117,7 @@ void
 MainWindow::InitTimeArea(QWidget *parent)
 {
     QFont font;
-    font.setPointSize(23);
+    font.setPointSize(20);
     /* text area with time */
     timeArea = new QPlainTextEdit(parent);
     timeArea->setFixedSize(TIME_AREA_WIDTH, TIME_AREA_HEIGHT);

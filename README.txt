@@ -17,10 +17,19 @@ with route number and bus id.
 
 Zoom in and out whole map is possible by `plus` and `minus` buttons under the text area and mouse wheel.
 
- ### Slowdown
-List of streets is in combo box. Right after street selection, use slider located next to combo box
-to change slowdown on selected street.
+### Slowdown
+List of streets is in combo box. Right after street selection, use slider located next to the combo box
+to change slowdown on selected street. Yellow color The yellow color indicates the medium-fast slowdown,
+red color indicates high slowdown.
 
 ### Roadblock
-For roadblock change RoadBlockMode to ON by clicking on button. RoadBlockMode is special mode used for roadblock.
-Selection of new route for bus is needed and can be done by clicking on squares.
+For roadblock change RoadBlockMode to ON by clicking on button. Selection of new route for bus is needed and can be done 
+by clicking on squares.
+When the button changes color to green, you can choose between two options:
+    - close the street between 2 stops
+    - close the bus stop
+color of squares is red.
+After clicking on the bus, already traveled route turns pink and new clicked route has same color. When the new route ends 
+and bus can continue on the normal route, it is necessary to confirm wheather the bus should continue. If option "No" is selected, 
+bus will be deleted at the end of its route.
+The new route is saved after clicking on any bus or turning RoadBlockMode OFF. 

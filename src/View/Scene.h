@@ -58,10 +58,17 @@ public:
      * @brief add buses to scene
      * @param currentMinute current minute
      */
-    void AddBuses(int currentMinute = 0);
+    void AddBuses();
 
-    void CheckRoadBlockBus();
+    /**
+     * @brief add the bus one by one to scene at the beginning of the program execution
+     * according to current time
+     */
+    void AddBusOneByOne();
 
+    /**
+     * @brief show map only with road, roadblock and slowdown
+     */
     void MapClean();
 
     /**
@@ -84,7 +91,7 @@ public:
     int  m_originalX = 0;           //!< x mouse position to move map
     int  m_originalY = 0;           //!< y mouse position to move map
     bool m_moving = false;          //!< moving map with mouse
-    Bus *markedBus = nullptr;
+    Bus *markedBus = nullptr;       //!< a bus that changes route
     int busId = 0;                  //!< bus id
 
 
@@ -145,21 +152,43 @@ private:
     */
     StreetMap::stopData BusStopRoadBlock(StreetMap::stopData stop);
 
+    /**
+    * @brief Get coordinate between 2 stops
+    * @param square clicked square
+    * @param start starting coordinate (return)
+    * @param end ending coordinate (return)
+    * @param startInt x or y starting coordinate
+    * @param endInt x or y ending coordinate
+    * @param xy x or y axis
+    */
     void GetStreetPositionBetweenStops(Square *square, Coordinates::Coordinates_S *start, Coordinates::Coordinates_S *end,
                                        int* startInt, int* endInt, bool* xy);
 
     /**
-     * @brief add the bus one by one to scene at the beginning of the program execution
-     * according to current time
-     */
-    void AddBusOneByOne();
-
+    * @brief Change color on map between two stops
+    * @param first first stop
+    * @param second second stop
+    * @param colour the color to which the path changes
+    */
     void PlottingRouteBetweenStops(const Coordinates::BusStop_S &first, const Coordinates::BusStop_S &second,QString colour) const;
 
+    /**
+    * @brief Pick bus in RoadBlockMode, assign to markedBus
+    * @param bus picked bus
+    */
     void BusPick(Bus *b);
 
+    /**
+    * @brief Service marked bus, clicking bus road
+    * @param square clicked square
+    * @param photo clicked busstop or new bus to pick new markedBus
+    */
     void RoadStopBusService(Square *square, QGraphicsPixmapItem *photo);
 
+    /**
+    * @brief connection to the previous bus journey
+    * @param information stop from which to continue
+    */
     void ContinueBusRoute(Coordinates::BusStop_S &information);
 };
 

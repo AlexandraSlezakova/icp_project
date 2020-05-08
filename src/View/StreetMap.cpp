@@ -89,6 +89,55 @@ StreetMap::GetStreet(const std::string& name)
 }
 
 void
+StreetMap::UpdateAllStreet()
+{
+    std::shared_ptr<Street> street;
+    for (auto &x : Map) {
+        for (auto &y : x) {
+            if (!y.empty()) {
+
+                Square *square;
+                /* change street color according to traffic */
+                if (street->start.x == street->end.x) {
+                    for (int i = street->start.y; i <= street->end.y; i++) {
+                        square = Square::layout[street->start.x][i];
+                        if (y.front()->slowdown < 1.33) {
+                            if (!square->roadBlock)
+                                square->SetColor("#C0C0C0");
+                        }
+                        else if (y.front()->slowdown < 1.66) {
+                            if (!square->roadBlock)
+                                square->SetColor("#FFFF66");
+                        }
+                        else {
+                            if (!square->roadBlock)
+                                square->SetColor("#FF6600");
+                        }
+                    }
+                }
+                else {
+                    for (int i = street->start.x; i <= street->end.x; i++) {
+                        square = Square::layout[i][street->start.y];
+                        if (y.front()->slowdown < 1.33) {
+                            if (!square->roadBlock)
+                                square->SetColor("#C0C0C0");
+                        }
+                        else if (y.front()->slowdown < 1.66) {
+                            if (!square->roadBlock)
+                                square->SetColor("#FFFF66");
+                        }
+                        else {
+                            if (!square->roadBlock)
+                                square->SetColor("#FF6600");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
 StreetMap::UpdateStreet(const std::string& name, float updateSlowdown)
 {
     std::shared_ptr<Street> street;

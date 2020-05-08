@@ -28,7 +28,7 @@ public:
      * @param busNumber number of bus
      * @param scene graphics scene
      */
-    void AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration = 0);
+    void AddBus(int id, int busNumber, QGraphicsScene *scene, int busCount);
 
     /**
      * @brief move all buses on the scene
@@ -36,13 +36,6 @@ public:
      * @param scene graphics scene
      */
     void MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene);
-
-    /**
-    * @brief get bus from bus storage
-    * @param id id of bus
-    * @return bus found bus | nullptr
-    */
-    Bus* GetBus(int id);
 
     /**
      * @brief get bus by photo
@@ -66,6 +59,10 @@ public:
      */
     void DeleteBus(Bus *bus, QGraphicsScene *scene);
 
+    /**
+    * @brief check roadblock on long distance, on all bus road
+    * @param bus bus to check
+    */
     bool CheckRoadBlockLongDistance(Bus *bus);
 
     /**
@@ -74,6 +71,12 @@ public:
      */
     void DeleteBuses(QGraphicsScene *scene);
 private:
+
+    /**
+    * @brief check roadblock on short distance, on first next stop
+    * and route between current and next busstop
+    * @param bus bus to check
+    */
     bool CheckRoadBlockShortDistance(Bus *bus);
 };
 

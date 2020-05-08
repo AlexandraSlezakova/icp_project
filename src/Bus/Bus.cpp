@@ -1,16 +1,14 @@
 #include "Bus.h"
 
-Bus::Bus(int id, int busNumber, int busIteration, int routeLen)
+Bus::Bus(int id, int busNumber, int busIteration)
 {
     id_ = id;
     busNumber_ = busNumber;
     busPosition.x = 0;
     busPosition.y = 0;
-    iteration = busIteration;
-    routeLength = routeLen;
     roadStopOnRoad = false;
     pastStops = 0;
-    LoadTimetable();
+    LoadTimetable(busIteration);
 
 }
 
@@ -25,13 +23,13 @@ Bus::~Bus()
 }
 
 void
-Bus::LoadTimetable()
+Bus::LoadTimetable(int busCount)
 {
     std::ifstream file;
     std::ostringstream ss;
     std::string line, minute;
     std::vector<std::string> tokens;
-    int stopHours, stopMinutes, minutes, id = 0;
+    int stopHours, stopMinutes, id = 0;
     Coordinates::Coordinates_S coordinates;
 
     ss << "../examples/bus-route-map/" << std::to_string(busNumber_) << ".txt";
@@ -41,34 +39,43 @@ Bus::LoadTimetable()
     file.open(path);
     IF(!file.is_open(), std::cerr << "Error: Couldn't open file" << std::endl)
 
+    int minuteNow = Timer::GetMinute();
+    int hourNow = Timer::GetHour();
+
+
+    int timeInMinute = hourNow * 60 + minuteNow;
+    /* time divisible by fifteen */
+    int startTime = timeInMinute - (timeInMinute % 15);
+
+    int newStartTime = 0;
+    bool firstStop = true;
+
+
     /* save bus stop
      * each line has own data with hour [0], minutes [1]
      * and name of bus stops [3] */
     while (std::getline(file, line)) {
         tokens = Functions::Split(line, " ");
 
-        stopHours = std::stoi(tokens[0]) + Timer::GetHour();
+        stopHours = std::stoi(tokens[0]);
         stopMinutes = std::stoi(tokens[1]);
         coordinates = StreetMap::GetStopByName(tokens[2]);
 
-        if (iteration > 0) {
-            stopMinutes += (iteration * 15);
-            if (stopMinutes >= 60) {
-                stopHours++;
-                stopMinutes -= 60;
+        /* newly calculated start time */
+        newStartTime = startTime - (busCount * 15) + stopHours * 60 + stopMinutes;
+
+        if (firstStop) {
+            if (0 <= hourNow && hourNow < 6) {
+                deleteBus = 1;
+                return;
             }
-        }
-        else if (iteration < 0) {
-            /* new time with negative iteration */
-            minutes = (stopHours * 60 + stopMinutes) + (iteration * 15);
-            stopHours = minutes / 60;
-            stopMinutes = minutes - (stopHours * 60);
+            firstStop = false;
         }
 
         Coordinates::BusStop_S information;
         information.coordinates = coordinates;
-        information.stopHour = stopHours;
-        information.stopMin = stopMinutes;
+        information.stopHour = newStartTime / 60;
+        information.stopMin = newStartTime % 60;
         information.name = tokens[2];
         information.id = id;
 
@@ -76,88 +83,12 @@ Bus::LoadTimetable()
         stopInformation.push_back(information);
         id++;
     }
-    std::vector<std::string>().swap(tokens);
-
-    int minuteNow = Timer::GetMinute();
-    int hourNow = Timer::GetHour();
-    int size = stopInformation.size();
-    Coordinates::BusStop_S *info = &stopInformation[size - 1];
-
-    if (minuteNow >= info->stopMin && hourNow == info->stopHour) {
-        if (iteration < 0) {
-            deleteBus = 1;
-        }
-        else {
-            while (minuteNow % 15) {
-                minuteNow++;
-            }
-
-            for (int i = 0; i < size; i++) {
-                info = &stopInformation[i];
-                info->stopMin += minuteNow;
-
-                /* bus with arrival time at the first bus stop hourNow:00 already exists
-                 * if time of current bus has same arrival time, delete bus */
-                if (i == 0 && info->stopMin == 0 && info->stopHour == hourNow) {
-                    deleteBus = 1;
-                    break;
-                }
-
-                if (info->stopMin >= 60) {
-                    info->stopHour++;
-                    info->stopMin -= 60;
-                }
-
-                if ((info->stopMin > minuteNow || info->stopHour > hourNow) && i == 0 && !iteration) {
-                    i = iteration = -1;
-                    minuteNow -= 15;
-                    IF(info->stopHour > hourNow, info->stopHour--)
-                }
-            }
-        }
-    }
-
-    currentBusStop = stopInformation[0];
-    nextBusStop = stopInformation[1];
-
-    /* buses with arrival time at first bus stops greater than midnight are deleted */
-    int midnight = 23 * 60 + 60;
-    stopHours = stopInformation[size - 1].stopHour;
-    IF(stopHours >= 0 && stopHours < 6, stopHours += 24)
-    int firstBusStop = stopHours * 60 + stopInformation[size - 1].stopMin;
-    IF(firstBusStop >= midnight, deleteBus = 1)
-
-    /* save route length in minutes */
-    if (iteration == 0) {
-        Coordinates::BusStop_S lastBusStop = stopInformation[size - 1];
-        routeLength = (lastBusStop.stopHour * 60 + lastBusStop.stopMin)
-                      - (currentBusStop.stopHour * 60 + currentBusStop.stopMin);
-    }
-
-    /* last check if bus arrival time at its first bus stop
-     * is less or equal to current time */
-    if (!deleteBus) {
-        if (currentBusStop.stopMin > minuteNow || currentBusStop.stopHour > hourNow) {
-            deleteBus = 1;
-        }
-    }
-
 
     /* find out where the bus should be according to current time */
     minuteNow = Timer::GetMinute();
     hourNow = Timer::GetHour();
 
-    int nxt, nw, mn, i = 0;
-    int stopInformationSize = (int)stopInformation.size();
-    for (; i < stopInformationSize - 2; i++) {
-        nxt = stopInformation[i+1].stopHour * 60 + stopInformation[i+1].stopMin;
-        nw  = hourNow * 60 + minuteNow;
-        mn = stopInformation[i].stopHour * 60 + stopInformation[i].stopMin;
-
-        if (nxt > nw and nw >= mn)
-            break;
-    }
-    pastStops = i;
+    GetBusStops();
 
     file.close();
 }
@@ -190,6 +121,28 @@ Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
 
     /* draw bus route on map */
     BusRouteMap::DrawLine(stopInformation, color);
+}
+
+void
+Bus::GetBusStops() {
+    /* find out where the bus should be according to current time */
+    int minuteNow = Timer::GetMinute();
+    int hourNow = Timer::GetHour();
+
+    int nxt, nw, mn, i = 0;
+    int stopInformationSize = (int)stopInformation.size();
+    for (; i < stopInformationSize - 2; i++) {
+        nxt = stopInformation[i + 1].stopHour * 60 + stopInformation[i + 1].stopMin;
+        nw  = hourNow * 60 + minuteNow;
+        mn = stopInformation[i].stopHour * 60 + stopInformation[i].stopMin;
+
+        if (nxt > nw and nw >= mn)
+            break;
+    }
+    pastStops = i;
+
+    currentBusStop = stopInformation[i];
+    nextBusStop = stopInformation[i + 1];
 }
 
 void
@@ -269,6 +222,10 @@ Bus::GetCoordinate(int hourNow, int minNow, int secNow, int isC, const Coordinat
     int coordinates;
     /* get number square between current and next stop */
     int countSquare = next.coordinates.x + next.coordinates.y - currentBusStop.coordinates.x - currentBusStop.coordinates.y;
+
+    if (countSquare == 0) {
+        return isC ? busPosition.x : busPosition.y;
+    }
     /* time in sec between current a next stop */
     int timerStop;
 
