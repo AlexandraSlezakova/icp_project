@@ -24,7 +24,8 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
                 if (Square::layout[currentCoordinate.x][y]->hasStop)
                     continue;
 
-                Square::layout[currentCoordinate.x][y]->SetColor(color);
+                if (Square::layout[currentCoordinate.x][y]->GetColor() != "#ff0000")
+                    Square::layout[currentCoordinate.x][y]->SetColor(color);
             }
 
         } /* moving along the y axis */
@@ -41,7 +42,8 @@ BusRouteMap::DrawLine(std::vector<Coordinates::BusStop_S> stopInformation, QStri
                 if (Square::layout[x][currentCoordinate.y]->hasStop)
                     continue;
 
-                Square::layout[x][currentCoordinate.y]->SetColor(color);
+                if (Square::layout[x][currentCoordinate.y]->GetColor() != "#ff0000")
+                    Square::layout[x][currentCoordinate.y]->SetColor(color);
             }
         }
     }

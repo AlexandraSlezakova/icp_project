@@ -72,10 +72,15 @@ public slots:
      */
     void ResetTimer();
 
-
+    /**
+     * @brief checking and changed value if it was changed
+     * @param slowDown new value of slowdown
+     */
     void ChangedSlowDownValue(int slowDown);
 
-
+    /**
+     * @brief  entry to make roadblock and change bus line
+     */
     void RoadBlockSwitcher();
 
     /**
@@ -141,5 +146,6 @@ private:
     int height = 0;                 //!< height of screen
     int stopFlag = 0;               //!< timer is active or inactive
     int nightFlag = 0;              //!< night flag (midnight - 6AM)
+
 };
 #endif // MAINWINDOW_H

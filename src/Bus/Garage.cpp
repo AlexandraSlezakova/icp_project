@@ -3,34 +3,19 @@
 Garage::Garage() = default;
 
 void
-Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int iteration)
+Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int busCount)
 {
-    Bus *bus = new Bus(id, busNumber, iteration);
+    Bus *bus = new Bus(id, busNumber, busCount);
     if (bus->deleteBus) {
         delete bus;
         return;
     }
-    IF(!iteration, routeTime.emplace(busNumber, bus->routeLength))
 
     bus->InitBus(scene,"../images/bus.png",0,0);
     bus->MoveBus();
 
-    if (iteration < 0) {
-        allBuses.insert(allBuses.begin(), bus);
-    } else {
-        allBuses.push_back(bus);
-    }
-}
+    allBuses.push_back(bus);
 
-Bus*
-Garage::GetBus(int id) 
-{
-    for (Bus *bus : allBuses) {
-        if (id == bus->id_)
-            return bus;
-    }
-
-    return nullptr;
 }
 
 Bus*
@@ -51,27 +36,102 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
     for (Bus *bus : allBuses) {
         if (!bus->stopMoving) {
             bus = CheckRoad(streetMap, bus);
-            bus->MoveBus();
+            if (!bus->stopMoving) {
+                bus->MoveBus();
 
-            if (bus->deleteBus) {
-                /* clear text area, if timetable displayed there belongs to the deleted bus */
-                if (bus->textArea) {
-                    bus->textArea->clear();
-                    BusRouteMap::DrawLine(bus->stopInformation, "#c0c0c0");
+                if (bus->deleteBus) {
+                    /* clear text area, if timetable displayed there belongs to the deleted bus */
+                    if (bus->textArea) {
+                        bus->textArea->clear();
+                        BusRouteMap::DrawLine(bus->stopInformation, "#c0c0c0");
+                    }
+                    deletedBus = 1;
+                    DeleteBus(bus, scene);
+                    continue;
                 }
-                deletedBus = 1;
-                DeleteBus(bus, scene);
+            }
+        }
+        else {
+            /* buse line is changed
+             * checking for bus stops on new bus line
+             * adding delay while the bus stood*/
+            if (!CheckRoadBlockShortDistance(bus)) {
+                int hourNow = Timer::GetHour();
+                int minuteNow = Timer::GetMinute();
+
+                int minAdd = 1 + (hourNow * 60 + minuteNow) - bus->stopInformation[bus->pastStops - 1].stopHour * 60
+                        - bus->stopInformation[bus->pastStops - 1].stopMin;
+
+                Coordinates::busStop addStop = bus->currentBusStop;
+
+                bus->stopInformation.insert(bus->stopInformation.begin() + bus->pastStops,addStop);
+
+                unsigned int k = bus->pastStops;
+
+                if (!bus->newStopInformation.empty()) {
+                    k++;
+                }
+
+                /* add delay for all next stops */
+                for (; k < bus->stopInformation.size(); k++) {
+                    if (bus->stopInformation[k].stopMin + minAdd >= 60) {
+                        bus->stopInformation[k].stopHour = hourNow + 1;
+                        bus->stopInformation[k].stopMin = bus->stopInformation[k].stopMin + minAdd - 60;
+                    }
+                    else {
+                        bus->stopInformation[k].stopHour = bus->stopInformation[k - 1].stopHour;
+                        bus->stopInformation[k].stopMin = bus->stopInformation[k].stopMin + minAdd;
+                    }
+                }
+
+                bus->GetBusStops();
+                bus->stopMoving = false;
+                bus->roadStopOnRoad = CheckRoadBlockLongDistance(bus);
+
+                /* show black pic bus */
+                if (!bus->roadStopOnRoad) {
+                    scene->removeItem(bus->busPhoto);
+                    bus->InitBus(scene, "../images/bus.png", bus->busPosition.x * 20, bus->busPosition.y * 20);
+                    bus->BusRotation(bus->busPosition.x, bus->busPosition.y, bus->nextBusStop);
+                    int yShift = 0;
+                    int xShift = 0;
+                    /* moving along the X axis */
+                    if (bus->nextBusStop.coordinates.y == bus->currentBusStop.coordinates.y) {
+                        yShift = -5;
+
+                    } /* moving along the Y axis */
+                    else if (bus->nextBusStop.coordinates.x == bus->currentBusStop.coordinates.x) {
+                        xShift = bus->currentBusStop.coordinates.y < bus->nextBusStop.coordinates.y ? 25 : -5;
+                    }
+
+                    bus->busPhoto->setPos(bus->busPosition.x * SQUARE_SIZE + xShift, bus->busPosition.y * SQUARE_SIZE + yShift);
+                }
             }
         }
         if (bus->roadStopOnRoad) {
+
+            /* warning, bus pis flashing black and red */
             int secNow = Timer::GetSecond();
             const char *imagePath;
 
             scene->removeItem(bus->busPhoto);
             imagePath = !(secNow % 2) ? "../images/bus.png" : "../images/busWarning.png";
 
-            bus->InitBus(scene, imagePath, bus->busPosition.x, bus->busPosition.y);
-            bus->BusRotation(bus->currentBusStop.coordinates.x, bus->currentBusStop.coordinates.y, bus->nextBusStop);
+            bus->InitBus(scene, imagePath, bus->busPosition.x * 20, bus->busPosition.y * 20);
+            bus->BusRotation(bus->busPosition.x, bus->busPosition.y, bus->nextBusStop);
+
+            int yShift = 0;
+            int xShift = 0;
+            /* moving along the X axis */
+            if (bus->nextBusStop.coordinates.y == bus->currentBusStop.coordinates.y) {
+                yShift = -5;
+
+            } /* moving along the Y axis */
+            else if (bus->nextBusStop.coordinates.x == bus->currentBusStop.coordinates.x) {
+                xShift = bus->currentBusStop.coordinates.y < bus->nextBusStop.coordinates.y ? 25 : -5;
+            }
+
+            bus->busPhoto->setPos(bus->busPosition.x * SQUARE_SIZE + xShift, bus->busPosition.y * SQUARE_SIZE + yShift);
         }
     }
 }
@@ -96,7 +156,7 @@ Garage::CheckRoadBlockShortDistance(Bus *bus)
         else {
             /* checking second stop if the stop is closed */
             if (Square::layout[bus->nextBusStop.coordinates.x][bus->nextBusStop.coordinates.y]->roadBlock) {
-                return false;
+                return true;
             }
             else {
                 /* check vertically or horizontally street if it is closed */
@@ -139,28 +199,17 @@ Garage::DeleteBuses(QGraphicsScene *scene)
 bool
 Garage::CheckRoadBlockLongDistance(Bus *bus)
 {
-    int hourNow = Timer::GetHour();
-    int minuteNow = Timer::GetMinute();
-    int i = 0;
-    int nxt, nw, mn;
-
+    int i = bus->pastStops;
     int stopInformationSize = (int)bus->stopInformation.size();
-    for (; i < stopInformationSize - 2; i++) {
-        nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
-        nw  = hourNow * 60 + minuteNow;
-        mn = bus->stopInformation[i].stopHour * 60 + bus->stopInformation[i].stopMin;
 
-        if (nxt > nw and nw >= mn) {
-            i++;
-            break;
-        }
-    }
     /* check next bustop if it is closed and route behind it to the end of bus route
      * example (1. iteration):
      *                     stop             stop
      *  S   R   B   R   R   S   R   R   R   S
      *         bus         |check section|
      * */
+
+
     for (; i < stopInformationSize - 1; i++) {
         if (Square::layout[bus->stopInformation[i].coordinates.x][bus->stopInformation[i].coordinates.y]->roadBlock) {
             /* roadStop on stop */
@@ -217,6 +266,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
     if (bus->stopInformation[i].name.empty())
         return bus;
 
+
     currentSplit = Functions::Split(bus->stopInformation[i].name, "-");
     nextSplit = Functions::Split(bus->stopInformation[i + 1].name, "-");
     /* get name of street where bus is
@@ -230,14 +280,15 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
 
     /* change time in timetable
      * used in street slowdown */
-    if ((bus->stopInformation[i].name != bus->currentBusStop.name and bus->stopInformation[i + 1].name != bus->nextBusStop.name)
+    if ((bus->stopInformation[i].name != bus->currentBusStop.name || bus->stopInformation[i + 1].name != bus->nextBusStop.name)
         or street->previousSlowdown != street->slowdown) {
 
         if (bus->stopInformation[i].name != bus->currentBusStop.name
-            && bus->stopInformation[i + 1].name != bus->nextBusStop.name)
+            || bus->stopInformation[i + 1].name != bus->nextBusStop.name)
         {
             bus->currentBusStop = bus->stopInformation[i];
             bus->nextBusStop = bus->stopInformation[i + 1];
+            bus->pastStops++;
 
             /* if in short distance is something closed and the bus would get into a dead end
              * save actual time and stop moving with bus*/
@@ -247,6 +298,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
                 bus->stopMin = minuteNow;
                 return bus;
             }
+
         }
         else {
              bus->currentBusStop.coordinates.x = bus->busPosition.x;

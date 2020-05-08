@@ -76,6 +76,7 @@ public:
 
     std::vector<std::shared_ptr<Street>> Map[X][Y]{};         //!< map of streets
     static std::vector<stopData> stopList;                    //!< list of stops
+    void UpdateAllStreet();
 };
 
 #endif // STREETMAP_H

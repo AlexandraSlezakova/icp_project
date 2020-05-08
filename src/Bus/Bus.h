@@ -28,19 +28,22 @@ public:
     QPlainTextEdit *textArea = nullptr;
 
     std::vector<Coordinates::BusStop_S> newStopInformation; //!< new bus stop coordinates and time
-    bool roadStopOnRoad;
-    bool stopMoving = false;
-    int stopHour{};                                           //!< hour when the bus is at a stop
-    int stopMin{};                                            //!< minute when the bus is at a stop
+    bool roadStopOnRoad;                                    //!< value if its roadblock on busway
+    bool stopMoving = false;                                //!< for stop moving with bus, because roadblock
+
+    int stopHour;                                           //!< hour when the bus is at a stop
+    int stopMin;                                            //!< minute when the bus is at a stop
+    int pastStops;                                          //!< counter on stops
+
 
     /**
      * @brief bus constructor
      * @param id id of bus
      * @param busNumber number of bus
      * @param position position
-     * @param routeLen route length
+     * @param iteration route length
      */
-    Bus(int id, int busNumber, int busIteration = 0, int routeLen = 0);
+    Bus(int id, int busNumber, int busIteration = 0);
 
     ~Bus();
 
@@ -85,15 +88,16 @@ public:
      */
     void BusRotation(int x, int y, const Coordinates::BusStop_S &next) const;
 
-    int routeLength{};
+    /**
+     * @brief change current and next busstop
+     */
+    void GetBusStops();
+
 private:
     /**
      * @brief load timetable of bus from file and save all information
      */
-    void LoadTimetable();
-
-    //!< bus travel time in minutes
-
+    void LoadTimetable(int busCount);
 };
 
 
