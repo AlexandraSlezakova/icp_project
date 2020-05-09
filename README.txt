@@ -30,6 +30,6 @@ When the button changes color to green, you can choose between two options:
     - close the bus stop
 color of squares is red.
 After clicking on the bus, already traveled route turns pink and new clicked route has same color. When the new route ends 
-and bus can continue on the normal route, it is necessary to confirm wheather the bus should continue. If option "No" is selected, 
+and bus can continue on the normal route, it is necessary to confirm whether the bus should continue. If option "No" is selected,
 bus will be deleted at the end of its route.
 The new route is saved after clicking on any bus or turning RoadBlockMode OFF. 

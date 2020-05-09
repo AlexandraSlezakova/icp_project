@@ -15,7 +15,6 @@ Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int busCount)
     bus->MoveBus();
 
     allBuses.push_back(bus);
-
 }
 
 Bus*
@@ -52,7 +51,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
             }
         }
         else {
-            /* buse line is changed
+            /* bus line is changed
              * checking for bus stops on new bus line
              * adding delay while the bus stood*/
             if (!CheckRoadBlockShortDistance(bus)) {
@@ -80,8 +79,9 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 i++;
                 bus->pastStops = i;
 
+                stopInformationSize = (int)bus->stopInformation.size();
                 /* add delay for all next stops */
-                for (; i < bus->stopInformation.size(); i++) {
+                for (; i < stopInformationSize; i++) {
                     if (bus->stopInformation[i].stopMin + minAdd >= 60) {
                         bus->stopInformation[i].stopHour = hourNow + 1;
                         bus->stopInformation[i].stopMin = bus->stopInformation[i].stopMin + minAdd - 60;

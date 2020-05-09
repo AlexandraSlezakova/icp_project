@@ -1,6 +1,6 @@
 #include "Bus.h"
 
-Bus::Bus(int id, int busNumber, int busIteration)
+Bus::Bus(int id, int busNumber, int busCount)
 {
     id_ = id;
     busNumber_ = busNumber;
@@ -8,8 +8,7 @@ Bus::Bus(int id, int busNumber, int busIteration)
     busPosition.y = 0;
     roadStopOnRoad = false;
     pastStops = 0;
-    LoadTimetable(busIteration);
-
+    LoadTimetable(busCount);
 }
 
 Bus::~Bus()
@@ -41,15 +40,12 @@ Bus::LoadTimetable(int busCount)
 
     int minuteNow = Timer::GetMinute();
     int hourNow = Timer::GetHour();
-
-
     int timeInMinute = hourNow * 60 + minuteNow;
     /* time divisible by fifteen */
     int startTime = timeInMinute - (timeInMinute % 15);
 
     int newStartTime = 0;
     bool firstStop = true;
-
 
     /* save bus stop
      * each line has own data with hour [0], minutes [1]
