@@ -39,11 +39,6 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 bus->MoveBus();
 
                 if (bus->deleteBus) {
-                    /* clear text area, if timetable displayed there belongs to the deleted bus */
-                    if (bus->textArea) {
-                        bus->textArea->clear();
-                        BusRouteMap::DrawLine(bus->stopInformation, "#c0c0c0");
-                    }
                     deletedBus = 1;
                     DeleteBus(bus, scene);
                     continue;
@@ -58,8 +53,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 int hourNow = Timer::GetHour();
                 int minuteNow = Timer::GetMinute();
 
-                int nxt, nw, mn;
-                unsigned int i = 0;
+                int nxt, nw, mn, i = 0;
                 int stopInformationSize = (int)bus->stopInformation.size();
                 for (; i < stopInformationSize - 2; i++) {
                     nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
@@ -181,10 +175,18 @@ Garage::CheckRoadBlockShortDistance(Bus *bus)
 }
 
 void
-Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
+Garage::DeleteBus(Bus *bus, QGraphicsScene *scene, int clearStorage)
 {
-    auto found = std::find(std::begin(allBuses), std::end(allBuses), bus);
-    allBuses.erase(found);
+	if (clearStorage) {
+		auto found = std::find(std::begin(allBuses), std::end(allBuses), bus);
+		allBuses.erase(found);
+
+		/* clear text area, if timetable displayed there belongs to the deleted bus */
+		if (bus->textArea) {
+			bus->textArea->clear();
+			BusRouteMap::DrawLine(bus->stopInformation, "#c0c0c0");
+		}
+	}
     scene->removeItem(bus->busPhoto);
     delete bus;
 }
@@ -192,16 +194,10 @@ Garage::DeleteBus(Bus *bus, QGraphicsScene *scene)
 void
 Garage::DeleteBuses(QGraphicsScene *scene)
 {
-    Coordinates::BusStop_S stopInformation;
-    int busStorageSize = (int)allBuses.size();
-
-    for (int i = 0; i < busStorageSize; i++) {
-        Bus *bus = allBuses[i];
-        stopInformation = bus->stopInformation[0];
-        DeleteBus(bus, scene);
-        busStorageSize--;
-        i--;
+    for (auto bus : allBuses) {
+	    DeleteBus(bus, scene, 0);
     }
+	std::vector<Bus*>().swap(allBuses);
 }
 
 bool

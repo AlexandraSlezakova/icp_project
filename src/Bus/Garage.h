@@ -56,8 +56,9 @@ public:
      * @brief delete bus from bus storage and scene
      * @param bus bus to delete
      * @param scene graphics scene
+     * @param clearStorage delete bus from bus storage
      */
-    void DeleteBus(Bus *bus, QGraphicsScene *scene);
+    void DeleteBus(Bus *bus, QGraphicsScene *scene, int clearStorage = 1);
 
     /**
     * @brief check roadblock on long distance, on all bus road
