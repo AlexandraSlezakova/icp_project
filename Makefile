@@ -6,7 +6,7 @@ FILES = Makefile \
 	src/main.cpp \
 	src/main.h \
 	src/mainwindow.ui \
-	src/src.pro \
+	src/icp.pro \
 	src/ui_mainwindow.h
 	
 DELETE = src/Bus.o \
@@ -41,7 +41,7 @@ doxygen:
 	doxygen doc/Doxyfile
 
 pack:
-	zip xsleza20-xvadur04 Makefile README.txt -r src/Bus/* -r src/View/* $(FILES) -r examples/* -r images/*
+	zip xvadur04-xsleza20 Makefile README.txt -r src/Bus/* -r src/View/* $(FILES) -r examples/* -r images/* doc/Doxyfile
 	
 clean:
 	rm -rf doc/latex/*
