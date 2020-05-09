@@ -270,40 +270,28 @@ MainWindow::ReadInput()
 void
 MainWindow::TimeShiftForward(int hourNow, int minuteNow)
 {
-    IF(hourNow >= 0 && hourNow < 6, return)
-
-    int minute;
-    int allBusesSize = scene->garage.allBuses.size();
-    int iteration;
-    int busTime, currentTime;
-    std::vector<int> seenBus;
-
     Coordinates::BusStop_S stopInformation;
-    Bus *bus;
-    for (int i = allBusesSize - 1; i >= 0; i--) {
-        bus = scene->garage.allBuses[i];
+    int busStorageSize = scene->garage.allBuses.size();
 
-        auto found = std::find(std::begin(seenBus), std::end(seenBus), bus->busNumber_);
-        IF(found != std::end(seenBus), continue;)
+    for (int i = 0; i < busStorageSize; i++) {
+        Bus *bus = scene->garage.allBuses[i];
+        stopInformation = bus->stopInformation[bus->stopInformation.size() - 1];
 
-        seenBus.push_back(bus->busNumber_);
-        stopInformation = bus->stopInformation[0];
-        iteration = bus->iteration + 1;
-
-        busTime = stopInformation.stopHour * 60 + stopInformation.stopMin;
-        currentTime = hourNow * 60 + minuteNow;
-
-        if (currentTime > busTime) {
-            minute = currentTime - busTime;
-            minute /= 15;
-
-            for (int j = 0; j < minute; j++) {
-                scene->garage.AddBus(scene->busId++, bus->busNumber_, scene->graphicsScene, iteration);
-                iteration++;
-            }
+        if (stopInformation.stopMin + stopInformation.stopHour * 60 < hourNow * 60 + minuteNow) {
+            scene->garage.DeleteBus(bus, scene->graphicsScene);
+            busStorageSize--;
+            i--;
         }
     }
-    std::vector<int>().swap(seenBus);
+
+    /* no buses exist, create new ones */
+    if (scene->garage.allBuses.empty()) {
+        scene->busId = 0;
+        scene->AddBuses();
+    }
+    else {
+        scene->AddBusOneByOne();
+    }
 }
 
 void
@@ -316,7 +304,7 @@ MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
         Bus *bus = scene->garage.allBuses[i];
         stopInformation = bus->stopInformation[0];
 
-        if (stopInformation.stopMin > minuteNow || stopInformation.stopHour > hourNow) {
+        if (stopInformation.stopMin + stopInformation.stopHour * 60 > hourNow * 60 + minuteNow) {
             scene->garage.DeleteBus(bus, scene->graphicsScene);
             busStorageSize--;
             i--;
@@ -327,6 +315,9 @@ MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
     if (scene->garage.allBuses.empty()) {
         scene->busId = 0;
         scene->AddBuses();
+    }
+    else {
+        scene->AddBusOneByOne();
     }
 }
 

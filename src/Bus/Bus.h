@@ -40,8 +40,7 @@ public:
      * @brief bus constructor
      * @param id id of bus
      * @param busNumber number of bus
-     * @param position position
-     * @param iteration route length
+     * @param busIteration counting bus same busline
      */
     Bus(int id, int busNumber, int busIteration = 0);
 

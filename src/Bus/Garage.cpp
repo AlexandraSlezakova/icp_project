@@ -59,7 +59,8 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 int hourNow = Timer::GetHour();
                 int minuteNow = Timer::GetMinute();
 
-                int nxt, nw, mn, i = 0;
+                int nxt, nw, mn;
+                unsigned int i = 0;
                 int stopInformationSize = (int)bus->stopInformation.size();
                 for (; i < stopInformationSize - 2; i++) {
                     nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
@@ -117,7 +118,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
         }
         if (bus->roadStopOnRoad) {
 
-            /* warning, bus pis flashing black and red */
+            /* warning, bus photo flashing black and red */
             int secNow = Timer::GetSecond();
             const char *imagePath;
 
@@ -270,7 +271,7 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
             break;
     }
 
-    if (bus->stopInformation[i].name.empty())
+    if (bus->stopInformation.empty())
         return bus;
 
 

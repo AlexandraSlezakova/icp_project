@@ -192,7 +192,8 @@ Bus::MoveBus()
     busPhoto->setPos(x * SQUARE_SIZE + xShift, y * SQUARE_SIZE + yShift);
 }
 
-void Bus::BusRotation(int x, int y, const Coordinates::BusStop_S &next) const {
+void
+Bus::BusRotation(int x, int y, const Coordinates::BusStop_S &next) const {
     int rotation = 0;
     if (next.coordinates.x > x) {
         busPhoto->setTransform(QTransform::fromScale(1, 1));
