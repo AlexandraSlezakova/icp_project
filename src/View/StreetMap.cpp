@@ -97,6 +97,11 @@ StreetMap::UpdateAllStreet()
             if (!y.empty()) {
 
                 Square *square;
+                if (y.front() == nullptr)
+                    continue;
+
+                street = y.front();
+
                 /* change street color according to traffic */
                 if (street->start.x == street->end.x) {
                     for (int i = street->start.y; i <= street->end.y; i++) {
