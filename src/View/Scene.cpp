@@ -221,7 +221,7 @@ void Scene::PlottingRouteBetweenStops(const Coordinates::BusStop_S &first, const
             startInt++;
         }
         for (; startInt < endInt; startInt++) {
-            if (Square::layout[first.coordinates.x][startInt]->GetColor() != "#ff0000")
+            if (Square::layout[startInt][first.coordinates.x]->GetColor() != "#ff0000")
                 Square::layout[startInt][first.coordinates.y]->SetColor(colour);
         }
     }
