@@ -61,7 +61,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
 
                 int nxt, nw, mn;
                 unsigned int i = 0;
-                int stopInformationSize = (int)bus->stopInformation.size();
+                int stopInformationSize = bus->stopInformation.size();
                 for (; i < stopInformationSize - 2; i++) {
                     nxt = bus->stopInformation[i + 1].stopHour * 60 + bus->stopInformation[i + 1].stopMin;
                     nw  = hourNow * 60 + minuteNow;
@@ -78,7 +78,7 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
 
                 bus->stopInformation.insert(bus->stopInformation.begin() + i, addStop);
                 i++;
-                bus->pastStops = i;
+                bus->pastStops = (int)i;
 
                 /* add delay for all next stops */
                 for (; i < bus->stopInformation.size(); i++) {
