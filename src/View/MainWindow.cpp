@@ -325,15 +325,18 @@ MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
 void
 MainWindow::ResetTimer()
 {
-	int previousHour = Timer::GetHour();
-	int previousMinute = Timer::GetMinute();
+	/* timer reset is allowed while the time is being changed */
+	if (!stopFlag) {
+		int previousHour = Timer::GetHour();
+		int previousMinute = Timer::GetMinute();
 
-    Timer::ResetTime();
-    killTimer(timerId);
-    timerInterval = 1000;
-    timerId = startTimer(timerInterval);
-    timerLabel->setText("Timer interval = " + QString::number(100) + "%");
-    CheckTime(previousHour, previousMinute);
+		Timer::ResetTime();
+		killTimer(timerId);
+		timerInterval = 1000;
+		timerId = startTimer(timerInterval);
+		timerLabel->setText("Timer interval = " + QString::number(100) + "%");
+		CheckTime(previousHour, previousMinute);
+	}
 }
 
 void
@@ -364,7 +367,6 @@ MainWindow::RoadBlockSwitcher()
         scene->roadBlockMode = true;
 
         scene->MapClean();
-
     }
     else {
         roadBlockButton->setText("RoadBlockMode OFF");
@@ -385,8 +387,9 @@ MainWindow::TimerPlus()
 {
     /* value of interval cannot be negative integer */
     if (timerInterval > 0) {
-        timerInterval = timerInterval <= 200 ? timerInterval - 25 : timerInterval - 200;
+        timerInterval -= timerInterval <= 200 ? 25 : 200;
     }
+
     killTimer(timerId);
     timerId = startTimer(timerInterval);
     int percentage = (timerInterval * 100) / 1000;
@@ -400,7 +403,7 @@ void
 MainWindow::TimerSub()
 {
     killTimer(timerId);
-    timerInterval += 200;
+    timerInterval += timerInterval < 200 ? 25 : 200;
     timerId = startTimer(timerInterval);
     int percentage = ((timerInterval * 100) / 1000) - 100;
     percentage = 100 - percentage;
