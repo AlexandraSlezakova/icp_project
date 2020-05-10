@@ -11,7 +11,7 @@ Garage::AddBus(int id, int busNumber, QGraphicsScene *scene, int busCount)
         return;
     }
 
-    bus->InitBus(scene,"../images/bus.png",0,0);
+    bus->InitBusPhoto(scene,"../images/bus.png",0,0);
     bus->MoveBus();
 
     allBuses.push_back(bus);
@@ -90,10 +90,10 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
                 bus->stopMoving = false;
                 bus->roadStopOnRoad = CheckRoadBlockLongDistance(bus);
 
-                /* show black pic bus */
+                /* show black photo of the bus */
                  if (!bus->roadStopOnRoad) {
                      scene->removeItem(bus->busPhoto);
-                     bus->InitBus(scene, "../images/bus.png", bus->busPosition.x * 20, bus->busPosition.y * 20);
+                     bus->InitBusPhoto(scene, "../images/bus.png", bus->busPosition.x * 20, bus->busPosition.y * 20);
                      bus->BusRotation(bus->busPosition.x, bus->busPosition.y, bus->nextBusStop);
                      int yShift = 0;
                      int xShift = 0;
@@ -111,15 +111,14 @@ Garage::MoveAllBuses(StreetMap *streetMap, QGraphicsScene *scene)
             }
         }
         if (bus->roadStopOnRoad) {
-
-            /* warning, bus photo flashing black and red */
+            /* bus photo flashing black and red */
             int secNow = Timer::GetSecond();
             const char *imagePath;
 
             scene->removeItem(bus->busPhoto);
             imagePath = !(secNow % 2) ? "../images/bus.png" : "../images/busWarning.png";
 
-            bus->InitBus(scene, imagePath, bus->busPosition.x * 20, bus->busPosition.y * 20);
+            bus->InitBusPhoto(scene, imagePath, bus->busPosition.x * 20, bus->busPosition.y * 20);
             bus->BusRotation(bus->busPosition.x, bus->busPosition.y, bus->nextBusStop);
 
             int yShift = 0;
@@ -378,9 +377,6 @@ Garage::CheckRoad(StreetMap *streetMap, Bus *bus)
         /* current slowdown */
         street->previousSlowdown = street->slowdown;
     }
-
-    std::vector<std::string>().swap(currentSplit);
-    std::vector<std::string>().swap(nextSplit);
 
     return bus;
 }

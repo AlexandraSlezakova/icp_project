@@ -22,7 +22,7 @@ public:
     int deleteBus = 0;                                      //!< flag if bus should be deleted
     std::vector<Coordinates::BusStop_S> stopInformation;    //!< bus stop coordinates and time
     Coordinates::Coordinates_S busPosition;                 //!< position of bus
-    QGraphicsPixmapItem *busPhoto{};                        //!< picture of bus
+    QGraphicsPixmapItem *busPhoto = nullptr;                //!< picture of bus
     Coordinates::BusStop_S nextBusStop, currentBusStop;     //!< current and next bus stop
     QPlainTextEdit *textArea = nullptr;
 
@@ -46,11 +46,11 @@ public:
     ~Bus();
 
     /**
-     * @brief initialize bus
+     * @brief initialize bus photo
      * put image of little bus on scene, set scale and initial position
      * @param scene graphics scene
      */
-    void InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y);
+    void InitBusPhoto(QGraphicsScene *scene, const char *imagePath, int x, int y);
 
     /**
      * @brief get coordinates of bus

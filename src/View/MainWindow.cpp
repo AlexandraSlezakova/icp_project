@@ -1,6 +1,6 @@
 #include "MainWindow.h"
-//#include "../../build-src-Desktop-Debug/ui_mainwindow.h" // Cesta Alex  TODO v qt_creator len ui_mainwindow.h
-#include "../ui_mainwindow.h" // Cesta Martin
+#include "../ui_mainwindow.h"
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -16,6 +16,11 @@ MainWindow::~MainWindow()
         for (auto &y : x) {
             delete y;
         }
+    }
+
+    /* free memory allocated by realpath function */
+    for (char *path : Functions::pathPointers) {
+    	free(path);
     }
 
     delete ui;
@@ -196,7 +201,6 @@ MainWindow::InitButtons(QWidget *parent)
 void
 MainWindow::InitSliders(QWidget *parent)
 {
-
     std::ifstream file;
     std::string line;
     std::vector<std::string> street;
@@ -243,15 +247,7 @@ MainWindow::StopTimer()
         stopFlag = 0;
         timerId = startTimer(1000);
         disconnect(timeArea, SIGNAL(textChanged()), this, SLOT(ReadInput()));
-
-        int hourNow = Timer::GetHour();
-        int minuteNow = Timer::GetMinute();
-        int previousTime = previousHour * 60 + previousMinute;
-        int currentTime = hourNow * 60 + minuteNow;
-
-        currentTime < previousTime
-            ? TimeShiftBackwards(hourNow, minuteNow)
-            : TimeShiftForward(hourNow, minuteNow);
+        CheckTime(previousHour, previousMinute);
     }
 }
 
@@ -297,17 +293,22 @@ MainWindow::TimeShiftForward(int hourNow, int minuteNow)
 void
 MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
 {
-    Coordinates::BusStop_S stopInformation;
+    Coordinates::BusStop_S firstInformation, lastInformation;
     int busStorageSize = scene->garage.allBuses.size();
+    int timeNow = hourNow * 60 + minuteNow;
+    int stopInformationSize;
 
     for (int i = 0; i < busStorageSize; i++) {
         Bus *bus = scene->garage.allBuses[i];
-        stopInformation = bus->stopInformation[0];
+        stopInformationSize = bus->stopInformation.size();
+	    firstInformation = bus->stopInformation[0];
+	    lastInformation = bus->stopInformation[stopInformationSize - 1];
 
-        if (stopInformation.stopMin + stopInformation.stopHour * 60 > hourNow * 60 + minuteNow) {
+        if ((firstInformation.stopMin + firstInformation.stopHour * 60 >= timeNow)
+            || (lastInformation.stopMin + lastInformation.stopHour * 60 <= timeNow)) {
             scene->garage.DeleteBus(bus, scene->graphicsScene);
             busStorageSize--;
-            i--;
+            i = 0;
         }
     }
 
@@ -324,13 +325,29 @@ MainWindow::TimeShiftBackwards(int hourNow, int minuteNow)
 void
 MainWindow::ResetTimer()
 {
+	int previousHour = Timer::GetHour();
+	int previousMinute = Timer::GetMinute();
+
     Timer::ResetTime();
     killTimer(timerId);
     timerInterval = 1000;
     timerId = startTimer(timerInterval);
     timerLabel->setText("Timer interval = " + QString::number(100) + "%");
+    CheckTime(previousHour, previousMinute);
 }
 
+void
+MainWindow::CheckTime(int previousHour, int previousMinute)
+{
+	int hourNow = Timer::GetHour();
+	int minuteNow = Timer::GetMinute();
+	int previousTime = previousHour * 60 + previousMinute;
+	int currentTime = hourNow * 60 + minuteNow;
+
+	currentTime < previousTime
+		? TimeShiftBackwards(hourNow, minuteNow)
+		: TimeShiftForward(hourNow, minuteNow);
+}
 
 void 
 MainWindow::ChangedSlowDownValue(int slowDown) 

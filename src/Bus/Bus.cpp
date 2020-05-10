@@ -13,8 +13,6 @@ Bus::Bus(int id, int busNumber, int busCount)
 
 Bus::~Bus()
 {
-    std::vector<Coordinates::busStop>().swap(stopInformation);
-
     if (busPhoto) {
         delete busPhoto;
         busPhoto = nullptr;
@@ -90,14 +88,14 @@ Bus::LoadTimetable(int busCount)
 }
 
 void
-Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
+Bus::CreateTimetable(QString& color, QPlainTextEdit *plainTextArea)
 {
     std::string minute;
     int hour, min;
     QFont font;
     font.setPointSize(11);
-    textArea->setFont(font);
-    textArea->appendPlainText("Route " + QString::number(busNumber_) + " (id: " + QString::number(id_) + ")");
+	plainTextArea->setFont(font);
+	plainTextArea->appendPlainText("Route " + QString::number(busNumber_) + " (id: " + QString::number(id_) + ")");
 
     for (const Coordinates::BusStop_S& info : stopInformation) {
         /* show bus timetable in text area */
@@ -112,7 +110,7 @@ Bus::CreateTimetable(QString& color, QPlainTextEdit *textArea)
         }
 
         stream << std::to_string(hour) << ":" << minute << " " << info.name;
-        textArea->appendPlainText(QString::fromStdString(stream.str()));
+	    plainTextArea->appendPlainText(QString::fromStdString(stream.str()));
     }
 
     /* draw bus route on map */
@@ -142,9 +140,15 @@ Bus::GetBusStops() {
 }
 
 void
-Bus::InitBus(QGraphicsScene *scene, const char *imagePath, int x, int y)
+Bus::InitBusPhoto(QGraphicsScene *scene, const char *imagePath, int x, int y)
 {
     QString path = QString::fromStdString(Functions::GetAbsolutePath(imagePath));
+
+    if (busPhoto) {
+    	delete busPhoto;
+    	busPhoto = nullptr;
+    }
+
     busPhoto = new QGraphicsPixmapItem(QPixmap(path));
     busPhoto->setToolTip(QString::fromStdString(std::to_string(busNumber_)));
     busPhoto->setScale(0.06);

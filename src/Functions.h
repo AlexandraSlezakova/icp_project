@@ -34,6 +34,8 @@ public:
      * @return absolute path as string
      */
     static std::string GetAbsolutePath(const char* fileName);
+
+    static std::vector<char*> pathPointers;
 };
 
 #endif // FUNCTIONS_H

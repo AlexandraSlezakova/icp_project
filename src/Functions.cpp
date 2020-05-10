@@ -29,10 +29,14 @@ Functions::Split(const std::string& str, const std::string& delimiter)
     return tokens;
 }
 
+std::vector<char*> Functions::pathPointers;
+
 std::string
 Functions::GetAbsolutePath(const char *fileName)
 {
-    std::string path  = realpath(fileName, nullptr);
-    IF (path.empty(), std::cerr << "Error: Couldn't open file " << fileName; exit(1))
-    return path;
+    char *path = realpath(fileName, nullptr);
+    IF (path == nullptr, std::cerr << "Error: Couldn't open file " << fileName; exit(1))
+    pathPointers.push_back(path);
+    std::string string = path;
+    return string;
 }

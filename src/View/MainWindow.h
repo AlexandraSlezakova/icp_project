@@ -130,6 +130,14 @@ private:
      */
     void Run();
 
+    /**
+     * @brief check current and previous time
+     * according to changes delete or add buses
+     * @param previousHour hour before change
+     * @param previousMinute minute before change
+     */
+    void CheckTime(int previousHour, int previousMinute);
+
     QComboBox *combobox;            //!< combobox on pick street to slowdown
     std::string streetUpdate;       //!< street name
     QPushButton *roadBlockButton;   //!< button to add roadblock
