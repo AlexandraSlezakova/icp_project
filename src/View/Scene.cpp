@@ -17,7 +17,6 @@ Scene::~Scene()
     }
     std::vector<StreetMap::stopData>().swap(StreetMap::stopList);
     delete map;
-    delete markedBus;
 }
 
 void
@@ -516,7 +515,8 @@ Scene::RoadStopBusService (Square *square, QGraphicsPixmapItem *photo) {
             Msgbox.exec();
         }
         if (square->GetColor() == "#c0c0c0" || square->GetColor() == "#9f92ca"
-            || square->GetColor() =="#f46c6e"|| square->GetColor() == "#77bcbd") {
+            || square->GetColor() =="#f46c6e" || square->GetColor() == "#77bcbd"
+            || square->GetColor() =="#ff6600" || square->GetColor() == "#ffff66") {
             bool xy;
             int startInt,endInt;
             Coordinates::Coordinates_S start, end;
