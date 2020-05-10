@@ -13,7 +13,7 @@ Bus::Bus(int id, int busNumber, int busCount)
 
 Bus::~Bus()
 {
-    if (busPhoto) {
+    if (busPhoto != nullptr) {
         delete busPhoto;
         busPhoto = nullptr;
     }
