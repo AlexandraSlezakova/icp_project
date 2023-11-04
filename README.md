@@ -1,4 +1,4 @@
-# ICP Project
+# The C++ Programming Language Project
 
 ## Application for displaying public transport lines and simulating their movement
 Authors: Alexandra Slezakova, Martin Vadura
